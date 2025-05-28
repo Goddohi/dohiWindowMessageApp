@@ -1,0 +1,27 @@
+﻿<Window x:Class="dohiMessageApp.UI.FriendManagerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="친구 관리" Height="400" Width="350" WindowStartupLocation="CenterOwner">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- 입력 폼 -->
+        <StackPanel Orientation="Vertical" Grid.Row="0" Margin="0,0,0,10">
+            <TextBox x:Name="NameBox" Text="이름" Margin="0,0,0,5"/>
+            <TextBox x:Name="IpBox" Text="IP 주소" Margin="0,0,0,5"/>
+        </StackPanel>
+
+        <!-- 친구 목록 -->
+        <ListBox x:Name="FriendList" Grid.Row="1" />
+
+        <!-- 버튼 -->
+        <StackPanel Orientation="Horizontal" Grid.Row="2" HorizontalAlignment="Right" Margin="0,10,0,0">
+            <Button Content="추가" Width="60" Margin="0,0,10,0" Click="AddFriend_Click"/>
+            <Button Content="삭제" Width="60" Click="RemoveFriend_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>
