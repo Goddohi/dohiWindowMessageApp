@@ -146,19 +146,18 @@ namespace dohiMessageApp
         #region UI 이벤트
 
 
-        private void InputBox_KeyDown(object sender,KeyEventArgs e)
+        private void InputBox_PreviewKeyDown(object sender,KeyEventArgs e)
         {
             if(e.Key == Key.Enter)
             {
-                if (Keyboard.IsKeyDown(Key.LeftAlt))
+                if ((Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift)
                 {
-                    //한줄추가
-                    InputBox.Text = InputBox.Text + Environment.NewLine;
+                    return; //기본 Enter 동작 안막고 통과
                 }
                 else
                 {
-                    SendTextMessageAsync();
-                    return;
+                    e.Handled = true; // 기본 Enter 동작 막기
+                    SendTextMessageAsync(); // 메시지 전송
                 }
             }
         }
@@ -217,6 +216,10 @@ namespace dohiMessageApp
         }
 
         #endregion UI 이벤트 끝
+
+
+
+
 
 
 
