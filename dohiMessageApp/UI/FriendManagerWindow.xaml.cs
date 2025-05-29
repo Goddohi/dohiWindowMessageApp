@@ -15,6 +15,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using dohiMessageApp;
 
 namespace dohiMessageApp.UI
 {
@@ -29,14 +30,24 @@ namespace dohiMessageApp.UI
         public FriendManagerWindow()
         {
             InitializeComponent();
-            Friends = new List<Friend>(MainWindowData.friends); // 복사본
+            Friends = new List<Friend>(MainData.Friends); // 복사본
             RefreshList();
+            
         }
 
         private void RefreshList()
         {
             FriendList.ItemsSource = null;
             FriendList.ItemsSource = Friends.Select(f => $"{f.Name} ({f.Ip})");
+        }
+
+        
+        private void UpdateFriends_Click(object sender, RoutedEventArgs e)
+        {
+            if (MessageBox.Show($"수정내용을 저장하시겠습니까?", "저장 확인", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+            {
+                MainData.Friends = Friends;
+            }
         }
 
         private void AddFriend_Click(object sender, RoutedEventArgs e)
@@ -91,3 +102,5 @@ namespace dohiMessageApp.UI
         }
     }
 }
+
+

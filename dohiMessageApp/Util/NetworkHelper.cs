@@ -25,6 +25,5 @@ namespace dohiMessageApp.Util
             return string.IsNullOrEmpty(localIp) ? "127.0.0.1" : localIp;
         }
 
-
     }
 }

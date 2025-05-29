@@ -40,6 +40,8 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -60,7 +62,7 @@
     </ApplicationDefinition>
     <Compile Include="Entity\Friend.cs" />
     <Compile Include="Entity\User.cs" />
-    <Compile Include="MainWindow.xmal.Data.cs" />
+    <Compile Include="MainData.cs" />
     <Compile Include="UI\FriendManagerWindow.xaml.cs">
       <DependentUpon>FriendManagerWindow.xaml</DependentUpon>
     </Compile>
@@ -111,6 +113,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Data\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="개발계획도.md" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

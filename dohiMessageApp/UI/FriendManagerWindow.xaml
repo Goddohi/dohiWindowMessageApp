@@ -11,15 +11,31 @@
 
         <!-- 입력 폼 -->
         <StackPanel Orientation="Vertical" Grid.Row="0" Margin="0,0,0,10">
-            <TextBox x:Name="NameBox" Text="이름" Margin="0,0,0,5"/>
-            <TextBox x:Name="IpBox" Text="IP 주소" Margin="0,0,0,5"/>
+            
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="50"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="이름"      Margin="0,0,0,5"/>
+                <TextBox   Grid.Column="1" x:Name="NameBox" Margin="0,0,0,5"/>
+            </Grid>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="50"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="IP 주소" Margin="0,0,0,5"/>
+                    <TextBox   Grid.Column="1" x:Name="IpBox" Margin="0,0,0,5"/>
+            </Grid>
         </StackPanel>
 
         <!-- 친구 목록 -->
-        <ListBox x:Name="FriendList" Grid.Row="1" />
+        <ListBox x:Name="FriendList" Grid.Row="1"  />
 
         <!-- 버튼 -->
         <StackPanel Orientation="Horizontal" Grid.Row="2" HorizontalAlignment="Right" Margin="0,10,0,0">
+            <Button Content="저장" Width="60" Margin="0,0,10,0" Click="UpdateFriends_Click"/>
             <Button Content="추가" Width="60" Margin="0,0,10,0" Click="AddFriend_Click"/>
             <Button Content="삭제" Width="60" Click="RemoveFriend_Click"/>
         </StackPanel>
