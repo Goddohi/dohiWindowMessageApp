@@ -32,7 +32,7 @@ namespace dohiMessageApp.UI
             InitializeComponent();
             Friends = new List<Friend>(MainData.Friends); // 복사본
             RefreshList();
-            
+
         }
 
         private void RefreshList()
@@ -41,7 +41,7 @@ namespace dohiMessageApp.UI
             FriendList.ItemsSource = Friends.Select(f => $"{f.Name} ({f.Ip})");
         }
 
-        
+
         private void UpdateFriends_Click(object sender, RoutedEventArgs e)
         {
             if (MessageBox.Show($"수정내용을 저장하시겠습니까?", "저장 확인", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
@@ -53,8 +53,8 @@ namespace dohiMessageApp.UI
         private void AddFriend_Click(object sender, RoutedEventArgs e)
         {
             string name = NameBox.Text.Trim();
-            string ip = IpBox.Text.Trim();
-            
+            string ip = IpBox1.Text.Trim()+"."+ IpBox2.Text.Trim() + "." + IpBox3.Text.Trim() + "." + IpBox4.Text.Trim();
+
 
             if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(ip))
             {
@@ -78,7 +78,8 @@ namespace dohiMessageApp.UI
             Friends.Add(new Friend { Name = name, Ip = ip, Port = 9000 });
             SaveFriends();
             RefreshList();
-            NameBox.Clear(); IpBox.Clear(); 
+            NameBox.Clear(); 
+            IpBox1.Clear(); IpBox2.Clear(); IpBox3.Clear(); IpBox4.Clear();
         }
 
         private void RemoveFriend_Click(object sender, RoutedEventArgs e)
@@ -99,6 +100,42 @@ namespace dohiMessageApp.UI
         {
             string json = JsonConvert.SerializeObject(Friends, Formatting.Indented);
             File.WriteAllText(filePath, json);
+        }
+
+        private void IpBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            // 숫자가 아니면 입력 차단
+            e.Handled = !e.Text.All(char.IsDigit);
+        }
+
+        private void txtAddBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Tab || e.Key == Key.Enter)
+            {
+                e.Handled = true; // 기본 Tab 동작 막기
+                if (sender is TextBox textBox)
+                {
+                    switch (textBox.Name)
+                    {
+                        case "NameBox":
+                            IpBox1.Focus();
+                            break;
+                        case "IpBox1":
+                            IpBox2.Focus();
+                            break;
+                        case "IpBox2":
+                            IpBox3.Focus();
+                            break;
+                        case "IpBox3":
+                            IpBox4.Focus();
+                            break;
+                        case "IpBox4":
+                            btnAddFriend.Focus();
+                            break;
+                    }
+                    
+                }
+            }
         }
     }
 }

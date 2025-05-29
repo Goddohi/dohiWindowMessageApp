@@ -18,7 +18,7 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0" Text="이름"      Margin="0,0,0,5"/>
-                <TextBox   Grid.Column="1" x:Name="NameBox" Margin="0,0,0,5"/>
+                <TextBox   Grid.Column="1" x:Name="NameBox" Margin="0,0,0,5" KeyDown="txtAddBox_KeyDown"/>
             </Grid>
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -26,7 +26,16 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                     <TextBlock Grid.Column="0" Text="IP 주소" Margin="0,0,0,5"/>
-                    <TextBox   Grid.Column="1" x:Name="IpBox" Margin="0,0,0,5"/>
+                <StackPanel Orientation="Horizontal" Grid.Column="1"  Margin="0,10,0,0">
+                    <TextBox   MinWidth="50" x:Name="IpBox1" Margin="0,0,0,5" MaxLength="3" PreviewTextInput="IpBox_PreviewTextInput" KeyDown="txtAddBox_KeyDown"/>
+                    <TextBlock Text="." Margin="2,0,2,0" />
+                    <TextBox   MinWidth="50" x:Name="IpBox2" Margin="0,0,0,5" MaxLength="3" PreviewTextInput="IpBox_PreviewTextInput" KeyDown="txtAddBox_KeyDown"/>
+                    <TextBlock Text="." Margin="2,0,2,0" />
+                    <TextBox   MinWidth="50" x:Name="IpBox3" Margin="0,0,0,5" MaxLength="3" PreviewTextInput="IpBox_PreviewTextInput" KeyDown="txtAddBox_KeyDown"/>
+                    <TextBlock Text="." Margin="2,0,2,0" />
+                    <TextBox   MinWidth="50" x:Name="IpBox4" Margin="0,0,0,5" MaxLength="3" PreviewTextInput="IpBox_PreviewTextInput" KeyDown="txtAddBox_KeyDown" />
+                </StackPanel>
+               
             </Grid>
         </StackPanel>
 
@@ -36,7 +45,7 @@
         <!-- 버튼 -->
         <StackPanel Orientation="Horizontal" Grid.Row="2" HorizontalAlignment="Right" Margin="0,10,0,0">
             <Button Content="저장" Width="60" Margin="0,0,10,0" Click="UpdateFriends_Click"/>
-            <Button Content="추가" Width="60" Margin="0,0,10,0" Click="AddFriend_Click"/>
+            <Button Content="추가" Width="60" Margin="0,0,10,0"  x:Name="btnAddFriend" Click="AddFriend_Click"/>
             <Button Content="삭제" Width="60" Click="RemoveFriend_Click"/>
         </StackPanel>
     </Grid>
