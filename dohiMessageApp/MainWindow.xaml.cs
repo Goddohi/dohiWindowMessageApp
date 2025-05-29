@@ -24,6 +24,7 @@ using MessageBox = System.Windows.MessageBox;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
 using Application = System.Windows.Application;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
+using System.Reflection;
 
 namespace dohiMessageApp
 {
@@ -47,10 +48,24 @@ namespace dohiMessageApp
 
             trayIcon = new NotifyIcon
             {
-                Icon = SystemIcons.Application,  //new Icon("icon.ico"),
+                Icon = SystemIcons.Application,
                 Visible = true,
                 Text = "도히 메신저"
             };
+            try
+            {
+                string iconPath = "Assets/dohiMessage.ico";
+
+                if (File.Exists(iconPath))
+                {
+                    trayIcon.Icon = new Icon(iconPath);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"트레이 아이콘 설정 실패: {ex.Message}");
+            }
+
 
             trayIcon.DoubleClick += (s, e) =>
             {
@@ -72,7 +87,7 @@ namespace dohiMessageApp
         {
             e.Cancel = true;        // 닫기 방지
             this.Hide();            // 창 숨기기
-            trayIcon.ShowBalloonTip(1000, "도히 메신저", "백그라운드에서 실행 중입니다.", ToolTipIcon.Info);
+            trayIcon.ShowBalloonTip(3000, "도히 메신저", "백그라운드에서 실행 중입니다.", ToolTipIcon.Info);
         }
 
         private void ShowMainWindow()
@@ -109,13 +124,7 @@ namespace dohiMessageApp
                     if (msg.Type == "text")
                     {
                         MessageList.Items.Add($"📩 {msg.Sender}({msg.SenderIp}): {msg.Content}");
-                        // 트레이 알림 띄우기
-                        trayIcon.ShowBalloonTip(
-                            2000,                        // 표시 시간 (ms)
-                            $"📨 {msg.Sender}님이 보냄",   // 제목
-                            msg.Content,                // 내용
-                            ToolTipIcon.Info            // 아이콘 종류 (Info, Warning, Error, None)
-                        );
+                        new ToastWindow($"📨 {msg.Sender}님이 보냄", msg.Content).Show();
                     }
                     else if (msg.Type == "file")
                     {
