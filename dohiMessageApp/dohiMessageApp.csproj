@@ -68,7 +68,7 @@
     <Compile Include="UI\FriendManagerWindow.xaml.cs">
       <DependentUpon>FriendManagerWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\Model\FriendManagerWindowModel.cs" />
+    <Compile Include="UI\ViewModel\FriendManagerWindowViewModel.cs" />
     <Compile Include="Util\MessengerReceiver.cs" />
     <Compile Include="Util\MessengerSender.cs" />
     <Compile Include="Util\NetworkHelper.cs" />

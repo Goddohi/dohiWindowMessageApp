@@ -8,9 +8,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace dohiMessageApp.UI.Model
+namespace dohiMessageApp.UI.ViewModel
 {
-    public class FriendManagerWindowModel : DohiViewModelBase
+    public class FriendManagerWindowViewModel : DohiViewModelBase
     {
         private string _name;
         public string Name

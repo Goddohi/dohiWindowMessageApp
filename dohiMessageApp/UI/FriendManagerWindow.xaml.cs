@@ -16,7 +16,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using dohiMessageApp;
-using dohiMessageApp.UI.Model;
+using dohiMessageApp.UI.ViewModel;
 using System.Collections.ObjectModel;
 
 namespace dohiMessageApp.UI
@@ -26,7 +26,7 @@ namespace dohiMessageApp.UI
     /// </summary>
     public partial class FriendManagerWindow : Window
     {
-        public FriendManagerWindowModel viewModel = new FriendManagerWindowModel();
+        public FriendManagerWindowViewModel viewModel = new FriendManagerWindowViewModel();
         private readonly string filePath = "friends.json";
         
         public FriendManagerWindow()
