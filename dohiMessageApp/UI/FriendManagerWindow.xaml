@@ -1,7 +1,9 @@
 ﻿<Window x:Class="dohiMessageApp.UI.FriendManagerWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:dohiMessageApp.UI.Model"
         Title="친구 관리" Height="400" Width="350" WindowStartupLocation="CenterOwner">
+
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -40,11 +42,21 @@
         </StackPanel>
 
         <!-- 친구 목록 -->
-        <ListBox x:Name="FriendList" Grid.Row="1"  />
+        <ListBox ItemsSource="{Binding Friends , UpdateSourceTrigger=PropertyChanged}" x:Name="FriendList" Grid.Row="1" >
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding Name}" Margin="0,0,5,0"/>
+                        <TextBlock Text="(" />
+                        <TextBlock Text="{Binding Ip}" />
+                        <TextBlock Text=")" />
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
 
         <!-- 버튼 -->
         <StackPanel Orientation="Horizontal" Grid.Row="2" HorizontalAlignment="Right" Margin="0,10,0,0">
-            <Button Content="저장" Width="60" Margin="0,0,10,0" Click="UpdateFriends_Click"/>
             <Button Content="추가" Width="60" Margin="0,0,10,0"  x:Name="btnAddFriend" Click="AddFriend_Click"/>
             <Button Content="삭제" Width="60" Click="RemoveFriend_Click"/>
         </StackPanel>

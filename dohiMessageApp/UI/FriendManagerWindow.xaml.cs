@@ -16,6 +16,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using dohiMessageApp;
+using dohiMessageApp.UI.Model;
+using System.Collections.ObjectModel;
 
 namespace dohiMessageApp.UI
 {
@@ -24,36 +26,47 @@ namespace dohiMessageApp.UI
     /// </summary>
     public partial class FriendManagerWindow : Window
     {
-
+        public FriendManagerWindowModel viewModel = new FriendManagerWindowModel();
         private readonly string filePath = "friends.json";
-        public List<Friend> Friends { get; private set; }
+        
         public FriendManagerWindow()
         {
             InitializeComponent();
-            Friends = new List<Friend>(MainData.Friends); // 복사본
+            this.DataContext = viewModel;
+            viewModel.Friends = new ObservableCollection<Friend>(MainData.Friends); // 복사본
             RefreshList();
 
         }
 
         private void RefreshList()
         {
-            FriendList.ItemsSource = null;
-            FriendList.ItemsSource = Friends.Select(f => $"{f.Name} ({f.Ip})");
+            //FriendList.ItemsSource = null;
+           // FriendList.ItemsSource = Friends.Select(f => $"{f.Name} ({f.Ip})");
         }
 
-
-        private void UpdateFriends_Click(object sender, RoutedEventArgs e)
+        #region 클리어 로직
+        private void AddBoxAllClear()
         {
-            if (MessageBox.Show($"수정내용을 저장하시겠습니까?", "저장 확인", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
-            {
-                MainData.Friends = Friends;
-            }
+            NameBox.Clear();
+            AddBoxIpClear();
         }
+
+        private void AddBoxIpClear()
+        {
+            IpBox1.Clear(); IpBox2.Clear(); IpBox3.Clear(); IpBox4.Clear();
+        }
+
+        #endregion
+
+        private string GetIpFullstring() {
+            return IpBox1.Text.Trim() + "." + IpBox2.Text.Trim() + "." + IpBox3.Text.Trim() + "." + IpBox4.Text.Trim();
+        }
+
 
         private void AddFriend_Click(object sender, RoutedEventArgs e)
         {
             string name = NameBox.Text.Trim();
-            string ip = IpBox1.Text.Trim()+"."+ IpBox2.Text.Trim() + "." + IpBox3.Text.Trim() + "." + IpBox4.Text.Trim();
+            string ip = GetIpFullstring();
 
 
             if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(ip))
@@ -68,18 +81,16 @@ namespace dohiMessageApp.UI
                 return;
             }
 
-
-            if (Friends.Any(f => f.Name == name))
+            if (viewModel.Friends.Any(f => f.Ip == ip))
             {
-                MessageBox.Show("같은 이름의 친구가 이미 존재합니다.");
+                MessageBox.Show("같은 ip가 이미 존재합니다.");
                 return;
             }
 
-            Friends.Add(new Friend { Name = name, Ip = ip, Port = 9000 });
+            viewModel.Friends.Add(new Friend { Name = name, Ip = ip, Port = 9000 });
             SaveFriends();
             RefreshList();
-            NameBox.Clear(); 
-            IpBox1.Clear(); IpBox2.Clear(); IpBox3.Clear(); IpBox4.Clear();
+            AddBoxAllClear();
         }
 
         private void RemoveFriend_Click(object sender, RoutedEventArgs e)
@@ -87,10 +98,10 @@ namespace dohiMessageApp.UI
             int selectedIndex = FriendList.SelectedIndex;
             if (selectedIndex < 0) return;
 
-            var friend = Friends[selectedIndex];
+            var friend = viewModel.Friends[selectedIndex];
             if (MessageBox.Show($"{friend.Name}을 삭제할까요?", "삭제 확인", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
             {
-                Friends.RemoveAt(selectedIndex);
+                viewModel.Friends.RemoveAt(selectedIndex);
                 SaveFriends();
                 RefreshList();
             }
@@ -98,8 +109,9 @@ namespace dohiMessageApp.UI
 
         private void SaveFriends()
         {
-            string json = JsonConvert.SerializeObject(Friends, Formatting.Indented);
+            string json = JsonConvert.SerializeObject(viewModel.Friends, Formatting.Indented);
             File.WriteAllText(filePath, json);
+            MainData.Friends = viewModel.Friends.ToList();
         }
 
         private void IpBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
@@ -137,6 +149,9 @@ namespace dohiMessageApp.UI
                 }
             }
         }
+
+
+
     }
 }
 

@@ -1,5 +1,7 @@
-﻿using System;
+﻿using dohiMessageApp.Core;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -7,11 +9,25 @@ using System.Threading.Tasks;
 namespace dohiMessageApp.Entity
 
 {
-    public class Friend
+    public class Friend : DohiEntityBase
     {
-        public string Name { get; set; }
-        public string Ip { get; set; }
-        public int Port { get; set; }
+        private string _name;
+        public string Name
+        {
+            get => _name;
+            set { _name = value; OnPropertyChanged(nameof(Name)); }
+        }
+
+        private string _ip;
+        public string Ip {
+            get => _ip;
+            set { _ip = value; OnPropertyChanged(nameof(Ip)); }
+        }
+        private int _port;
+        public int Port {
+            get => _port;
+            set { _port = value; OnPropertyChanged(nameof(Port)); }
+        }
 
     }
 }

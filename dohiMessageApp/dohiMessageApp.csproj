@@ -60,12 +60,15 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Core\DohiEntityBase.cs" />
+    <Compile Include="Core\DohiViewModelBase.cs" />
     <Compile Include="Entity\Friend.cs" />
     <Compile Include="Entity\User.cs" />
     <Compile Include="MainData.cs" />
     <Compile Include="UI\FriendManagerWindow.xaml.cs">
       <DependentUpon>FriendManagerWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\Model\FriendManagerWindowModel.cs" />
     <Compile Include="Util\MessengerReceiver.cs" />
     <Compile Include="Util\MessengerSender.cs" />
     <Compile Include="Util\NetworkHelper.cs" />
