@@ -34,15 +34,9 @@ namespace dohiMessageApp.UI
             InitializeComponent();
             this.DataContext = viewModel;
             viewModel.Friends = new ObservableCollection<Friend>(MainData.Friends); // 복사본
-            RefreshList();
 
         }
 
-        private void RefreshList()
-        {
-            //FriendList.ItemsSource = null;
-           // FriendList.ItemsSource = Friends.Select(f => $"{f.Name} ({f.Ip})");
-        }
 
         #region 클리어 로직
         private void AddBoxAllClear()
@@ -89,7 +83,6 @@ namespace dohiMessageApp.UI
 
             viewModel.Friends.Add(new Friend { Name = name, Ip = ip, Port = 9000 });
             SaveFriends();
-            RefreshList();
             AddBoxAllClear();
         }
 
@@ -103,7 +96,6 @@ namespace dohiMessageApp.UI
             {
                 viewModel.Friends.RemoveAt(selectedIndex);
                 SaveFriends();
-                RefreshList();
             }
         }
 
