@@ -1,0 +1,10 @@
+﻿<UserControl x:Class="WalkieDohi.UC.StartChatTabControl"
+              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Height="Auto" Width="Auto">
+    <StackPanel Margin="10">
+        <TextBlock Text="채팅할 친구를 선택하세요:" Margin="0,0,0,5"/>
+        <ComboBox x:Name="FriendComboBox" DisplayMemberPath="Name" Height="30" Margin="0,0,0,5"/>
+        <Button Content="채팅 시작" Height="30" x:Name="StartChatButton"/>
+    </StackPanel>
+</UserControl>

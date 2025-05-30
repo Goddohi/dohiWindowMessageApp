@@ -1,0 +1,19 @@
+﻿<UserControl x:Class="WalkieDohi.UC.ChatTabControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Height="Auto" Width="Auto">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ListBox x:Name="ChatList"  MouseDoubleClick="ChatList_MouseDoubleClick" Grid.Row="0" Margin="5"/>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="5">
+            <TextBox x:Name="InputBox" Width="400" Height="30" Margin="0,0,5,0"/>
+            <Button x:Name="SendButton" Content="전송" Width="80" Height="30"/>
+            <Button Content="파일 전송" Margin="20,0,0,0" Width="100" Height="30" Click="SendFileButton_Click"/>
+        </StackPanel>
+    </Grid>
+</UserControl>
