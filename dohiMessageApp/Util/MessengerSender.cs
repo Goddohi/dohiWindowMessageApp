@@ -5,10 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Net.Sockets;
 using Newtonsoft.Json;
-using dohiMessageApp.Entity;
+using WalkieDohi.Entity;
 
 
-namespace dohiMessageApp.Util
+namespace WalkieDohi.Util
 {
     public class MessengerSender
     {

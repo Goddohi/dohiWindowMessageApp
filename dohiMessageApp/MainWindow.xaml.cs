@@ -1,5 +1,5 @@
-﻿using dohiMessageApp.Entity;
-using dohiMessageApp.Util;
+﻿using WalkieDohi.Entity;
+using WalkieDohi.Util;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -17,7 +17,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Newtonsoft.Json;
-using dohiMessageApp.UI;
+using WalkieDohi.UI;
 using System.Windows.Forms; 
 using System.Drawing;
 using MessageBox = System.Windows.MessageBox;
@@ -26,7 +26,7 @@ using Application = System.Windows.Application;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using System.Reflection;
 
-namespace dohiMessageApp
+namespace WalkieDohi
 {
     /// <summary>
     /// MainWindow.xaml에 대한 상호 작용 논리
@@ -54,7 +54,7 @@ namespace dohiMessageApp
             };
             try
             {
-                string iconPath = "Assets/dohiMessage.ico";
+                string iconPath = "Assets/WalkieDohi.ico";
 
                 if (File.Exists(iconPath))
                 {

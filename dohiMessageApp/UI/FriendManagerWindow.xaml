@@ -1,7 +1,7 @@
-﻿<Window x:Class="dohiMessageApp.UI.FriendManagerWindow"
+﻿<Window x:Class="WalkieDohi.UI.FriendManagerWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:vm="clr-namespace:dohiMessageApp.UI.ViewModel"
+        xmlns:vm="clr-namespace:WalkieDohi.UI.ViewModel"
         Title="친구 관리" Height="400" Width="350" WindowStartupLocation="CenterOwner">
 
     <Grid Margin="10">

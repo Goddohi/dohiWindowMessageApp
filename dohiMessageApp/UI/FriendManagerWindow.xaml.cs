@@ -1,4 +1,4 @@
-﻿using dohiMessageApp.Entity;
+﻿using WalkieDohi.Entity;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -15,11 +15,11 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using dohiMessageApp;
-using dohiMessageApp.UI.ViewModel;
+using WalkieDohi;
+using WalkieDohi.UI.ViewModel;
 using System.Collections.ObjectModel;
 
-namespace dohiMessageApp.UI
+namespace WalkieDohi.UI
 {
     /// <summary>
     /// FriendManagerWindow.xaml에 대한 상호 작용 논리

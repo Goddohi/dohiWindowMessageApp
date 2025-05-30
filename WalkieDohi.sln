@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.35425.106
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.35122.118
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dohiMessageApp", "dohiMessageApp\dohiMessageApp.csproj", "{6911A972-A4B1-4FC6-87B6-806B0A53944B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WalkieDohi", "dohiMessageApp\WalkieDohi.csproj", "{6911A972-A4B1-4FC6-87B6-806B0A53944B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{6911A972-A4B1-4FC6-87B6-806B0A53944B}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>dohiMessageApp</RootNamespace>
-    <AssemblyName>dohiMessageApp</AssemblyName>
+    <RootNamespace>WalkieDohi</RootNamespace>
+    <AssemblyName>WalkieDohi</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -35,7 +35,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Assets\dohiMessage.ico</ApplicationIcon>
+    <ApplicationIcon>Assets\WalkieDohi.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -134,9 +134,10 @@
     <None Include="개발계획도.md" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Assets\dohiMessage.ico">
+    <Content Include="Assets\WalkieDohi.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Resource Include="Assets\WalkieDohi.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -7,9 +7,9 @@ using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using Newtonsoft.Json;
-using dohiMessageApp.Entity;
+using WalkieDohi.Entity;
 
-namespace dohiMessageApp.Util
+namespace WalkieDohi.Util
 {
     public class MessengerReceiver
     {

@@ -1,5 +1,5 @@
-﻿using dohiMessageApp.Core;
-using dohiMessageApp.Entity;
+﻿using WalkieDohi.Core;
+using WalkieDohi.Entity;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace dohiMessageApp.UI.ViewModel
+namespace WalkieDohi.UI.ViewModel
 {
     public class FriendManagerWindowViewModel : DohiViewModelBase
     {

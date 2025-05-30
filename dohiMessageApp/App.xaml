@@ -1,7 +1,7 @@
-﻿<Application x:Class="dohiMessageApp.App"
+﻿<Application x:Class="WalkieDohi.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:dohiMessageApp"
+             xmlns:local="clr-namespace:WalkieDohi"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
          
