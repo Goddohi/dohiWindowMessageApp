@@ -13,6 +13,7 @@ using System.Drawing;
 using Application = System.Windows.Application;
 using MessageBox = System.Windows.MessageBox;
 using WalkieDohi.UI;
+using Orientation = System.Windows.Controls.Orientation;
 
 namespace WalkieDohi
 {
@@ -123,20 +124,64 @@ namespace WalkieDohi
                 await msgSender.SendMessageAsync(ip, port, msgEntity);
             };
 
-            var tab = new TabItem { Header = $"{name}({ip})", Content = chatControl };
+            var headerPanel = new StackPanel
+            {
+                Orientation = Orientation.Horizontal,
+                Tag = key
+            };
+
+            name = MainData.GetFriendNameOrReturnOriginal(name, ip);
+            headerPanel.Children.Add(new TextBlock
+            {
+                Text = $"{name}({ip})",
+                Margin = new Thickness(0, 0, 5, 0),
+                VerticalAlignment = VerticalAlignment.Center
+            });
+
+            var closeBtn = new System.Windows.Controls.Button
+            {
+                Content = "×",
+                Background = System.Windows.Media.Brushes.Transparent,
+                BorderBrush = System.Windows.Media.Brushes.Transparent,
+                Padding = new Thickness(0),
+                Cursor = System.Windows.Input.Cursors.Hand,
+                Foreground = System.Windows.Media.Brushes.Gray,
+                FontWeight = FontWeights.Bold,
+                Width = 16,
+                Height = 16
+            };
+
+            closeBtn.Click += (s, e) =>
+            {
+                var tabToRemove = ChatTabControlHost.Items.Cast<TabItem>()
+                    .FirstOrDefault(t => t.Header is StackPanel panel && panel.Tag?.ToString() == key);
+                if (tabToRemove != null)
+                {
+                    ChatTabControlHost.Items.Remove(tabToRemove);
+                    chatTabs.Remove(key);
+                }
+            };
+
+            headerPanel.Children.Add(closeBtn);
+
+            var tab = new TabItem { Header = headerPanel, Content = chatControl };
             ChatTabControlHost.Items.Add(tab);
             ChatTabControlHost.SelectedItem = tab;
             chatTabs[key] = chatControl;
             return chatControl;
         }
-
+        /*
+         * 
+         */
         private void AddStartTab()
         {
             var startControl = new StartChatTabControl();
             startControl.SetFriends(MainData.Friends);
             startControl.OnStartChat += friend =>
             {
+                MainData.GetFriendNameOrReturnOriginal(friend);
                 AddChatTab(friend.Name, friend.Ip, friend.Port);
+
             };
 
             var tab = new TabItem
@@ -260,9 +305,47 @@ namespace WalkieDohi
                 await msgSender.SendMessageAsync(ip, port, msgEntity);
             };
 
+            var headerPanel = new StackPanel
+            {
+                Orientation = System.Windows.Controls.Orientation.Horizontal,
+                Tag = key
+            };
+
+            headerPanel.Children.Add(new TextBlock
+            {
+                Text = $"{name}({ip})",
+                Margin = new Thickness(0, 0, 5, 0)
+            });
+
+            var closeBtn = new System.Windows.Controls.Button
+            {
+                Content = "×",
+                Background = System.Windows.Media.Brushes.Transparent,
+                BorderBrush = System.Windows.Media.Brushes.Transparent,
+                Padding = new Thickness(0),
+                Cursor = System.Windows.Input.Cursors.Hand,
+                Foreground = System.Windows.Media.Brushes.Gray,
+                FontWeight = FontWeights.Bold,
+                Width = 16,
+                Height = 16
+            };
+
+            closeBtn.Click += (s, e) =>
+            {
+                var tabToRemove = ChatTabControlHost.Items.Cast<TabItem>()
+                    .FirstOrDefault(t => t.Header is StackPanel panel && panel.Tag?.ToString() == key);
+                if (tabToRemove != null)
+                {
+                    ChatTabControlHost.Items.Remove(tabToRemove);
+                    chatTabs.Remove(key);
+                }
+            };
+
+            headerPanel.Children.Add(closeBtn);
+
             var tab = new TabItem
             {
-                Header = $"{name}({ip})",
+                Header = headerPanel,
                 Content = chatControl
             };
 

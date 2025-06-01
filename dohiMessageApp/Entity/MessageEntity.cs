@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WalkieDohi.Core;
 
 namespace WalkieDohi.Entity
 {
-    public class MessageEntity
+    public class MessageEntity : DohiEntityBase
     {
         public string Type { get; set; } // "text" or "file"
         public string Sender { get; set; }
