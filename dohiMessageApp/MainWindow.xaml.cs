@@ -40,7 +40,7 @@ namespace WalkieDohi
             {
                 Icon = SystemIcons.Application,
                 Visible = true,
-                Text = "도히 메신저"
+                Text = "워키도히"
             };
 
             try
@@ -71,7 +71,7 @@ namespace WalkieDohi
 
                     if (msg.Type == "file")
                     {
-                        string folderPath = @"C:\\ReceivedFiles";
+                        string folderPath = @"C:\ReceivedFiles";
                         if (!Directory.Exists(folderPath))
                             Directory.CreateDirectory(folderPath);
 
