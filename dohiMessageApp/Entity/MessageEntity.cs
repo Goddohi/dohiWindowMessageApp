@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,5 +15,23 @@ namespace WalkieDohi.Entity
         public string SenderIp { get; set; }
         public string Content { get; set; } // 메시지 내용 또는 파일 Base64 문자열
         public string FileName { get; set; } // 파일 이름 (파일일 경우)
+
+        private ResultType resultType = ResultType.Success;
+
+        public ResultType ResultType { get { return resultType; } }
+
+        public void ResultSetFail()
+        {
+            resultType = ResultType.Fail;
+        }
+        public void ResultSetSuccess()
+        {
+            resultType = ResultType.Success;
+        }
+
+    }
+    public enum ResultType
+    {
+        Success, Fail
     }
 }

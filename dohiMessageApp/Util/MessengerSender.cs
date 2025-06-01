@@ -32,6 +32,7 @@ namespace WalkieDohi.Util
             }
             catch (Exception ex)
             {
+                message.ResultSetFail();
                 Console.WriteLine($"전송 실패: {ex.Message}");
             }
         }

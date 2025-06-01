@@ -53,14 +53,32 @@ namespace WalkieDohi.UC
                 OnSendMessage?.Invoke(this, text);
                 AddMessage("📤 나", text, messageType.Send);
                 InputBox.Clear();
+
+                Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    InputBox.Focus();
+                }), System.Windows.Threading.DispatcherPriority.Background);
             }
         }
 
         public void AddMessage(string sender, string message, messageType type)
         {
             ChatList.Items.Add($"{sender}: {message}");
-            if (type.Equals(messageType.Receive)){
+
+            if (type == messageType.Receive)
+            {
                 new ToastWindow($"📨 {sender}님이 보냄", message).Show();
+            }
+
+            // 자동 스크롤 처리
+            ScrollViewer scroll = GetScrollViewer(ChatList);
+            if (scroll != null)
+            {
+                bool isAtBottom = scroll.VerticalOffset >= scroll.ScrollableHeight - 10;
+                if (isAtBottom)
+                {
+                    ChatList.ScrollIntoView(ChatList.Items[ChatList.Items.Count - 1]);
+                }
             }
         }
 
@@ -157,7 +175,30 @@ namespace WalkieDohi.UC
                 }
             }
         }
+        private bool IsScrolledToBottom()
+        {
+            var scrollViewer = GetScrollViewer(ChatList);
+            if (scrollViewer == null) return true;
+
+            // 거의 바닥에 있는 경우만 true
+            return scrollViewer.VerticalOffset >= scrollViewer.ScrollableHeight - 10;
+        }
+
+        private ScrollViewer GetScrollViewer(DependencyObject obj)
+        {
+            if (obj is ScrollViewer viewer) return viewer;
+
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(obj); i++)
+            {
+                var child = VisualTreeHelper.GetChild(obj, i);
+                var result = GetScrollViewer(child);
+                if (result != null) return result;
+            }
+            return null;
+        }
+
     }
+
 }
 
 public enum messageType
