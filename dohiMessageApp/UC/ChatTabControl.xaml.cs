@@ -38,11 +38,6 @@ namespace WalkieDohi.UC
         {
             InitializeComponent();
             SendButton.Click += (s, e) => Send();
-            InputBox.KeyDown += (s, e) =>
-            {
-                if (e.Key == Key.Enter && !string.IsNullOrWhiteSpace(InputBox.Text))
-                    Send();
-            };
         }
 
         private void Send()
@@ -130,14 +125,7 @@ namespace WalkieDohi.UC
                     byte[] fileData = File.ReadAllBytes(filePath);
                     string base64 = Convert.ToBase64String(fileData);
 
-                    var fileMessage = new MessageEntity
-                    {
-                        Type = "file",
-                        Sender = MainData.currentUser.Nickname,
-                        SenderIp = NetworkHelper.GetLocalIPv4(),
-                        Content = base64,
-                        FileName = System.IO.Path.GetFileName(filePath)
-                    };
+                    var fileMessage = MessageEntity.OfSendFileMassage(base64, System.IO.Path.GetFileName(filePath));
 
                     OnSendFile?.Invoke(this, (fileMessage.FileName, base64));
                     AddMessage("📤 나 → 파일 전송", fileMessage.FileName, messageType.Send);
@@ -197,12 +185,28 @@ namespace WalkieDohi.UC
             return null;
         }
 
+        private void InputBox_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                if ((Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift)
+                {
+                    return; //기본 Enter 동작 안막고 통과
+                }
+                else
+                {
+                    e.Handled = true; // 기본 Enter 동작 막기
+                    Send(); // 메시지 전송
+                }
+            }
+        }
+
+
     }
 
-}
-
-public enum messageType
-{
-    Send,
-    Receive
+    public enum messageType
+    {
+        Send,
+        Receive
+    }
 }

@@ -69,7 +69,7 @@ namespace WalkieDohi
                 {
                     var tab = AddOrFocusChatTab(msg.Sender, msg.SenderIp, 9000);
 
-                    if (msg.Type == "file")
+                    if (msg.CheckMessageTypeFile())
                     {
                         string folderPath = @"C:\ReceivedFiles";
                         if (!Directory.Exists(folderPath))
@@ -101,26 +101,13 @@ namespace WalkieDohi
             var chatControl = new ChatTabControl { TargetIp = ip, TargetPort = port };
             chatControl.OnSendMessage += async (s, messageText) =>
             {
-                var msg = new MessageEntity
-                {
-                    Type = "text",
-                    Sender = MainData.currentUser.Nickname,
-                    SenderIp = NetworkHelper.GetLocalIPv4(),
-                    Content = messageText
-                };
+                var msg = MessageEntity.OfSendTextMassage(messageText);
                 await msgSender.SendMessageAsync(ip, port, msg);
             };
 
             chatControl.OnSendFile += async (s, fileInfo) =>
             {
-                var msgEntity = new MessageEntity
-                {
-                    Type = "file",
-                    Sender = MainData.currentUser.Nickname,
-                    SenderIp = NetworkHelper.GetLocalIPv4(),
-                    Content = fileInfo.Base64Content,
-                    FileName = fileInfo.FileName
-                };
+                var msgEntity = MessageEntity.OfSendFileMassage(fileInfo.Base64Content, fileInfo.FileName);
                 await msgSender.SendMessageAsync(ip, port, msgEntity);
             };
 
@@ -295,13 +282,7 @@ namespace WalkieDohi
 
             chatControl.OnSendMessage += async (s, messageText) =>
             {
-                var msgEntity = new MessageEntity
-                {
-                    Type = "text",
-                    Sender = MainData.currentUser.Nickname,
-                    SenderIp = NetworkHelper.GetLocalIPv4(),
-                    Content = messageText
-                };
+                var msgEntity = MessageEntity.OfSendTextMassage(messageText);
                 await msgSender.SendMessageAsync(ip, port, msgEntity);
             };
 
