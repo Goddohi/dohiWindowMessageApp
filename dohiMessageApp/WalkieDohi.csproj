@@ -81,7 +81,7 @@
     <Compile Include="Core\DohiEntityBase.cs" />
     <Compile Include="Core\DohiViewModelBase.cs" />
     <Compile Include="Core\TabBasicinterface.cs" />
-    <Compile Include="UI\FriendSelectWindow.xaml.cs">
+    <Compile Include="UI\GroupManger\FriendSelectWindow.xaml.cs">
       <DependentUpon>FriendSelectWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\GroupManger\GroupMemberDisplay.cs" />
@@ -98,10 +98,10 @@
     <Compile Include="UI\GroupManger\GroupManagerWindow.xaml.cs">
       <DependentUpon>GroupManagerWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\FriendManagerWindow.xaml.cs">
+    <Compile Include="UI\FriendManger\FriendManagerWindow.xaml.cs">
       <DependentUpon>FriendManagerWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\InputDialog.xaml.cs">
+    <Compile Include="UI\GroupManger\InputDialog.xaml.cs">
       <DependentUpon>InputDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\ToastWindow.xaml.cs">
@@ -137,7 +137,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\FriendSelectWindow.xaml">
+    <Page Include="UI\GroupManger\FriendSelectWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -145,11 +145,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UI\FriendManagerWindow.xaml">
+    <Page Include="UI\FriendManger\FriendManagerWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\InputDialog.xaml">
+    <Page Include="UI\GroupManger\InputDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
