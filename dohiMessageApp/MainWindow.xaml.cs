@@ -71,18 +71,15 @@ namespace WalkieDohi
 
                     if (msg.CheckMessageTypeFile())
                     {
-                        string folderPath = @"C:\ReceivedFiles";
-                        if (!Directory.Exists(folderPath))
-                            Directory.CreateDirectory(folderPath);
+                        MessageUtil.CheckFileDrietory();
 
-                        string fullPath = System.IO.Path.Combine(folderPath, msg.FileName);
-                        File.WriteAllBytes(fullPath, Convert.FromBase64String(msg.Content));
+                        File.WriteAllBytes(MessageUtil.GetFilePath(msg.FileName), Convert.FromBase64String(msg.Content));
 
-                        tab.AddReceivedFile(msg.Sender, msg.FileName, fullPath);
+                        tab.AddReceivedFile(msg);
                     }
                     else
                     {
-                        tab.AddMessage(msg.Sender, msg.Content, messageType.Receive);
+                        tab.AddReceivedMessage(msg);
                     }
                 });
             };

@@ -9,15 +9,19 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
+using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 using WalkieDohi.Entity;
 using WalkieDohi.UI;
 using WalkieDohi.Util;
+using MessageBox = System.Windows.MessageBox;
+using UserControl = System.Windows.Controls.UserControl;
 
 namespace WalkieDohi.UC
 {
@@ -33,6 +37,7 @@ namespace WalkieDohi.UC
 
         public event EventHandler<(string FileName, string Base64Content)> OnSendFile;
 
+        private Dictionary<string, string> receivedFiles = new Dictionary<string, string>();
 
         public ChatTabControl()
         {
@@ -40,54 +45,144 @@ namespace WalkieDohi.UC
             SendButton.Click += (s, e) => Send();
         }
 
-        private void Send()
-        {
-            var text = InputBox.Text.Trim();
-            if (!string.IsNullOrEmpty(text))
-            {
-                OnSendMessage?.Invoke(this, text);
-                AddMessage("📤 나", text, messageType.Send);
-                InputBox.Clear();
 
-                Dispatcher.BeginInvoke(new Action(() =>
-                {
-                    InputBox.Focus();
-                }), System.Windows.Threading.DispatcherPriority.Background);
-            }
-        }
-
-        public void AddMessage(string sender, string message, messageType type)
-        {
-            ChatList.Items.Add($"{sender}: {message}");
-
-            if (type == messageType.Receive)
-            {
-                new ToastWindow($"📨 {sender}님이 보냄", message).Show();
-            }
-
-            // 자동 스크롤 처리
-            ScrollViewer scroll = GetScrollViewer(ChatList);
-            if (scroll != null)
-            {
-                bool isAtBottom = scroll.VerticalOffset >= scroll.ScrollableHeight - 10;
-                if (isAtBottom)
-                {
-                    ChatList.ScrollIntoView(ChatList.Items[ChatList.Items.Count - 1]);
-                }
-            }
-        }
+        #region UI 이벤트
 
         private void SendFileButton_Click(object sender, RoutedEventArgs e)
         {
             SendFileMessageAsync();
         }
 
+        private void InputBox_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key != Key.Enter)
+            {
+                return;
+            }
+
+            if ((Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift)
+            {//쉬프트+엔터
+                return;
+            }
+
+            e.Handled = true; // 기본 Enter 동작 막기
+            Send(); // 메시지 전송
+
+
+        }
+
+
+        private void ChatList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (ChatList.SelectedItem is string selected && receivedFiles.TryGetValue(selected, out string path))
+            {
+                if (File.Exists(path))
+                {
+                    System.Diagnostics.Process.Start("explorer.exe", $"/select,\"{path}\"");
+                }
+                else
+                {
+                    MessageBox.Show("파일이 존재하지 않습니다.", "오류", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
+        #endregion
+
+
+
+
+
+
+        /// <summary>
+        /// 메세지 보내는 로직
+        /// </summary>
+        private void Send()
+        {
+            var text = InputBox.Text.Trim();
+            if (!string.IsNullOrEmpty(text))
+            {
+                OnSendMessage?.Invoke(this, text);
+                var display = GetMsgDisplay("", text, MessageType.Text, MessageDirection.Send);
+                AddMessage(display, MessageDirection.Send);
+                InputBox.Clear();
+
+                Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    InputBox.Focus();
+                }), DispatcherPriority.Background);
+            }
+        }
+
+
+        public void AddMessage(string display, MessageDirection type)
+        {
+            ChatList.Items.Add(display);
+
+            // 스크롤 처리
+            Dispatcher.BeginInvoke(
+                new Action(() =>
+                {
+                    // 실행할 UI 작업
+                    ChatList.ScrollIntoView(ChatList.Items[ChatList.Items.Count - 1]);
+                }),
+                DispatcherPriority.Normal
+                );
+        }
+
+        public void AddReceivedMessage(MessageEntity msg)
+        {
+            string display = GetMsgDisplay(msg, MessageDirection.Receive);
+            AddMessage(display, MessageDirection.Receive);
+        }
+
+        public void AddReceivedFile(MessageEntity msg)
+        {
+            string display = GetMsgDisplay(msg, MessageDirection.Receive);
+            AddMessage(display, MessageDirection.Receive);
+            receivedFiles[display] = MessageUtil.GetFilePath(msg.FileName);
+        }
+
+        /// <summary>
+        /// 해당메서드는 Display메세지를 반환하면서 받은 메세지의 경우 알림을 설정해줍니다.
+        /// </summary>
+        /// <param name="msg"></param>
+        /// <param name="Direction"></param>
+        /// <returns></returns>
+        public string GetMsgDisplay(MessageEntity msg, MessageDirection Direction)
+        {
+            if (msg == null) return "메세지 없음(에러)";
+            if (msg.Type == MessageType.Text) return GetMsgDisplay(msg.Sender, msg.Content, msg.Type, Direction);
+
+            if (msg.Type == MessageType.File) return GetMsgDisplay(msg.Sender,msg.FileName,msg.Type,Direction);
+
+            return "메세지 없음(잘못된 타입)";
+        }
+        public string GetMsgDisplay(string Sender,string Content,MessageType messageType, MessageDirection Direction)
+        {
+            if (Direction == MessageDirection.Send)
+            {
+                if(messageType == MessageType.Text) return $"📤 나 : {Content}";
+
+                if (messageType == MessageType.File) return $"📤 나(파일 전송) : {Content}";
+
+            }
+            if (Direction == MessageDirection.Receive)
+            {
+                new ToastWindow($"📨 {Sender}님이 보냄", Content).Show();
+
+                if (messageType == MessageType.Text) return $"{Sender}: {Content}";
+
+                if (messageType == MessageType.File) return $"📥{Sender}(파일 받음): {Content}";
+            }
+            return "메세지 없음(잘못된 타입)";
+        }
+        
 
         private string getOpenFilePath()
         {
             try
             {
-                var dialog = new OpenFileDialog();
+                var dialog = new Microsoft.Win32.OpenFileDialog();
                 dialog.Title = "보낼 파일 선택";
                 dialog.Filter = "모든 파일 (*.*)|*.*";
                 if (dialog.ShowDialog() == true)
@@ -97,7 +192,7 @@ namespace WalkieDohi.UC
             }
             catch (Exception ex)
             {
-                MessageBox.Show("파일 오픈 실패: " + ex.Message);
+                System.Windows.MessageBox.Show("파일 오픈 실패: " + ex.Message);
             }
             return "";
 
@@ -128,7 +223,9 @@ namespace WalkieDohi.UC
                     var fileMessage = MessageEntity.OfSendFileMassage(base64, System.IO.Path.GetFileName(filePath));
 
                     OnSendFile?.Invoke(this, (fileMessage.FileName, base64));
-                    AddMessage("📤 나 → 파일 전송", fileMessage.FileName, messageType.Send);
+
+                    var display = GetMsgDisplay("", fileMessage.FileName,MessageType.File, MessageDirection.Send);
+                    AddMessage(display, MessageDirection.Send);
                 }
                 catch (Exception ex)
                 {
@@ -139,37 +236,14 @@ namespace WalkieDohi.UC
         }
 
 
-        public void AddReceivedFile(string sender, string fileName, string fullPath)
-        {
-            string display = $"📥 {sender} 파일 받음: {fileName}";
-            new ToastWindow($"📨 {sender}님이 보냄", fileName).Show();
-            ChatList.Items.Add(display);
-            receivedFiles[display] = fullPath;
-        }
 
-        private Dictionary<string, string> receivedFiles = new Dictionary<string, string>();
 
-        private void ChatList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            if (ChatList.SelectedItem is string selected && receivedFiles.TryGetValue(selected, out string path))
-            {
-                if (File.Exists(path))
-                {
-                    System.Diagnostics.Process.Start("explorer.exe", $"/select,\"{path}\"");
-                }
-                else
-                {
-                    MessageBox.Show("파일이 존재하지 않습니다.", "오류", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
-            }
-        }
-        private bool IsScrolledToBottom()
-        {
-            var scrollViewer = GetScrollViewer(ChatList);
-            if (scrollViewer == null) return true;
 
-            // 거의 바닥에 있는 경우만 true
-            return scrollViewer.VerticalOffset >= scrollViewer.ScrollableHeight - 10;
+
+        private bool IsScrolledToBottom(ScrollViewer scroll)
+        {
+            // ScrollableHeight와 VerticalOffset의 차이가 작으면 맨 아래로 판단
+            return scroll.VerticalOffset >= scroll.ScrollableHeight ;
         }
 
         private ScrollViewer GetScrollViewer(DependencyObject obj)
@@ -185,26 +259,14 @@ namespace WalkieDohi.UC
             return null;
         }
 
-        private void InputBox_PreviewKeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Enter)
-            {
-                if ((Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift)
-                {
-                    return; //기본 Enter 동작 안막고 통과
-                }
-                else
-                {
-                    e.Handled = true; // 기본 Enter 동작 막기
-                    Send(); // 메시지 전송
-                }
-            }
-        }
+
+
+
 
 
     }
 
-    public enum messageType
+    public enum MessageDirection
     {
         Send,
         Receive
