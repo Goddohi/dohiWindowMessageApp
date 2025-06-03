@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using WalkieDohi.Core;
 using WalkieDohi.Util;
@@ -13,6 +14,8 @@ namespace WalkieDohi.Entity
     {
         public MessageType Type { get; set; } // "text" or "file"
         public string Sender { get; set; }
+        public GroupEntity Group { get; set; }
+
         public string SenderIp { get; set; }
         public string Content { get; set; } // 메시지 내용 또는 파일 Base64 문자열
         public string FileName { get; set; } // 파일 이름 (파일일 경우)
@@ -68,6 +71,54 @@ namespace WalkieDohi.Entity
         }
 
 
+        public static MessageEntity OfGroupTextMassage(GroupEntity group, string sender, string senderIp, string content)
+        {
+            return new MessageEntity
+            {
+                Type = MessageType.Text,
+                Group = group,
+                Sender = sender,
+                SenderIp = senderIp,
+                Content = content
+            };
+        }
+        public static MessageEntity OfGroupSendTextMassage(GroupEntity group, string content)
+        {
+            return new MessageEntity
+            {
+                Type = MessageType.Text,
+                Group = group,
+                Sender = MainData.currentUser.Nickname,
+                SenderIp = NetworkHelper.GetLocalIPv4(),
+                Content = content
+            };
+        }
+        public static MessageEntity OfGroupFileMassage(GroupEntity group, string sender, string senderIp, string content, string fileName)
+        {
+            return new MessageEntity
+            {
+                Type = MessageType.File,
+                Group = group,
+                Sender = sender,
+                SenderIp = senderIp,
+                Content = content,
+                FileName = fileName
+            };
+        }
+        public static MessageEntity OfGroupSendFileMassage(GroupEntity group,string content, string fileName)
+        {
+            return new MessageEntity
+            {
+                Type = MessageType.File,
+                Group = group,
+                Sender = MainData.currentUser.Nickname,
+                SenderIp = NetworkHelper.GetLocalIPv4(),
+                Content = content,
+                FileName = fileName
+            };
+        }
+
+
         public void ResultSetFail()
         {
             resultType = ResultType.Fail;
@@ -87,6 +138,14 @@ namespace WalkieDohi.Entity
             return this.Type == MessageType.Text;
         }
     }
+
+
+
+
+
+
+
+
 
 
     public enum MessageType

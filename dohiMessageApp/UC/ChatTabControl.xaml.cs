@@ -151,9 +151,9 @@ namespace WalkieDohi.UC
         public string GetMsgDisplay(MessageEntity msg, MessageDirection Direction)
         {
             if (msg == null) return "메세지 없음(에러)";
-            if (msg.Type == MessageType.Text) return GetMsgDisplay(msg.Sender, msg.Content, msg.Type, Direction);
+            if (msg.CheckMessageTypeText()) return GetMsgDisplay(msg.Sender, msg.Content, msg.Type, Direction);
 
-            if (msg.Type == MessageType.File) return GetMsgDisplay(msg.Sender,msg.FileName,msg.Type,Direction);
+            if (msg.CheckMessageTypeFile()) return GetMsgDisplay(msg.Sender,msg.FileName,msg.Type,Direction);
 
             return "메세지 없음(잘못된 타입)";
         }

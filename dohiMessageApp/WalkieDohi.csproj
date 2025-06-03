@@ -81,6 +81,7 @@
     <Compile Include="Core\DohiEntityBase.cs" />
     <Compile Include="Core\DohiViewModelBase.cs" />
     <Compile Include="Entity\Friend.cs" />
+    <Compile Include="Entity\GroupEntity.cs" />
     <Compile Include="Entity\User.cs" />
     <Compile Include="MainData.cs" />
     <Compile Include="UC\StartChatTabControl.xaml.cs">

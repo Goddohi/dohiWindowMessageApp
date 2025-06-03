@@ -67,7 +67,9 @@ namespace WalkieDohi
             {
                 await Dispatcher.InvokeAsync(async () =>
                 {
-                    var tab = AddOrFocusChatTab(msg.Sender, msg.SenderIp, 9000);
+                    //상대방의 이름이 ip기준으로 내가 저장한 이름으로 출력되도록 수정 
+                    msg.Sender = MainData.GetFriendNameOrReturnOriginal(msg.Sender, msg.SenderIp);
+                    var tab = AddOrFocusChatTab(msg, 9000);
 
                     if (msg.CheckMessageTypeFile())
                     {
@@ -86,26 +88,26 @@ namespace WalkieDohi
             msgReceiver.Start();
         }
 
-        private ChatTabControl AddOrFocusChatTab(string name, string ip, int port)
+        private ChatTabControl AddOrFocusChatTab(MessageEntity msg, int port)
         {
-            string key = ip;
+            string key = msg.SenderIp;
 
             if (chatTabs.ContainsKey(key))
             {
                 return chatTabs[key];
             }
 
-            var chatControl = new ChatTabControl { TargetIp = ip, TargetPort = port };
+            var chatControl = new ChatTabControl { TargetIp = msg.SenderIp, TargetPort = port };
             chatControl.OnSendMessage += async (s, messageText) =>
             {
-                var msg = MessageEntity.OfSendTextMassage(messageText);
-                await msgSender.SendMessageAsync(ip, port, msg);
+                var msgText = MessageEntity.OfSendTextMassage(messageText);
+                await msgSender.SendMessageAsync(msg.SenderIp, port, msgText);
             };
 
             chatControl.OnSendFile += async (s, fileInfo) =>
             {
                 var msgEntity = MessageEntity.OfSendFileMassage(fileInfo.Base64Content, fileInfo.FileName);
-                await msgSender.SendMessageAsync(ip, port, msgEntity);
+                await msgSender.SendMessageAsync(msg.SenderIp, port, msgEntity);
             };
 
             var headerPanel = new StackPanel
@@ -114,10 +116,11 @@ namespace WalkieDohi
                 Tag = key
             };
 
-            name = MainData.GetFriendNameOrReturnOriginal(name, ip);
+            //그전에 처리하긴 하지만 그래도 혹시나하여 안빼고 처리 
+            msg.Sender = MainData.GetFriendNameOrReturnOriginal(msg.Sender, msg.SenderIp);
             headerPanel.Children.Add(new TextBlock
             {
-                Text = $"{name}({ip})",
+                Text = $"{msg.Sender}({msg.SenderIp})",
                 Margin = new Thickness(0, 0, 5, 0),
                 VerticalAlignment = VerticalAlignment.Center
             });
