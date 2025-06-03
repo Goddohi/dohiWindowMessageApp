@@ -17,6 +17,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using WalkieDohi.Core;
 using WalkieDohi.Entity;
 using WalkieDohi.UI;
 using WalkieDohi.Util;
@@ -28,7 +29,7 @@ namespace WalkieDohi.UC
     /// <summary>
     /// ChatTabControl.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class ChatTabControl : UserControl
+    public partial class ChatTabControl : UserControl, TabBasicinterface
     {
         public string TargetIp { get; set; }
         public int TargetPort { get; set; }

@@ -15,6 +15,7 @@ using MessageBox = System.Windows.MessageBox;
 using WalkieDohi.UI;
 using Orientation = System.Windows.Controls.Orientation;
 using System.Security.Cryptography;
+using WalkieDohi.Core;
 
 namespace WalkieDohi
 {
@@ -24,6 +25,8 @@ namespace WalkieDohi
         private MessengerReceiver msgReceiver;
         private MessengerSender msgSender = new MessengerSender();
         private Dictionary<string, ChatTabControl> chatTabs = new Dictionary<string, ChatTabControl>();
+        private Dictionary<string, GroupChatTabControl> GroupchatTabs = new Dictionary<string, GroupChatTabControl>();
+        private StartChatTabControl _startTabControl; // 추가
 
         public MainWindow()
         {
@@ -90,22 +93,22 @@ namespace WalkieDohi
             msgReceiver.Start();
         }
 
-        /*
-         * 
-         */
+       /// <summary>
+       /// 시작 탭
+       /// </summary>
         private void AddStartTab()
         {
-            var startControl = new StartChatTabControl();
-            startControl.SetFriends(MainData.Friends);
-            startControl.OnStartChat += friend =>
+            _startTabControl = new StartChatTabControl();
+            _startTabControl.SetFriends(MainData.Friends);
+            _startTabControl.OnStartChat += friend =>
             {
                 MainData.GetFriendNameOrReturnOriginal(friend);
                 AddChatTab(friend.Name, friend.Ip, friend.Port);
 
             };
 
-            startControl.SetGroups(MainData.Groups);
-            startControl.OnStartGroupChat += group =>
+            _startTabControl.SetGroups(MainData.Groups);
+            _startTabControl.OnStartGroupChat += group =>
             {
                 
                 //AddGroupChatTab(group.Name, groupsgroupsIp, groups.Port);
@@ -114,7 +117,7 @@ namespace WalkieDohi
             var tab = new TabItem
             {
                 Header = "➕ 채팅 시작하기",
-                Content = startControl
+                Content = _startTabControl
             };
             ChatTabControlHost.Items.Add(tab);
         }
@@ -212,14 +215,24 @@ namespace WalkieDohi
         {
             var popup = new FriendManagerWindow { Owner = this };
             popup.ShowDialog();
+         
+            _startTabControl?.SetFriends(MainData.Friends);
+      
+
         }
         private void ManageGroups_Click(object sender, RoutedEventArgs e)
         {
             var popup = new GroupManagerWindow { Owner = this };
             popup.ShowDialog();
+           
+            _startTabControl?.SetGroups(MainData.Groups);
+            
+
+
+            
         }
 
-        private ChatTabControl AddOrFocusChatTab(MessageEntity msg, int port)
+        private TabBasicinterface AddOrFocusChatTab(MessageEntity msg, int port)
         {
             string key = (msg.Group == null) ? msg.Group.GroupName : msg.SenderIp;
             if (msg.Group == null)
@@ -291,7 +304,74 @@ namespace WalkieDohi
             }
             else
             {
-                return null;
+                if (chatTabs.ContainsKey(key))
+                {
+                    return chatTabs[key];
+                }
+
+                var GroupchatControl = new GroupChatTabControl { TargetGroup = msg.Group, TargetPort = port };
+                GroupchatControl.OnSendMessage += async (s, messageText) =>
+                {
+                    var msgText = MessageEntity.OfSendTextMassage(messageText);
+                    foreach(string ip in msg.Group.Ips) 
+                    {
+                        await msgSender.SendMessageAsync(ip, port, msgText);
+                    }
+                    
+                };
+
+                GroupchatControl.OnSendFile += async (s, fileInfo) =>
+                {
+                    var msgEntity = MessageEntity.OfSendFileMassage(fileInfo.Base64Content, fileInfo.FileName);
+                    await msgSender.SendMessageAsync(msg.SenderIp, port, msgEntity);
+                };
+
+                var headerPanel = new StackPanel
+                {
+                    Orientation = Orientation.Horizontal,
+                    Tag = key
+                };
+
+                //그전에 처리하긴 하지만 그래도 혹시나하여 안빼고 처리 
+                msg.Sender = MainData.GetFriendNameOrReturnOriginal(msg.Sender, msg.SenderIp);
+                headerPanel.Children.Add(new TextBlock
+                {
+                    Text = $"{msg.Sender}({msg.SenderIp})",
+                    Margin = new Thickness(0, 0, 5, 0),
+                    VerticalAlignment = VerticalAlignment.Center
+                });
+
+                var closeBtn = new System.Windows.Controls.Button
+                {
+                    Content = "×",
+                    Background = System.Windows.Media.Brushes.Transparent,
+                    BorderBrush = System.Windows.Media.Brushes.Transparent,
+                    Padding = new Thickness(0),
+                    Cursor = System.Windows.Input.Cursors.Hand,
+                    Foreground = System.Windows.Media.Brushes.Gray,
+                    FontWeight = FontWeights.Bold,
+                    Width = 16,
+                    Height = 16
+                };
+
+                closeBtn.Click += (s, e) =>
+                {
+                    var tabToRemove = ChatTabControlHost.Items.Cast<TabItem>()
+                        .FirstOrDefault(t => t.Header is StackPanel panel && panel.Tag?.ToString() == key);
+                    if (tabToRemove != null)
+                    {
+                        ChatTabControlHost.Items.Remove(tabToRemove);
+                        chatTabs.Remove(key);
+                    }
+                };
+
+                headerPanel.Children.Add(closeBtn);
+
+                var tab = new TabItem { Header = headerPanel, Content = GroupchatControl };
+                ChatTabControlHost.Items.Add(tab);
+                ChatTabControlHost.SelectedItem = tab;
+                GroupchatTabs[key] = GroupchatControl;
+                return GroupchatControl;
             }
         }
 

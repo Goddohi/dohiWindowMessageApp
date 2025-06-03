@@ -17,6 +17,7 @@ namespace WalkieDohi.Entity
         public GroupEntity Group { get; set; }
 
         public string SenderIp { get; set; }
+        public string ReceiverIp { get; set; }
         public string Content { get; set; } // 메시지 내용 또는 파일 Base64 문자열
         public string FileName { get; set; } // 파일 이름 (파일일 경우)
 

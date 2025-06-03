@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using WalkieDohi.Core;
 using WalkieDohi.Entity;
 
 namespace WalkieDohi.UC
@@ -33,6 +34,7 @@ namespace WalkieDohi.UC
 
         public void SetFriends(List<Friend> friends)
         {
+            FriendComboBox.ItemsSource = null;
             FriendComboBox.ItemsSource = friends;
             if (friends.Count > 0)
                 FriendComboBox.SelectedIndex = 0;
@@ -40,6 +42,7 @@ namespace WalkieDohi.UC
 
         public void SetGroups(List<GroupEntity> groups)
         {
+            GroupComboBox.ItemsSource = null;
             GroupComboBox.ItemsSource = groups;
             if (groups.Count > 0)
                 GroupComboBox.SelectedIndex = 0;

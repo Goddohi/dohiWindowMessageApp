@@ -14,6 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using WalkieDohi.Core;
 using WalkieDohi.Entity;
 using WalkieDohi.UI;
 using WalkieDohi.Util;
@@ -23,7 +24,7 @@ namespace WalkieDohi.UC
     /// <summary>
     /// GroupChatTabControl.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class GroupChatTabControl : UserControl
+    public partial class GroupChatTabControl : UserControl , TabBasicinterface
     {
 
         public GroupEntity TargetGroup { get; set; }

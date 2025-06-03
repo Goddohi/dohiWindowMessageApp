@@ -12,7 +12,7 @@ namespace WalkieDohi.UI
 {
     public partial class GroupManagerWindow : Window
     {
-        public ObservableCollection<GroupEntity> Groups { get; set; } = new ObservableCollection<GroupEntity>();
+        public ObservableCollection<GroupEntity> Groups { get; set; } = new ObservableCollection<GroupEntity>(MainData.Groups);
         public ObservableCollection<Friend> FriendList { get; set; } = new ObservableCollection<Friend>(MainData.Friends);
 
         private GroupEntity _selectedGroup;
@@ -25,7 +25,7 @@ namespace WalkieDohi.UI
             InitializeComponent();
 
             // 그룹 불러오기
-            Groups = LoadGroupsFromFile();
+            //Groups = LoadGroupsFromFile();
             GroupList.ItemsSource = Groups;
 
             DataContext = this;
@@ -34,7 +34,7 @@ namespace WalkieDohi.UI
         private void Window_Closed(object sender, EventArgs e)
         {
             // 종료 시 저장
-            SaveGroupsToFile(Groups);
+            SaveGroupsToFile();
         }
 
         public ObservableCollection<GroupEntity> LoadGroupsFromFile()
@@ -63,6 +63,7 @@ namespace WalkieDohi.UI
             };
             Groups.Add(newGroup);
             GroupNameBox.Clear();
+            SaveGroupsToFile(); // 변경 사항 저장
         }
 
         private void GroupList_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
@@ -115,16 +116,24 @@ namespace WalkieDohi.UI
                 {
                     _selectedGroup.Ips = _selectedGroup.Ips.Append(selected.Ip).ToArray();
                     RefreshMemberDisplay();
-                    SaveGroupsToFile(Groups); // 변경 사항 저장
+                    SaveGroupsToFile(); // 변경 사항 저장
                 }
             }
         }
 
-        public void SaveGroupsToFile(ObservableCollection<GroupEntity> groups)
+
+        /// <summary>
+        /// Json으로 바로 적용
+        /// </summary>
+        public void SaveGroupsToFile()
         {
-            var json = JsonConvert.SerializeObject(groups, Formatting.Indented);
+            var json = JsonConvert.SerializeObject(Groups, Formatting.Indented);
             File.WriteAllText(GroupJsonPath, json);
+            MainData.Groups = Groups.ToList<GroupEntity>();
         }
+        /// <summary>
+        /// 그룹원 삭제
+        /// </summary>
         private void RemoveMember_Click(object sender, RoutedEventArgs e)
         {
 
@@ -138,6 +147,7 @@ namespace WalkieDohi.UI
             }
             _selectedGroup.Ips = _selectedGroup.Ips.Where(ip => ip != selected.Ip).ToArray();
             RefreshMemberDisplay();
+            SaveGroupsToFile(); 
         }
 
         private void RenameGroup_Click(object sender, RoutedEventArgs e)
@@ -150,6 +160,7 @@ namespace WalkieDohi.UI
                 _selectedGroup.GroupName = dialog.ResponseText;
                 GroupList.Items.Refresh();
             }
+            SaveGroupsToFile(); // 변경 사항 저장
         }
 
         private void DeleteGroup_Click(object sender, RoutedEventArgs e)
@@ -160,6 +171,7 @@ namespace WalkieDohi.UI
                 Groups.Remove(_selectedGroup);
                 _selectedGroup = null;
                 RefreshMemberDisplay();
+                SaveGroupsToFile(); // 변경 사항 저장
             }
         }
 
