@@ -185,6 +185,7 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+    <None Include="파일구조도.md" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
