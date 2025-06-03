@@ -308,7 +308,11 @@ namespace WalkieDohi
             {
                 if (chatTabs.ContainsKey(key))
                 {
-                    return chatTabs[key];
+                   var chatTab= (GroupChatTabControl)chatTabs[key];
+                    if (chatTab.TargetGroup.Key == msg.Group.Key)
+                    {
+                        return chatTabs[key];
+                    }
                 }
 
                 var GroupchatControl = new GroupChatTabControl { TargetGroup = msg.Group, TargetPort = port };
@@ -471,16 +475,20 @@ namespace WalkieDohi
 
             if (chatTabs.ContainsKey(key))
             {
-                var existing = ChatTabControlHost.Items.Cast<TabItem>()
-                    .FirstOrDefault(t => t.Header is StackPanel panel && panel.Tag?.ToString() == key);
-
-                if (existing != null)
+                var chatTab = (GroupChatTabControl)chatTabs[key];
+                if (chatTab.TargetGroup.Key == group.Key)
                 {
-                    ChatTabControlHost.SelectedItem = existing;
-                }
-                return;
-            }
+                    var existing = ChatTabControlHost.Items.Cast<TabItem>()
+                        .FirstOrDefault(t => t.Header is StackPanel panel && panel.Tag?.ToString() == key);
 
+                    if (existing != null)
+                    {
+                        ChatTabControlHost.SelectedItem = existing;
+                    }
+                    return;
+                }
+            }
+            group.SetRandomKey();
             var GroupchatControl = new GroupChatTabControl
             {
                 TargetGroup = group,
@@ -489,20 +497,20 @@ namespace WalkieDohi
             GroupchatControl.SetGroupMembers(MainData.Friends);
             GroupchatControl.OnSendMessage += async (s, messageText) =>
             {
-                var msgEntity = MessageEntity.OfGroupSendTextMassage(group,messageText);
-                var tasks = group.Ips
+                var msgEntity = MessageEntity.OfGroupSendTextMassage(GroupchatControl.TargetGroup, messageText);
+                var tasks = GroupchatControl.TargetGroup.Ips
                             .Where(ip => ip != NetworkHelper.GetLocalIPv4())
-                            .Select(ip => msgSender.SendMessageAsync(ip, group.Port, msgEntity));
+                            .Select(ip => msgSender.SendMessageAsync(ip, GroupchatControl.TargetGroup.Port, msgEntity));
 
                 await Task.WhenAll(tasks);
             };
 
             GroupchatControl.OnSendFile += async (s, fileInfo) =>
             {
-                var msgEntity = MessageEntity.OfGroupSendFileMassage(group, fileInfo.Base64Content, fileInfo.FileName);
-                var tasks = group.Ips
+                var msgEntity = MessageEntity.OfGroupSendFileMassage(GroupchatControl.TargetGroup, fileInfo.Base64Content, fileInfo.FileName);
+                var tasks = GroupchatControl.TargetGroup.Ips
                             .Where(ip => ip != NetworkHelper.GetLocalIPv4())
-                            .Select(ip => msgSender.SendMessageAsync(ip, group.Port, msgEntity));
+                            .Select(ip => msgSender.SendMessageAsync(ip, GroupchatControl.TargetGroup.Port, msgEntity));
 
                 await Task.WhenAll(tasks);
             };
@@ -515,7 +523,7 @@ namespace WalkieDohi
 
             headerPanel.Children.Add(new TextBlock
             {
-                Text = $"({group.GroupName})",
+                Text = $"({GroupchatControl.TargetGroup.GroupName})",
                 Margin = new Thickness(0, 0, 5, 0)
             });
 
