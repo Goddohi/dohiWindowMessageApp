@@ -28,6 +28,7 @@ namespace WalkieDohi
         private MessengerSender msgSender = new MessengerSender();
         private Dictionary<string, TabBasicinterface> chatTabs = new Dictionary<string, TabBasicinterface>();
         private StartChatTabControl _startTabControl; // 추가
+        
 
         public MainWindow()
         {
@@ -244,18 +245,7 @@ namespace WalkieDohi
                     return chatTabs[key];
                 }
 
-                var chatControl = new ChatTabControl { TargetIp = msg.SenderIp, TargetPort = port };
-                chatControl.OnSendMessage += async (s, messageText) =>
-                {
-                    var msgEntity = MessageEntity.OfSendTextMassage(messageText);
-                    await msgSender.SendMessageAsync(msg.SenderIp, port, msgEntity);
-                };
-
-                chatControl.OnSendFile += async (s, fileInfo) =>
-                {
-                    var msgEntity = MessageEntity.OfSendFileMassage(fileInfo.Base64Content, fileInfo.FileName);
-                    await msgSender.SendMessageAsync(msg.SenderIp, port, msgEntity);
-                };
+                var chatControl = GetChatTab(msg.SenderIp, port);
 
                 var headerPanel = new StackPanel
                 {
@@ -315,30 +305,7 @@ namespace WalkieDohi
                     }
                 }
 
-                var GroupchatControl = new GroupChatTabControl { TargetGroup = msg.Group, TargetPort = port };
-                GroupchatControl.SetGroupMembers(MainData.Friends);
-                GroupchatControl.OnSendMessage += async (s, messageText) =>
-                {
-                    var msgEntity = MessageEntity.OfGroupSendTextMassage(msg.Group,messageText);
-                    var tasks = msg.Group.Ips
-                                .Where(ip => ip != NetworkHelper.GetLocalIPv4())
-                                .Select(ip => msgSender.SendMessageAsync(ip, port, msgEntity));
-
-                    await Task.WhenAll(tasks);
-
-                };
-
-                GroupchatControl.OnSendFile += async (s, fileInfo) =>
-                {
-                    var msgEntity = MessageEntity.OfGroupSendFileMassage(msg.Group, fileInfo.Base64Content, fileInfo.FileName);
-                    var tasks = msg.Group.Ips
-                                .Where(ip => ip != NetworkHelper.GetLocalIPv4())
-                                .Select(ip => msgSender.SendMessageAsync(ip, port, msgEntity));
-
-                    await Task.WhenAll(tasks);
-               
-                };
-
+                var GroupchatControl = GetGroupChatTab(msg.Group);
                 var headerPanel = new StackPanel
                 {
                     Orientation = Orientation.Horizontal,
@@ -349,7 +316,7 @@ namespace WalkieDohi
                 msg.Sender = MainData.GetFriendNameOrReturnOriginal(msg.Sender, msg.SenderIp);
                 headerPanel.Children.Add(new TextBlock
                 {
-                    Text = $"({msg.Group.GroupName}생성자:{msg.Sender}))",
+                    Text = $"({msg.Group.GroupName} - 생성자:{msg.Sender}))",
                     Margin = new Thickness(0, 0, 5, 0),
                     VerticalAlignment = VerticalAlignment.Center
                 });
@@ -404,22 +371,8 @@ namespace WalkieDohi
                 return;
             }
 
-            var chatControl = new ChatTabControl
-            {
-                TargetIp = ip,
-                TargetPort = port
-            };
+            var chatControl = GetChatTab(ip, port);
 
-            chatControl.OnSendMessage += async (s, messageText) =>
-            {
-                var msgEntity = MessageEntity.OfSendTextMassage(messageText);
-                await msgSender.SendMessageAsync(ip, port, msgEntity);
-            };
-            chatControl.OnSendFile += async (s, fileInfo) =>
-            {
-                var msgEntity = MessageEntity.OfSendFileMassage(fileInfo.Base64Content, fileInfo.FileName);
-                await msgSender.SendMessageAsync(ip, port, msgEntity);
-            };
             var headerPanel = new StackPanel
             {
                 Orientation = System.Windows.Controls.Orientation.Horizontal,
@@ -489,32 +442,7 @@ namespace WalkieDohi
                 }
             }
             group.SetRandomKey();
-            var GroupchatControl = new GroupChatTabControl
-            {
-                TargetGroup = group,
-                TargetPort = group.Port
-            };
-            GroupchatControl.SetGroupMembers(MainData.Friends);
-            GroupchatControl.OnSendMessage += async (s, messageText) =>
-            {
-                var msgEntity = MessageEntity.OfGroupSendTextMassage(GroupchatControl.TargetGroup, messageText);
-                var tasks = GroupchatControl.TargetGroup.Ips
-                            .Where(ip => ip != NetworkHelper.GetLocalIPv4())
-                            .Select(ip => msgSender.SendMessageAsync(ip, GroupchatControl.TargetGroup.Port, msgEntity));
-
-                await Task.WhenAll(tasks);
-            };
-
-            GroupchatControl.OnSendFile += async (s, fileInfo) =>
-            {
-                var msgEntity = MessageEntity.OfGroupSendFileMassage(GroupchatControl.TargetGroup, fileInfo.Base64Content, fileInfo.FileName);
-                var tasks = GroupchatControl.TargetGroup.Ips
-                            .Where(ip => ip != NetworkHelper.GetLocalIPv4())
-                            .Select(ip => msgSender.SendMessageAsync(ip, GroupchatControl.TargetGroup.Port, msgEntity));
-
-                await Task.WhenAll(tasks);
-            };
-
+            var GroupchatControl = GetGroupChatTab(group);
             var headerPanel = new StackPanel
             {
                 Orientation = System.Windows.Controls.Orientation.Horizontal,
@@ -563,5 +491,58 @@ namespace WalkieDohi
             chatTabs[key] = GroupchatControl;
             ChatTabControlHost.SelectedItem = tab;
         }
+
+        private GroupChatTabControl GetGroupChatTab(GroupEntity group) {
+
+            var GroupchatControl = new GroupChatTabControl
+            {
+                TargetGroup = group,
+                TargetPort = group.Port
+            };
+            GroupchatControl.SetGroupMembers(MainData.Friends);
+            GroupchatControl.OnSendMessage += async (s, messageText) =>
+            {
+                var msgEntity = MessageEntity.OfGroupSendTextMassage(GroupchatControl.TargetGroup, messageText);
+                var tasks = GroupchatControl.TargetGroup.Ips
+                            .Where(ip => ip != NetworkHelper.GetLocalIPv4())
+                            .Select(ip => msgSender.SendMessageAsync(ip, GroupchatControl.TargetGroup.Port, msgEntity));
+
+                await Task.WhenAll(tasks);
+            };
+
+            GroupchatControl.OnSendFile += async (s, fileInfo) =>
+            {
+                var msgEntity = MessageEntity.OfGroupSendFileMassage(GroupchatControl.TargetGroup, fileInfo.Base64Content, fileInfo.FileName);
+                var tasks = GroupchatControl.TargetGroup.Ips
+                            .Where(ip => ip != NetworkHelper.GetLocalIPv4())
+                            .Select(ip => msgSender.SendMessageAsync(ip, GroupchatControl.TargetGroup.Port, msgEntity));
+
+                await Task.WhenAll(tasks);
+            };
+
+            return GroupchatControl;
+        }
+
+        private ChatTabControl GetChatTab(string ip,int port)
+        {
+            var chatControl = new ChatTabControl
+            {
+                TargetIp = ip,
+                TargetPort = port
+            };
+
+            chatControl.OnSendMessage += async (s, messageText) =>
+            {
+                var msgEntity = MessageEntity.OfSendTextMassage(messageText);
+                await msgSender.SendMessageAsync(ip, port, msgEntity);
+            };
+            chatControl.OnSendFile += async (s, fileInfo) =>
+            {
+                var msgEntity = MessageEntity.OfSendFileMassage(fileInfo.Base64Content, fileInfo.FileName);
+                await msgSender.SendMessageAsync(ip, port, msgEntity);
+            };
+            return chatControl;
+        }
+        
     }
 }
