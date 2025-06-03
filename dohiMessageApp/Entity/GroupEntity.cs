@@ -11,5 +11,6 @@ namespace WalkieDohi.Entity
     {
         public string GroupName {  get; set; }
         public string[] Ips { get; set; } = Array.Empty<string>();
+        public int Port { get; set; } = 9000;
     }
 }

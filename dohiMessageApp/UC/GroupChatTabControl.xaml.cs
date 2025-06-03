@@ -43,6 +43,23 @@ namespace WalkieDohi.UC
 
         #region UI 이벤트
 
+        public void SetGroupMembers(List<Friend> allFriends)
+        {
+            if (TargetGroup == null) return;
+
+            var members = TargetGroup.Ips.Select(ip =>
+            {
+                var name = allFriends.FirstOrDefault(f => f.Ip == ip)?.Name;
+                return new
+                {
+                    Ip = ip,
+                    DisplayText = (ip == NetworkHelper.GetLocalIPv4()) ? "본인" : $"{name ?? "(이름 없음)"} ({ip})"
+                };
+            }).ToList();
+
+            GroupMemberList.ItemsSource = members;
+        }
+
         private void SendFileButton_Click(object sender, RoutedEventArgs e)
         {
             SendFileMessageAsync();

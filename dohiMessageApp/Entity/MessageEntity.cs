@@ -16,8 +16,10 @@ namespace WalkieDohi.Entity
         public string Sender { get; set; }
         public GroupEntity Group { get; set; }
 
+        /// <summary>
+        /// 수신인은 탭에서 관리하므로 Receiver가 필요없음.
+        /// </summary>
         public string SenderIp { get; set; }
-        public string ReceiverIp { get; set; }
         public string Content { get; set; } // 메시지 내용 또는 파일 Base64 문자열
         public string FileName { get; set; } // 파일 이름 (파일일 경우)
 
