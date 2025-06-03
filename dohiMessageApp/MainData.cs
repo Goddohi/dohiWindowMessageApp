@@ -9,7 +9,20 @@ namespace WalkieDohi
 {
     public static class MainData
     {
-        
+        private static List<GroupEntity> groups = new List<GroupEntity>();
+
+        public static List<GroupEntity> Groups
+        {
+            get { return groups; }
+            set
+            {
+                if (groups != value)
+                {
+                    groups = value;
+                }
+            }
+
+        }
 
 
         private static List<Friend> friends = new List<Friend>();
@@ -56,5 +69,9 @@ namespace WalkieDohi
         public static User currentUser = new User();
 
         public static Dictionary<string, string> receivedFiles = new Dictionary<string, string>();
+
+
+
+
     }
 }

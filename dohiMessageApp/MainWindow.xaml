@@ -11,7 +11,8 @@
         <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="10">
             <TextBox x:Name="NicknameBox" Width="150" Margin="0,0,10,0" />
             <Button x:Name="SaveUserButton" Content="닉네임 저장" Click="SaveUserButton_Click" Margin="0,0,10,0"/>
-            <Button x:Name="ManageFriendsButton" Content="친구 관리" Click="ManageFriends_Click"/>
+            <Button x:Name="ManageFriendsButton" Content="친구 관리" Click="ManageFriends_Click" Margin="0,0,10,0"/>
+            <Button x:Name="ManageGroupsButton" Content="그룹 관리" Click="ManageGroups_Click"/>
         </StackPanel>
 
         <TabControl x:Name="ChatTabControlHost" Margin="10"/>

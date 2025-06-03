@@ -1,0 +1,18 @@
+﻿<Window x:Class="WalkieDohi.UI.InputDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="입력" Height="150" Width="300" WindowStartupLocation="CenterOwner">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <TextBlock x:Name="txtBox" Grid.Row="0" Margin="0,0,0,10"/>
+        <TextBox x:Name="InputBox" Grid.Row="1" Margin="0,0,0,10"/>
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="확인" Width="60" Margin="0,0,5,0" Click="Ok_Click"/>
+            <Button Content="취소" Width="60" Click="Cancel_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

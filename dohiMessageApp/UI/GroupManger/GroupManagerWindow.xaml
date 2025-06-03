@@ -1,0 +1,52 @@
+﻿<Window x:Class="WalkieDohi.UI.GroupManagerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="그룹 관리" Height="500" Width="400" WindowStartupLocation="CenterOwner">
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <!-- 입력 -->
+            <RowDefinition Height="*"/>
+            <!-- 리스트 -->
+            <RowDefinition Height="Auto"/>
+            <!-- 버튼 -->
+        </Grid.RowDefinitions>
+
+        <!-- 그룹 생성 -->
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+            <TextBlock Text="그룹명:" VerticalAlignment="Center" Margin="0,0,5,0"/>
+            <TextBox Width="200" x:Name="GroupNameBox"/>
+            <Button Content="생성" Width="60" Margin="10,0,0,0" Click="CreateGroup_Click"/>
+        </StackPanel>
+
+        <!-- 그룹 리스트 -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="2*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- 그룹 목록 -->
+            <ListBox x:Name="GroupList" DisplayMemberPath="GroupName" 
+                     SelectionChanged="GroupList_SelectionChanged"/>
+
+            <!-- 그룹원 목록 -->
+            <StackPanel Grid.Column="2">
+                <TextBlock Text="그룹원:" FontWeight="Bold"/>
+                <ListBox x:Name="MemberList" Margin="0,5,0,0" DisplayMemberPath="DisplayText"/>
+                <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                    <Button Content="추가" Width="60" Margin="0,0,5,0" Click="AddMember_Click"/>
+                    <Button Content="삭제" Width="60" Click="RemoveMember_Click"/>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+
+        <!-- 하단 버튼 -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
+            <Button Content="이름 변경" Width="80" Margin="0,0,10,0" Click="RenameGroup_Click"/>
+            <Button Content="삭제" Width="60" Click="DeleteGroup_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

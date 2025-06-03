@@ -26,7 +26,7 @@ namespace WalkieDohi.UC
     public partial class GroupChatTabControl : UserControl
     {
 
-        public string TargetIp { get; set; }
+        public GroupEntity TargetGroup { get; set; }
         public int TargetPort { get; set; }
 
         public event EventHandler<string> OnSendMessage;

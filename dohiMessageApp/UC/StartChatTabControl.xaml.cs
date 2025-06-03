@@ -22,11 +22,13 @@ namespace WalkieDohi.UC
     public partial class StartChatTabControl : UserControl
     {
         public event Action<Friend> OnStartChat;
+        public event Action<GroupEntity> OnStartGroupChat;
 
         public StartChatTabControl()
         {
             InitializeComponent();
             StartChatButton.Click += StartChatButton_Click;
+            StartGroupChatButton.Click += StartGroupChatButton_Click;
         }
 
         public void SetFriends(List<Friend> friends)
@@ -34,6 +36,13 @@ namespace WalkieDohi.UC
             FriendComboBox.ItemsSource = friends;
             if (friends.Count > 0)
                 FriendComboBox.SelectedIndex = 0;
+        }
+
+        public void SetGroups(List<GroupEntity> groups)
+        {
+            GroupComboBox.ItemsSource = groups;
+            if (groups.Count > 0)
+                GroupComboBox.SelectedIndex = 0;
         }
 
         private void StartChatButton_Click(object sender, RoutedEventArgs e)
@@ -45,6 +54,18 @@ namespace WalkieDohi.UC
             else
             {
                 MessageBox.Show("친구를 선택하세요.");
+            }
+        }
+
+        private void StartGroupChatButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (GroupComboBox.SelectedItem is GroupEntity selected)
+            {
+                OnStartGroupChat?.Invoke(selected);
+            }
+            else
+            {
+                MessageBox.Show("그룹을 선택하세요.");
             }
         }
     }

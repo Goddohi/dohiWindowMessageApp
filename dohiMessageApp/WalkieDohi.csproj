@@ -80,6 +80,10 @@
     </ApplicationDefinition>
     <Compile Include="Core\DohiEntityBase.cs" />
     <Compile Include="Core\DohiViewModelBase.cs" />
+    <Compile Include="UI\FriendSelectWindow.xaml.cs">
+      <DependentUpon>FriendSelectWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\GroupManger\GroupMemberDisplay.cs" />
     <Compile Include="Entity\Friend.cs" />
     <Compile Include="Entity\GroupEntity.cs" />
     <Compile Include="Entity\User.cs" />
@@ -90,8 +94,14 @@
     <Compile Include="UC\StartChatTabControl.xaml.cs">
       <DependentUpon>StartChatTabControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\GroupManger\GroupManagerWindow.xaml.cs">
+      <DependentUpon>GroupManagerWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\FriendManagerWindow.xaml.cs">
       <DependentUpon>FriendManagerWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\InputDialog.xaml.cs">
+      <DependentUpon>InputDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\ToastWindow.xaml.cs">
       <DependentUpon>ToastWindow.xaml</DependentUpon>
@@ -100,6 +110,7 @@
     <Compile Include="UC\ChatTabControl.xaml.cs">
       <DependentUpon>ChatTabControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\ViewModel\GroupManagerViewModel.cs" />
     <Compile Include="Util\MessageUtil.cs" />
     <Compile Include="Util\MessengerReceiver.cs" />
     <Compile Include="Util\MessengerSender.cs" />
@@ -125,7 +136,19 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="UI\FriendSelectWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\GroupManger\GroupManagerWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="UI\FriendManagerWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\InputDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
