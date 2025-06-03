@@ -84,6 +84,9 @@
     <Compile Include="Entity\GroupEntity.cs" />
     <Compile Include="Entity\User.cs" />
     <Compile Include="MainData.cs" />
+    <Compile Include="UC\GroupChatTabControl.xaml.cs">
+      <DependentUpon>GroupChatTabControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UC\StartChatTabControl.xaml.cs">
       <DependentUpon>StartChatTabControl.xaml</DependentUpon>
     </Compile>
@@ -114,6 +117,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="UC\GroupChatTabControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UC\StartChatTabControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

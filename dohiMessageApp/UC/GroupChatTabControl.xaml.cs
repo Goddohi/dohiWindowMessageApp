@@ -1,5 +1,4 @@
-﻿using Microsoft.Win32;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,9 +8,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
-using System.Windows.Forms;
 using System.Windows.Input;
-using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
@@ -20,16 +17,15 @@ using System.Windows.Threading;
 using WalkieDohi.Entity;
 using WalkieDohi.UI;
 using WalkieDohi.Util;
-using MessageBox = System.Windows.MessageBox;
-using UserControl = System.Windows.Controls.UserControl;
 
 namespace WalkieDohi.UC
 {
     /// <summary>
-    /// ChatTabControl.xaml에 대한 상호 작용 논리
+    /// GroupChatTabControl.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class ChatTabControl : UserControl
+    public partial class GroupChatTabControl : UserControl
     {
+
         public string TargetIp { get; set; }
         public int TargetPort { get; set; }
 
@@ -38,13 +34,11 @@ namespace WalkieDohi.UC
         public event EventHandler<(string FileName, string Base64Content)> OnSendFile;
 
         private Dictionary<string, string> receivedFiles = new Dictionary<string, string>();
-
-        public ChatTabControl()
+        public GroupChatTabControl()
         {
             InitializeComponent();
             SendButton.Click += (s, e) => Send();
         }
-
 
         #region UI 이벤트
 
@@ -153,15 +147,15 @@ namespace WalkieDohi.UC
             if (msg == null) return "메세지 없음(에러)";
             if (msg.CheckMessageTypeText()) return GetMsgDisplay(msg.Sender, msg.Content, msg.Type, Direction);
 
-            if (msg.CheckMessageTypeFile()) return GetMsgDisplay(msg.Sender,msg.FileName,msg.Type,Direction);
+            if (msg.CheckMessageTypeFile()) return GetMsgDisplay(msg.Sender, msg.FileName, msg.Type, Direction);
 
             return "메세지 없음(잘못된 타입)";
         }
-        public string GetMsgDisplay(string Sender,string Content,MessageType messageType, MessageDirection Direction)
+        public string GetMsgDisplay(string Sender, string Content, MessageType messageType, MessageDirection Direction)
         {
             if (Direction == MessageDirection.Send)
             {
-                if(messageType == MessageType.Text) return $"📤 나 : {Content}";
+                if (messageType == MessageType.Text) return $"📤 나 : {Content}";
 
                 if (messageType == MessageType.File) return $"📤 나(파일 전송) : {Content}";
 
@@ -176,7 +170,7 @@ namespace WalkieDohi.UC
             }
             return "메세지 없음(잘못된 타입)";
         }
-        
+
 
         private string getOpenFilePath()
         {
@@ -224,7 +218,7 @@ namespace WalkieDohi.UC
 
                     OnSendFile?.Invoke(this, (fileMessage.FileName, base64));
 
-                    var display = GetMsgDisplay("", fileMessage.FileName,MessageType.File, MessageDirection.Send);
+                    var display = GetMsgDisplay("", fileMessage.FileName, MessageType.File, MessageDirection.Send);
                     AddMessage(display, MessageDirection.Send);
                 }
                 catch (Exception ex)
@@ -243,7 +237,7 @@ namespace WalkieDohi.UC
         private bool IsScrolledToBottom(ScrollViewer scroll)
         {
             // ScrollableHeight와 VerticalOffset의 차이가 작으면 맨 아래로 판단
-            return scroll.VerticalOffset >= scroll.ScrollableHeight ;
+            return scroll.VerticalOffset >= scroll.ScrollableHeight;
         }
 
         private ScrollViewer GetScrollViewer(DependencyObject obj)
@@ -266,5 +260,4 @@ namespace WalkieDohi.UC
 
     }
 
-    
 }

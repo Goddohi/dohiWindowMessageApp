@@ -90,55 +90,56 @@ namespace WalkieDohi
 
         private ChatTabControl AddOrFocusChatTab(MessageEntity msg, int port)
         {
-            string key = msg.SenderIp;
-
-            if (chatTabs.ContainsKey(key))
+            string key = (msg.Group == null) ? msg.Group.GroupName : msg.SenderIp;
+            if (msg.Group == null)
             {
-                return chatTabs[key];
-            }
+                if (chatTabs.ContainsKey(key))
+                {
+                    return chatTabs[key];
+                }
 
-            var chatControl = new ChatTabControl { TargetIp = msg.SenderIp, TargetPort = port };
-            chatControl.OnSendMessage += async (s, messageText) =>
-            {
-                var msgText = MessageEntity.OfSendTextMassage(messageText);
-                await msgSender.SendMessageAsync(msg.SenderIp, port, msgText);
-            };
+                var chatControl = new ChatTabControl { TargetIp = msg.SenderIp, TargetPort = port };
+                chatControl.OnSendMessage += async (s, messageText) =>
+                {
+                    var msgText = MessageEntity.OfSendTextMassage(messageText);
+                    await msgSender.SendMessageAsync(msg.SenderIp, port, msgText);
+                };
 
-            chatControl.OnSendFile += async (s, fileInfo) =>
-            {
-                var msgEntity = MessageEntity.OfSendFileMassage(fileInfo.Base64Content, fileInfo.FileName);
-                await msgSender.SendMessageAsync(msg.SenderIp, port, msgEntity);
-            };
+                chatControl.OnSendFile += async (s, fileInfo) =>
+                {
+                    var msgEntity = MessageEntity.OfSendFileMassage(fileInfo.Base64Content, fileInfo.FileName);
+                    await msgSender.SendMessageAsync(msg.SenderIp, port, msgEntity);
+                };
 
-            var headerPanel = new StackPanel
-            {
-                Orientation = Orientation.Horizontal,
-                Tag = key
-            };
+                var headerPanel = new StackPanel
+                {
+                    Orientation = Orientation.Horizontal,
+                    Tag = key
+                };
 
-            //그전에 처리하긴 하지만 그래도 혹시나하여 안빼고 처리 
-            msg.Sender = MainData.GetFriendNameOrReturnOriginal(msg.Sender, msg.SenderIp);
-            headerPanel.Children.Add(new TextBlock
-            {
-                Text = $"{msg.Sender}({msg.SenderIp})",
-                Margin = new Thickness(0, 0, 5, 0),
-                VerticalAlignment = VerticalAlignment.Center
-            });
+                //그전에 처리하긴 하지만 그래도 혹시나하여 안빼고 처리 
+                msg.Sender = MainData.GetFriendNameOrReturnOriginal(msg.Sender, msg.SenderIp);
+                headerPanel.Children.Add(new TextBlock
+                {
+                    Text = $"{msg.Sender}({msg.SenderIp})",
+                    Margin = new Thickness(0, 0, 5, 0),
+                    VerticalAlignment = VerticalAlignment.Center
+                });
 
-            var closeBtn = new System.Windows.Controls.Button
-            {
-                Content = "×",
-                Background = System.Windows.Media.Brushes.Transparent,
-                BorderBrush = System.Windows.Media.Brushes.Transparent,
-                Padding = new Thickness(0),
-                Cursor = System.Windows.Input.Cursors.Hand,
-                Foreground = System.Windows.Media.Brushes.Gray,
-                FontWeight = FontWeights.Bold,
-                Width = 16,
-                Height = 16
-            };
+                var closeBtn = new System.Windows.Controls.Button
+                {
+                    Content = "×",
+                    Background = System.Windows.Media.Brushes.Transparent,
+                    BorderBrush = System.Windows.Media.Brushes.Transparent,
+                    Padding = new Thickness(0),
+                    Cursor = System.Windows.Input.Cursors.Hand,
+                    Foreground = System.Windows.Media.Brushes.Gray,
+                    FontWeight = FontWeights.Bold,
+                    Width = 16,
+                    Height = 16
+                };
 
-            closeBtn.Click += (s, e) =>
+                closeBtn.Click += (s, e) =>
             {
                 var tabToRemove = ChatTabControlHost.Items.Cast<TabItem>()
                     .FirstOrDefault(t => t.Header is StackPanel panel && panel.Tag?.ToString() == key);
@@ -149,13 +150,18 @@ namespace WalkieDohi
                 }
             };
 
-            headerPanel.Children.Add(closeBtn);
+                headerPanel.Children.Add(closeBtn);
 
-            var tab = new TabItem { Header = headerPanel, Content = chatControl };
-            ChatTabControlHost.Items.Add(tab);
-            ChatTabControlHost.SelectedItem = tab;
-            chatTabs[key] = chatControl;
-            return chatControl;
+                var tab = new TabItem { Header = headerPanel, Content = chatControl };
+                ChatTabControlHost.Items.Add(tab);
+                ChatTabControlHost.SelectedItem = tab;
+                chatTabs[key] = chatControl;
+                return chatControl;
+            }
+            else
+            {
+                return null;
+            }
         }
         /*
          * 

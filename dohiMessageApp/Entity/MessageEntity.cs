@@ -156,4 +156,10 @@ namespace WalkieDohi.Entity
     {
         Success, Fail
     }
+
+    public enum MessageDirection
+    {
+        Send,
+        Receive
+    }
 }
