@@ -8,7 +8,10 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <ListBox x:Name="ChatList" MouseDoubleClick="ChatList_MouseDoubleClick" Grid.Row="0" Margin="5">
+        <ListBox x:Name="ChatList" 
+         SelectionMode="Single" MouseDoubleClick="ChatList_MouseDoubleClick" 
+         MouseRightButtonUp="ChatList_MouseRightButtonUp"
+                 PreviewKeyDown="ChatList_PreviewKeyDown" Grid.Row="0" Margin="5">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <Grid Margin="5">

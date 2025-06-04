@@ -98,6 +98,39 @@ namespace WalkieDohi.UC
                 }
             }
         }
+
+        private void ChatList_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            if (ChatList.SelectedItem == null) return;
+
+            // ContextMenu 생성
+            var menu = new ContextMenu();
+            var copyItem = new MenuItem { Header = "복사" };
+            copyItem.Click += (s, args) =>
+            {
+                var selected = ChatList.SelectedItem as ChatMessage;
+                if (selected != null)
+                {
+                    Clipboard.SetText(selected.Content);
+                }
+            };
+            menu.Items.Add(copyItem);
+            menu.IsOpen = true;
+        }
+
+        private void ChatList_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.C && (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
+            {
+                var selected = ChatList.SelectedItem as ChatMessage;
+                if (selected != null)
+                {
+                    Clipboard.SetText(selected.Content);
+                    e.Handled = true;
+                }
+            }
+        }
+
         #endregion
 
 
