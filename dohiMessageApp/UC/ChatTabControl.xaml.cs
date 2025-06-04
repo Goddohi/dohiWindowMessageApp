@@ -103,7 +103,7 @@ namespace WalkieDohi.UC
             if (!string.IsNullOrEmpty(text))
             {
                 OnSendMessage?.Invoke(this, text);
-                var display = GetMsgDisplay("", text, MessageType.Text, MessageDirection.Send);
+                var display = ChatMessage.GetMsgDisplay("", text, MessageType.Text, MessageDirection.Send);
                 AddMessage(display, MessageDirection.Send);
                 InputBox.Clear();
 
@@ -115,69 +115,38 @@ namespace WalkieDohi.UC
         }
 
 
-        public void AddMessage(string display, MessageDirection type)
+        public void AddMessage(ChatMessage display, MessageDirection type)
         {
             ChatList.Items.Add(display);
-
-            // 스크롤 처리
+            //스크롤 내려주는 코드 
             Dispatcher.BeginInvoke(
-                new Action(() =>
-                {
-                    // 실행할 UI 작업
-                    ChatList.ScrollIntoView(ChatList.Items[ChatList.Items.Count - 1]);
-                }),
-                DispatcherPriority.Normal
-                );
+               new Action(() =>
+               {
+                   if (ChatList.Items.Count > 0)
+                   {
+                       var lastItem = ChatList.Items[ChatList.Items.Count - 1];
+                       ChatList.ScrollIntoView(lastItem);
+                   }
+               }),
+               DispatcherPriority.Background // Normal보다 살짝 늦게 실행
+           );
         }
 
         public void AddReceivedMessage(MessageEntity msg)
         {
-            string display = GetMsgDisplay(msg, MessageDirection.Receive);
+            var display = ChatMessage.GetMsgDisplay(msg, MessageDirection.Receive);
             AddMessage(display, MessageDirection.Receive);
         }
 
         public void AddReceivedFile(MessageEntity msg)
         {
-            string display = GetMsgDisplay(msg, MessageDirection.Receive);
+            var display = ChatMessage.GetMsgDisplay(msg, MessageDirection.Receive);
             AddMessage(display, MessageDirection.Receive);
-            receivedFiles[display] = MessageUtil.GetFilePath(msg.FileName);
+            receivedFiles[display.Content] = MessageUtil.GetFilePath(msg.FileName);
         }
 
-        /// <summary>
-        /// 해당메서드는 Display메세지를 반환하면서 받은 메세지의 경우 알림을 설정해줍니다.
-        /// </summary>
-        /// <param name="msg"></param>
-        /// <param name="Direction"></param>
-        /// <returns></returns>
-        public string GetMsgDisplay(MessageEntity msg, MessageDirection Direction)
-        {
-            if (msg == null) return "메세지 없음(에러)";
-            if (msg.CheckMessageTypeText()) return GetMsgDisplay(msg.Sender, msg.Content, msg.Type, Direction);
 
-            if (msg.CheckMessageTypeFile()) return GetMsgDisplay(msg.Sender,msg.FileName,msg.Type,Direction);
 
-            return "메세지 없음(잘못된 타입)";
-        }
-        public string GetMsgDisplay(string Sender,string Content,MessageType messageType, MessageDirection Direction)
-        {
-            if (Direction == MessageDirection.Send)
-            {
-                if(messageType == MessageType.Text) return $"📤 나 : {Content}";
-
-                if (messageType == MessageType.File) return $"📤 나(파일 전송) : {Content}";
-
-            }
-            if (Direction == MessageDirection.Receive)
-            {
-                new ToastWindow($"📨 {Sender}님이 보냄", Content).Show();
-
-                if (messageType == MessageType.Text) return $"{Sender}: {Content}";
-
-                if (messageType == MessageType.File) return $"📥{Sender}(파일 받음): {Content}";
-            }
-            return "메세지 없음(잘못된 타입)";
-        }
-        
 
         private string getOpenFilePath()
         {
@@ -225,7 +194,7 @@ namespace WalkieDohi.UC
 
                     OnSendFile?.Invoke(this, (fileMessage.FileName, base64));
 
-                    var display = GetMsgDisplay("", fileMessage.FileName,MessageType.File, MessageDirection.Send);
+                    var display = ChatMessage.GetMsgDisplay("", fileMessage.FileName, MessageType.File, MessageDirection.Send);
                     AddMessage(display, MessageDirection.Send);
                 }
                 catch (Exception ex)
@@ -244,7 +213,7 @@ namespace WalkieDohi.UC
         private bool IsScrolledToBottom(ScrollViewer scroll)
         {
             // ScrollableHeight와 VerticalOffset의 차이가 작으면 맨 아래로 판단
-            return scroll.VerticalOffset >= scroll.ScrollableHeight ;
+            return scroll.VerticalOffset >= scroll.ScrollableHeight;
         }
 
         private ScrollViewer GetScrollViewer(DependencyObject obj)
@@ -267,5 +236,5 @@ namespace WalkieDohi.UC
 
     }
 
-    
+
 }

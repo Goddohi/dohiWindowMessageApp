@@ -81,6 +81,7 @@
     <Compile Include="Core\DohiEntityBase.cs" />
     <Compile Include="Core\DohiViewModelBase.cs" />
     <Compile Include="Core\TabBasicinterface.cs" />
+    <Compile Include="Entity\ChatMessage.cs" />
     <Compile Include="UI\GroupManger\FriendSelectWindow.xaml.cs">
       <DependentUpon>FriendSelectWindow.xaml</DependentUpon>
     </Compile>

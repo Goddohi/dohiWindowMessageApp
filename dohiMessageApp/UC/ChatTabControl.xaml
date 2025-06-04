@@ -8,7 +8,23 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <ListBox x:Name="ChatList"  MouseDoubleClick="ChatList_MouseDoubleClick" Grid.Row="0" Margin="5"/>
+        <ListBox x:Name="ChatList" MouseDoubleClick="ChatList_MouseDoubleClick" Grid.Row="0" Margin="5">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid Margin="5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="100"/>
+                            <!-- 보낸이 영역 고정폭 -->
+                            <ColumnDefinition Width="*" />
+                            <!-- 메시지 영역 자동 확장 -->
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Grid.Column="0" Text="{Binding Sender}" FontWeight="Bold" />
+                        <TextBlock Grid.Column="1" Text="{Binding Content}" TextWrapping="Wrap"/>
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
         <Grid Grid.Row="1" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Left">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition MinWidth="50" Width="300*"/>
