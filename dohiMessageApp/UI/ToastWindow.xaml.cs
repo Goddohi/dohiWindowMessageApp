@@ -24,7 +24,12 @@ namespace WalkieDohi.UI
         private readonly DispatcherTimer _timer;
 
         public ToastWindow(string title, string message)
-        {
+        {   
+            // 포커스 방지
+            this.ShowActivated = false;
+            this.Topmost = true;
+            this.Focusable = false;
+            
             InitializeComponent();
             TitleText.Text = title;
             MessageText.Text = message;
