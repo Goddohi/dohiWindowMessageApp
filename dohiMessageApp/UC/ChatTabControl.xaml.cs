@@ -42,7 +42,7 @@ namespace WalkieDohi.UC
 
         public event EventHandler<(string FileName, string Base64Content)> OnSendFile;
 
-        private Dictionary<string, string> receivedFiles = new Dictionary<string, string>();
+        private Dictionary<ChatMessage, string> receivedFiles = new Dictionary<ChatMessage, string>();
 
         public ChatTabControl()
         {
@@ -79,7 +79,7 @@ namespace WalkieDohi.UC
 
         private void ChatList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if (ChatList.SelectedItem is string selected && receivedFiles.TryGetValue(selected, out string path))
+            if (ChatList.SelectedItem is ChatMessage selected && receivedFiles.TryGetValue(selected, out string path))
             {
                 if (File.Exists(path))
                 {
@@ -178,7 +178,7 @@ namespace WalkieDohi.UC
         {
             var display = ChatMessage.GetMsgDisplay(msg, MessageDirection.Receive);
             AddMessage(display, MessageDirection.Receive);
-            receivedFiles[display.Content] = MessageUtil.GetFilePath(msg.FileName);
+            receivedFiles[display] = MessageUtil.GetFilePath(msg.FileName);
         }
 
 
