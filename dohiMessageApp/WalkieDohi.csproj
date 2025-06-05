@@ -117,6 +117,7 @@
     <Compile Include="Util\ClipboadPasteUtil.cs" />
     <Compile Include="Util\InverseBoolToVisibilityConverter.cs" />
     <Compile Include="Util\JsonDataLoadingHelper.cs" />
+    <Compile Include="Util\MessageImageUtil.cs" />
     <Compile Include="Util\MessageUtil.cs" />
     <Compile Include="Util\MessengerReceiver.cs" />
     <Compile Include="Util\MessengerSender.cs" />

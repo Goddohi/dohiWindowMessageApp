@@ -85,8 +85,16 @@ namespace WalkieDohi
                     if (msg.CheckMessageTypeFile())
                     {
                         MessageUtil.CheckFileDrietory();
-
+                        //파일을 읽어오는 곳
                         File.WriteAllBytes(MessageUtil.GetFilePath(msg.FileName), Convert.FromBase64String(msg.Content));
+
+                        tab.AddReceivedFile(msg);
+                    }
+                    else if (msg.CheckMessageTypeImage())
+                    {
+                        MessageUtil.CheckImageDrietory();
+                        //파일을 읽어오는 곳
+                        File.WriteAllBytes(MessageUtil.GetImagePath(msg.FileName), Convert.FromBase64String(msg.Content));
 
                         tab.AddReceivedFile(msg);
                     }
@@ -492,6 +500,10 @@ namespace WalkieDohi
             GroupchatControl.OnSendFile += async (s, fileInfo) =>
             {
                 var msgEntity = MessageEntity.OfGroupSendFileMassage(GroupchatControl.TargetGroup, fileInfo.Base64Content, fileInfo.FileName);
+                if (MessageImageUtil.isImagecheck(msgEntity.FileName))
+                {
+                    msgEntity.Type = MessageType.Image;
+                }
                 var tasks = GroupchatControl.TargetGroup.Ips
                             .Where(ip => ip != NetworkHelper.GetLocalIPv4())
                             .Select(ip => msgSender.SendMessageAsync(ip, GroupchatControl.TargetGroup.Port, msgEntity));
@@ -518,6 +530,10 @@ namespace WalkieDohi
             chatControl.OnSendFile += async (s, fileInfo) =>
             {
                 var msgEntity = MessageEntity.OfSendFileMassage(fileInfo.Base64Content, fileInfo.FileName);
+                if (MessageImageUtil.isImagecheck(msgEntity.FileName))
+                {
+                    msgEntity.Type = MessageType.Image;
+                }
                 await msgSender.SendMessageAsync(ip, port, msgEntity);
             };
             return chatControl;

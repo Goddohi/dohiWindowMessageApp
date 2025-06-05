@@ -209,20 +209,25 @@ namespace WalkieDohi.UC
             AddMessage(display, MessageDirection.Receive);
         }
 
-        private static readonly string[] SupportedImageExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".bmp" };
-
+        
         public void AddReceivedFile(MessageEntity msg)
         {
             string extension = Path.GetExtension(msg.FileName).ToLower();
-            if (SupportedImageExtensions.Contains(extension))
+            if (MessageImageUtil.isImagecheck(msg.FileName))
             {
                 msg.Type = MessageType.Image;
             }
             
             ChatMessage display = ChatMessage.GetMsgDisplay(msg, MessageDirection.Receive);
             AddMessage(display, MessageDirection.Receive);
-            
-            receivedFiles[display] = MessageUtil.GetFilePath(msg.FileName);
+            if (msg.CheckMessageTypeImage())
+            {
+                receivedFiles[display] = MessageUtil.GetImagePath(msg.FileName);
+            }
+            else
+            {
+                receivedFiles[display] = MessageUtil.GetFilePath(msg.FileName);
+            }
         }
 
 
@@ -316,14 +321,19 @@ namespace WalkieDohi.UC
 
             try
             {
+                var messageType = MessageType.File;
                 byte[] fileData = File.ReadAllBytes(filePath);
                 string base64 = Convert.ToBase64String(fileData);
 
                 var fileMessage = MessageEntity.OfSendFileMassage(base64, Path.GetFileName(filePath));
 
                 OnSendFile?.Invoke(this, (fileMessage.FileName, base64));
+                if (MessageImageUtil.isImagecheck(fileMessage.FileName))
 
-                var display = ChatMessage.GetSendMsgDisplay(fileMessage.FileName,fileMessage.Content, MessageType.File, MessageDirection.Send);
+                {
+                    messageType = MessageType.Image;
+                }
+                var display = ChatMessage.GetSendMsgDisplay(fileMessage.FileName, fileMessage.Content, messageType, MessageDirection.Send);
                 AddMessage(display, MessageDirection.Send);
             }
             catch (Exception ex)
@@ -334,21 +344,15 @@ namespace WalkieDohi.UC
 
         private void SendClipboardImageMessage(string base64)
         {
-            string randomName = "clipboard_image_" + GenerateRandomString(10) + ".png";
+            string randomName = ClipboadPasteUtil.GetRandomClipboadImgName();
             var fileMessage = MessageEntity.OfSendFileMassage(base64, randomName);
 
             OnSendFile?.Invoke(this, (fileMessage.FileName, base64));
-            var display = ChatMessage.GetSendMsgDisplay(fileMessage.FileName, fileMessage.Content, MessageType.File, MessageDirection.Send);
+            var display = ChatMessage.GetSendMsgDisplay(fileMessage.FileName, fileMessage.Content, MessageType.Image, MessageDirection.Send);
 
             AddMessage(display, MessageDirection.Send);
         }
-        private static string GenerateRandomString(int length)
-        {
-            const string chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-            var random = new Random();
-            return new string(Enumerable.Repeat(chars, length)
-                .Select(s => s[random.Next(s.Length)]).ToArray());
-        }
+
 
     }
 
