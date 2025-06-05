@@ -23,9 +23,13 @@ using WalkieDohi.UI;
 using WalkieDohi.Util;
 using Clipboard = System.Windows.Clipboard;
 using ContextMenu = System.Windows.Controls.ContextMenu;
+using DataFormats = System.Windows.DataFormats;
+using DragDropEffects = System.Windows.DragDropEffects;
+using DragEventArgs = System.Windows.DragEventArgs;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using MenuItem = System.Windows.Controls.MenuItem;
 using MessageBox = System.Windows.MessageBox;
+using Path = System.IO.Path;
 using UserControl = System.Windows.Controls.UserControl;
 
 namespace WalkieDohi.UC
@@ -60,6 +64,13 @@ namespace WalkieDohi.UC
 
         private void InputBox_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
+            if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.V)
+            {
+                PasteImageIfExists();
+            }
+
+
+
             if (e.Key != Key.Enter)
             {
                 return;
@@ -75,7 +86,23 @@ namespace WalkieDohi.UC
 
 
         }
+        private void PasteImageIfExists()
+        {
+            if (Clipboard.ContainsImage())
+            {
+                BitmapSource image = Clipboard.GetImage();
+                var encoder = new PngBitmapEncoder();
+                encoder.Frames.Add(BitmapFrame.Create(image));
+                using (var stream = new MemoryStream())
+                {
+                    encoder.Save(stream);
+                    byte[] imageBytes = stream.ToArray();
+                    string base64 = Convert.ToBase64String(imageBytes);
 
+                    SendClipboardImageMessage(base64);
+                }
+            }
+        }
 
         private void ChatList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
@@ -140,7 +167,7 @@ namespace WalkieDohi.UC
             if (!string.IsNullOrEmpty(text))
             {
                 OnSendMessage?.Invoke(this, text);
-                var display = ChatMessage.GetMsgDisplay("", text, MessageType.Text, MessageDirection.Send);
+                var display = ChatMessage.GetSendMsgDisplay(text,"", MessageType.Text, MessageDirection.Send);
                 AddMessage(display, MessageDirection.Send);
                 InputBox.Clear();
 
@@ -170,13 +197,21 @@ namespace WalkieDohi.UC
 
         public void AddReceivedMessage(MessageEntity msg)
         {
-            var display = ChatMessage.GetMsgDisplay(msg, MessageDirection.Receive);
+            ChatMessage display = ChatMessage.GetMsgDisplay(msg, MessageDirection.Receive);
             AddMessage(display, MessageDirection.Receive);
         }
+        private static readonly string[] SupportedImageExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".bmp" };
+
 
         public void AddReceivedFile(MessageEntity msg)
         {
-            var display = ChatMessage.GetMsgDisplay(msg, MessageDirection.Receive);
+            string extension = Path.GetExtension(msg.FileName).ToLower();
+            if (SupportedImageExtensions.Contains(extension))
+            {
+                msg.Type = MessageType.Image;
+            }
+
+            ChatMessage display = ChatMessage.GetMsgDisplay(msg, MessageDirection.Receive);
             AddMessage(display, MessageDirection.Receive);
             receivedFiles[display] = MessageUtil.GetFilePath(msg.FileName);
         }
@@ -205,43 +240,6 @@ namespace WalkieDohi.UC
         }
 
 
-        private async void SendFileMessageAsync()
-        {
-            string filePath = getOpenFilePath();
-            if (!filePath.Equals(""))
-            {
-                FileInfo fileInfo = new FileInfo(filePath);
-
-                //  10MB 초과 파일 체크
-                const long MaxFileSize = 10 * 1024 * 1024; // 10MB
-
-                if (fileInfo.Length > MaxFileSize)
-                {
-                    MessageBox.Show("❗ 10MB를 초과하는 파일은 전송할 수 없습니다.", "파일 용량 초과", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return;
-                }
-
-                try
-                {
-                    byte[] fileData = File.ReadAllBytes(filePath);
-                    string base64 = Convert.ToBase64String(fileData);
-
-                    var fileMessage = MessageEntity.OfSendFileMassage(base64, System.IO.Path.GetFileName(filePath));
-
-                    OnSendFile?.Invoke(this, (fileMessage.FileName, base64));
-
-                    var display = ChatMessage.GetMsgDisplay("", fileMessage.FileName, MessageType.File, MessageDirection.Send);
-                    AddMessage(display, MessageDirection.Send);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("파일 전송 실패: " + ex.Message);
-                }
-            }
-
-        }
-
-
 
 
 
@@ -264,11 +262,87 @@ namespace WalkieDohi.UC
             }
             return null;
         }
+        private async void SendFileMessageAsync()
+        {
+            string filePath = getOpenFilePath();
+            if (!string.IsNullOrEmpty(filePath))
+            {
+                await HandleDroppedFileAsync(filePath);
+            }
+        }
+        private void ChatList_DragEnter(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                e.Effects = DragDropEffects.Copy;
+            }
+            else
+            {
+                e.Effects = DragDropEffects.None;
+            }
+        }
 
+        private async void ChatList_Drop(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                string[] droppedFiles = (string[])e.Data.GetData(DataFormats.FileDrop);
 
+                foreach (var filePath in droppedFiles)
+                {
+                    await HandleDroppedFileAsync(filePath);
+                }
+            }
+        }
 
+        private async Task HandleDroppedFileAsync(string filePath)
+        {
+            if (!File.Exists(filePath)) return;
 
+            FileInfo fileInfo = new FileInfo(filePath);
+            const long MaxFileSize = 10 * 1024 * 1024;
 
+            if (fileInfo.Length > MaxFileSize)
+            {
+                MessageBox.Show("❗ 10MB를 초과하는 파일은 전송할 수 없습니다.", "파일 용량 초과", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            try
+            {
+                byte[] fileData = File.ReadAllBytes(filePath);
+                string base64 = Convert.ToBase64String(fileData);
+
+                var fileMessage = MessageEntity.OfSendFileMassage(base64, Path.GetFileName(filePath));
+
+                OnSendFile?.Invoke(this, (fileMessage.FileName, base64));
+
+                var display = ChatMessage.GetSendMsgDisplay(fileMessage.FileName, fileMessage.Content, MessageType.File, MessageDirection.Send);
+                AddMessage(display, MessageDirection.Send);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("파일 전송 실패: " + ex.Message);
+            }
+        }
+
+        private void SendClipboardImageMessage(string base64)
+        {
+            string randomName = "clipboard_image_" + GenerateRandomString(10) + ".png";
+            var fileMessage = MessageEntity.OfSendFileMassage(base64, randomName);
+
+            OnSendFile?.Invoke(this, (fileMessage.FileName, base64));
+            var display = ChatMessage.GetSendMsgDisplay(fileMessage.FileName, fileMessage.Content, MessageType.File, MessageDirection.Send);
+
+            AddMessage(display, MessageDirection.Send);
+        }
+        private static string GenerateRandomString(int length)
+        {
+            const string chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            var random = new Random();
+            return new string(Enumerable.Repeat(chars, length)
+                .Select(s => s[random.Next(s.Length)]).ToArray());
+        }
 
     }
 

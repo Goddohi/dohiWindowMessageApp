@@ -2,8 +2,11 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:WalkieDohi"
+             xmlns:util="clr-namespace:WalkieDohi.Util"
+             
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        <util:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+        <util:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter"/>
     </Application.Resources>
 </Application>

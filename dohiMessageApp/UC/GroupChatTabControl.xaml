@@ -25,9 +25,13 @@
         <!-- 채팅 메시지 리스트 -->
         <ListBox x:Name="ChatList" 
                    SelectionMode="Single"
+                   AllowDrop="True"
                    MouseDoubleClick="ChatList_MouseDoubleClick" 
                    MouseRightButtonUp="ChatList_MouseRightButtonUp"
-                   PreviewKeyDown="ChatList_PreviewKeyDown" Grid.Row="1" Margin="5">
+                   DragEnter="ChatList_DragEnter"
+                   Drop="ChatList_Drop"
+                   PreviewKeyDown="ChatList_PreviewKeyDown"
+                   Grid.Row="1" Margin="5">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <Grid Margin="5">
@@ -39,7 +43,13 @@
                         </Grid.ColumnDefinitions>
 
                         <TextBlock Grid.Column="0" Text="{Binding Sender}" FontWeight="Bold" />
-                        <TextBlock Grid.Column="1" Text="{Binding Content}" TextWrapping="Wrap"/>
+                        <Image Width="400" Height="200" Grid.Column="1"
+                                Source="{Binding ImageData}"
+                                Stretch="Uniform" 
+                                Visibility="{Binding IsImage, Converter={StaticResource BoolToVisibilityConverter}}"/>
+
+                        <TextBlock  Grid.Column="1" Text="{Binding Content}"
+                                    Visibility="{Binding IsImage, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
                     </Grid>
                 </DataTemplate>
             </ListBox.ItemTemplate>

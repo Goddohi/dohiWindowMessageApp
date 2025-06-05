@@ -140,6 +140,10 @@ namespace WalkieDohi.Entity
         {
             return this.Type == MessageType.Text;
         }
+        public bool CheckMessageTypeImage()
+        {
+            return this.Type == MessageType.Image;
+        }
     }
 
 
@@ -153,7 +157,7 @@ namespace WalkieDohi.Entity
 
     public enum MessageType
     {
-        Text,File
+        Text,File, Image
     }
     public enum ResultType
     {

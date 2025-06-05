@@ -9,9 +9,14 @@
         </Grid.RowDefinitions>
 
         <ListBox x:Name="ChatList" 
-         SelectionMode="Single" MouseDoubleClick="ChatList_MouseDoubleClick" 
-         MouseRightButtonUp="ChatList_MouseRightButtonUp"
-                 PreviewKeyDown="ChatList_PreviewKeyDown" Grid.Row="0" Margin="5">
+                 SelectionMode="Single"
+                 AllowDrop="True"
+                 MouseDoubleClick="ChatList_MouseDoubleClick" 
+                 MouseRightButtonUp="ChatList_MouseRightButtonUp"
+                 PreviewKeyDown="ChatList_PreviewKeyDown" 
+                 DragEnter="ChatList_DragEnter"
+                 Drop="ChatList_Drop"
+                 Grid.Row="0" Margin="5">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <Grid Margin="5">
@@ -23,7 +28,14 @@
                         </Grid.ColumnDefinitions>
 
                         <TextBlock Grid.Column="0" Text="{Binding Sender}" FontWeight="Bold" />
-                        <TextBlock Grid.Column="1" Text="{Binding Content}" TextWrapping="Wrap"/>
+                        <Image Width="400" Height="200" 
+                                Grid.Column="1"
+                                Stretch="Uniform" 
+                                Source="{Binding ImageData}"
+                                Visibility="{Binding IsImage, Converter={StaticResource BoolToVisibilityConverter}}"/>
+
+                        <TextBlock  Grid.Column="1" Text="{Binding Content}"
+                                    Visibility="{Binding IsImage, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
                     </Grid>
                 </DataTemplate>
             </ListBox.ItemTemplate>
