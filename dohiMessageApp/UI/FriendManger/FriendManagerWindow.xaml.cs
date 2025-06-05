@@ -57,11 +57,11 @@ namespace WalkieDohi.UI
         }
 
 
+
         private void AddFriend_Click(object sender, RoutedEventArgs e)
         {
             string name = NameBox.Text.Trim();
             string ip = GetIpFullstring();
-
 
             if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(ip))
             {
@@ -75,17 +75,35 @@ namespace WalkieDohi.UI
                 return;
             }
 
-            if (viewModel.Friends.Any(f => f.Ip == ip))
+            if (isEditMode)
             {
-                MessageBox.Show("같은 ip가 이미 존재합니다.");
-                return;
+                if (editIndex >= 0 && editIndex < viewModel.Friends.Count)
+                {
+                    viewModel.Friends[editIndex].Name = name;
+                    viewModel.Friends[editIndex].Ip = ip;
+                    FriendList.Items.Refresh();
+                    SaveFriends();
+                }
+
+                isEditMode = false;
+                editIndex = -1;
+                btnAddFriend.Content = "추가";
+                btnUpdateCancle.Visibility = Visibility.Hidden;
+            }
+            else
+            {
+                if (viewModel.Friends.Any(f => f.Ip == ip))
+                {
+                    MessageBox.Show("같은 ip가 이미 존재합니다.");
+                    return;
+                }
+
+                viewModel.Friends.Add(new Friend { Name = name, Ip = ip, Port = 9000 });
+                SaveFriends();
             }
 
-            viewModel.Friends.Add(new Friend { Name = name, Ip = ip, Port = 9000 });
-            SaveFriends();
             AddBoxAllClear();
         }
-
         private void RemoveFriend_Click(object sender, RoutedEventArgs e)
         {
             int selectedIndex = FriendList.SelectedIndex;
@@ -142,8 +160,39 @@ namespace WalkieDohi.UI
             }
         }
 
+        public Friend SelectedFriend { get; set; }
+        private bool isEditMode = false;
+        private int editIndex = -1;
+        private void FriendList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (FriendList.SelectedItem is Friend friend)
+            {
+                NameBox.Text = friend.Name;
+                var ipParts = friend.Ip.Split('.');
+                if (ipParts.Length == 4)
+                {
+                    IpBox1.Text = ipParts[0];
+                    IpBox2.Text = ipParts[1];
+                    IpBox3.Text = ipParts[2];
+                    IpBox4.Text = ipParts[3];
+                }
 
+                isEditMode = true;
+                editIndex = FriendList.SelectedIndex;
+                btnUpdateCancle.Visibility = Visibility.Visible;
+                btnAddFriend.Content = "수정 완료";
+            }
+        }
 
+        private void UpdateCancle_Click(object sender, RoutedEventArgs e)
+        {
+            isEditMode = false;
+            btnUpdateCancle.Visibility = Visibility.Hidden;
+            isEditMode = false;
+            editIndex = -1;
+            btnAddFriend.Content = "추가";
+            AddBoxAllClear();
+        }
     }
 }
 
