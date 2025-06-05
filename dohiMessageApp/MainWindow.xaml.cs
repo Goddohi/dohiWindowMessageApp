@@ -81,7 +81,7 @@ namespace WalkieDohi
                     //상대방의 이름이 ip기준으로 내가 저장한 이름으로 출력되도록 수정 
                     msg.Sender = MainData.GetFriendNameOrReturnOriginal(msg.Sender, msg.SenderIp);
                     var tab = AddOrFocusChatTab(msg, 9000);
-
+                    if(tab == null) { return;}
                     if (msg.CheckMessageTypeFile())
                     {
                         MessageUtil.CheckFileDrietory();
@@ -245,10 +245,19 @@ namespace WalkieDohi
             }
             else
             {
+
                 if (chatTabs.ContainsKey(key))
                 {
-                   var chatTab= (GroupChatTabControl)chatTabs[key];
-                    if (chatTab.TargetGroup.Key == msg.Group.Key)
+                    var chatTab = (GroupChatTabControl)chatTabs[key];
+
+                    var incomingIps = msg.Group.Ips.Distinct().OrderBy(ip => ip).ToList();
+                    var existingIps = chatTab.TargetGroup.Ips.Distinct().OrderBy(ip => ip).ToList();
+
+                    if (incomingIps.SequenceEqual(existingIps))
+                    {
+                        return chatTabs[key]; // 동일한 IP 리스트를 가진 기존 그룹
+                    }
+                    if (chatTab.TargetGroup.Key == msg.Group.Key) //이전 버전 사용자용 
                     {
                         return chatTabs[key];
                     }
@@ -373,11 +382,32 @@ namespace WalkieDohi
 
         private void AddChatTab(GroupEntity group)
         {
+            if (!group.Ips.Contains(NetworkHelper.GetLocalIPv4()))
+            {
+                MessageBox.Show("본인이 포함되어있지 않은 그룹은 생성불가입니다.");
+                return;
+            }
             string key = group.GroupName;
 
             if (chatTabs.ContainsKey(key))
             {
                 var chatTab = (GroupChatTabControl)chatTabs[key];
+
+                var incomingIps = group.Ips.Distinct().OrderBy(ip => ip).ToList();
+                var existingIps = chatTab.TargetGroup.Ips.Distinct().OrderBy(ip => ip).ToList();
+
+                if (incomingIps.SequenceEqual(existingIps))
+                {
+                    var existing = ChatTabControlHost.Items.Cast<TabItem>()
+                        .FirstOrDefault(t => t.Header is StackPanel panel && panel.Tag?.ToString() == key);
+
+                    if (existing != null)
+                    {
+                        ChatTabControlHost.SelectedItem = existing;
+                    }
+                    return;
+                }
+                //이전 버전 사용자용
                 if (chatTab.TargetGroup.Key == group.Key)
                 {
                     var existing = ChatTabControlHost.Items.Cast<TabItem>()
