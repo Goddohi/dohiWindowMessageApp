@@ -35,12 +35,16 @@ namespace WalkieDohi
             InitializeComponent();
             InitTrayIcon();
             LoadUser();
-            LoadFriends();
-            LoadGroups();
+            JsonDataLoadingHelper.LoadFriends();
+            JsonDataLoadingHelper.LoadGroups();
             StartReceiver();
             AddStartTab();
         }
 
+        private void LoadUser()
+        {
+            NicknameBox.Text = JsonDataLoadingHelper.LoadUser();
+        }
         private void InitTrayIcon()
         {
             trayIcon = new NotifyIcon
@@ -124,62 +128,6 @@ namespace WalkieDohi
             ChatTabControlHost.Items.Add(tab);
         }
 
-        private void LoadUser()
-        {
-            var path = "user.json";
-            if (File.Exists(path))
-            {
-                var json = File.ReadAllText(path);
-                MainData.currentUser = JsonConvert.DeserializeObject<User>(json);
-                NicknameBox.Text = MainData.currentUser.Nickname;
-            }
-            else
-            {
-                MainData.currentUser = new User { Nickname = "사용자" };
-                NicknameBox.Text = MainData.currentUser.Nickname;
-                SaveUser(false);
-            }
-        }
-
-        private void SaveUser(bool showMessage)
-        {
-            MainData.currentUser.Nickname = NicknameBox.Text.Trim();
-            File.WriteAllText("user.json", JsonConvert.SerializeObject(MainData.currentUser, Formatting.Indented));
-            if (showMessage) MessageBox.Show("닉네임이 저장되었습니다.");
-        }
-
-        private void LoadFriends()
-        {
-            var path = "friends.json";
-            if (!File.Exists(path))
-            {
-                MainData.Friends = new List<Friend> {
-                    new Friend { Name = "로컬 테스트", Ip = "127.0.0.1", Port = 9000 }
-                };
-                File.WriteAllText(path, JsonConvert.SerializeObject(MainData.Friends, Formatting.Indented));
-                MessageBox.Show("기본 친구 목록을 생성했습니다.");
-            }
-            else
-            {
-                MainData.Friends = JsonConvert.DeserializeObject<List<Friend>>(File.ReadAllText(path));
-            }
-        }
-
-        private void LoadGroups()
-        {
-            var path = "groups.json";
-            if (!File.Exists(path))
-            {
-                MainData.Groups = new List<GroupEntity>();
-                File.WriteAllText(path, JsonConvert.SerializeObject(MainData.Friends, Formatting.Indented));
-    
-            }
-            else
-            {
-                MainData.Groups = JsonConvert.DeserializeObject<List<GroupEntity>>(File.ReadAllText(path));
-            }
-        }
-
         private void ShowMainWindow()
         {
             this.Show();
@@ -210,7 +158,7 @@ namespace WalkieDohi
 
         private void SaveUserButton_Click(object sender, RoutedEventArgs e)
         {
-            SaveUser(true);
+            JsonDataLoadingHelper.SaveUser(NicknameBox.Text.Trim(), true);
         }
 
         private void ManageFriends_Click(object sender, RoutedEventArgs e)
@@ -229,10 +177,11 @@ namespace WalkieDohi
            
                _startTabControl?.SetGroups(MainData.Groups);
             
-
-
-            
         }
+
+
+
+        #region 탭 생성로직
 
         private TabBasicinterface AddOrFocusChatTab(MessageEntity msg, int port)
         {
@@ -543,6 +492,8 @@ namespace WalkieDohi
             };
             return chatControl;
         }
-        
+
+        #endregion 탭 생성로직
+
     }
 }

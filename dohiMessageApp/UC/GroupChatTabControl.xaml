@@ -24,9 +24,10 @@
 
         <!-- 채팅 메시지 리스트 -->
         <ListBox x:Name="ChatList" 
-                   SelectionMode="Single" MouseDoubleClick="ChatList_MouseDoubleClick" 
- MouseRightButtonUp="ChatList_MouseRightButtonUp"
-                 PreviewKeyDown="ChatList_PreviewKeyDown" Grid.Row="1" Margin="5">
+                   SelectionMode="Single"
+                   MouseDoubleClick="ChatList_MouseDoubleClick" 
+                   MouseRightButtonUp="ChatList_MouseRightButtonUp"
+                   PreviewKeyDown="ChatList_PreviewKeyDown" Grid.Row="1" Margin="5">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <Grid Margin="5">
