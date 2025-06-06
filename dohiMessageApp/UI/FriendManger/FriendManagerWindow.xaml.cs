@@ -75,6 +75,16 @@ namespace WalkieDohi.UI
                 return;
             }
 
+            // 자기 자신을 제외한 IP 중복 검사 (수정모드가 아닐때는 -1이므로 영향 없음)
+            bool duplicateIp = viewModel.Friends
+                .Where((f, index) => index != editIndex)
+                .Any(f => f.Ip == ip);
+            if (duplicateIp)
+            {
+                MessageBox.Show("같은 IP가 이미 존재합니다.");
+                return;
+            }
+
             if (isEditMode)
             {
                 if (editIndex >= 0 && editIndex < viewModel.Friends.Count)
@@ -84,29 +94,24 @@ namespace WalkieDohi.UI
                     FriendList.Items.Refresh();
                     SaveFriends();
                 }
-
-                isEditMode = false;
-                editIndex = -1;
-                btnAddFriend.Content = "추가";
-                btnUpdateCancle.Visibility = Visibility.Hidden;
-            }
-            else
-            {
-                if (viewModel.Friends.Any(f => f.Ip == ip))
-                {
-                    MessageBox.Show("같은 ip가 이미 존재합니다.");
-                    return;
-                }
-
-                viewModel.Friends.Add(new Friend { Name = name, Ip = ip, Port = 9000 });
-                SaveFriends();
-            }
+                UpdateCancleLogic();
+                return;
+            }      
+            
+            viewModel.Friends.Add(new Friend { Name = name, Ip = ip, Port = 9000 });
+            SaveFriends();
 
             AddBoxAllClear();
         }
+
         private void RemoveFriend_Click(object sender, RoutedEventArgs e)
         {
             int selectedIndex = FriendList.SelectedIndex;
+            if (isEditMode)
+            {
+                selectedIndex = editIndex;
+            }
+                
             if (selectedIndex < 0) return;
 
             var friend = viewModel.Friends[selectedIndex];
@@ -114,6 +119,7 @@ namespace WalkieDohi.UI
             {
                 viewModel.Friends.RemoveAt(selectedIndex);
                 SaveFriends();
+                UpdateCancleLogic() ;
             }
         }
 
@@ -161,6 +167,9 @@ namespace WalkieDohi.UI
         }
 
         public Friend SelectedFriend { get; set; }
+        /// <summary>
+        /// 수정모드 
+        /// </summary>
         private bool isEditMode = false;
         private int editIndex = -1;
         private void FriendList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -186,9 +195,13 @@ namespace WalkieDohi.UI
 
         private void UpdateCancle_Click(object sender, RoutedEventArgs e)
         {
+            UpdateCancleLogic();
+        }
+
+        private void UpdateCancleLogic()
+        {
             isEditMode = false;
             btnUpdateCancle.Visibility = Visibility.Hidden;
-            isEditMode = false;
             editIndex = -1;
             btnAddFriend.Content = "추가";
             AddBoxAllClear();
