@@ -131,6 +131,8 @@ namespace WalkieDohi.UI
             File.WriteAllText(GroupJsonPath, json);
             MainData.Groups = Groups.ToList<GroupEntity>();
         }
+
+#region 그룹원 삭제
         /// <summary>
         /// 그룹원 삭제
         /// </summary>
@@ -145,10 +147,29 @@ namespace WalkieDohi.UI
                 MessageBox.Show("본인은 제외할 수 없습니다.");
                 return;
             }
-            _selectedGroup.Ips = _selectedGroup.Ips.Where(ip => ip != selected.Ip).ToArray();
-            RefreshMemberDisplay();
-            SaveGroupsToFile(); 
+            if (MessageBox.Show($"{selected.DisplayText}을 삭제할까요?", "삭제 확인", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+            {
+                _selectedGroup.Ips = _selectedGroup.Ips.Where(ip => ip != selected.Ip).ToArray();
+                RefreshMemberDisplay();
+                SaveGroupsToFile();
+            }
         }
+        private void MemberList_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (_selectedGroup == null) return;
+            var selected = MemberList.SelectedItem as GroupMemberDisplay;
+            if (selected == null) return;
+            if (selected.Ip == NetworkHelper.GetLocalIPv4()) return;
+            if (MessageBox.Show($"{selected.DisplayText}을 삭제할까요?", "삭제 확인", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+            {
+                _selectedGroup.Ips = _selectedGroup.Ips.Where(ip => ip != selected.Ip).ToArray();
+                RefreshMemberDisplay();
+                SaveGroupsToFile();
+            }
+        }
+
+
+#endregion 그룹원 삭제
 
         private void RenameGroup_Click(object sender, RoutedEventArgs e)
         {
@@ -165,8 +186,17 @@ namespace WalkieDohi.UI
 
         private void DeleteGroup_Click(object sender, RoutedEventArgs e)
         {
+            GroupRemoveLogic();
+        }
+        private void GroupList_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            GroupRemoveLogic();
+        }
+
+        private void GroupRemoveLogic()
+        {
             if (_selectedGroup == null) return;
-            if (MessageBox.Show("정말 삭제하시겠습니까?", "확인", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+            if (MessageBox.Show($"정말 그룹 {_selectedGroup.GroupName}을 삭제하시겠습니까?", "그룹삭제", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
             {
                 Groups.Remove(_selectedGroup);
                 _selectedGroup = null;
@@ -180,5 +210,7 @@ namespace WalkieDohi.UI
             public string Ip { get; set; }
             public string DisplayText { get; set; }
         }
+
+
     }
 }

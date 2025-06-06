@@ -22,5 +22,14 @@ namespace WalkieDohi.UI
                 DialogResult = true;
             }
         }
+
+        private void FriendListBox_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            SelectedFriend = FriendListBox.SelectedItem as Friend;
+            if (SelectedFriend != null)
+            {
+                DialogResult = true;
+            }
+        }
     }
 }

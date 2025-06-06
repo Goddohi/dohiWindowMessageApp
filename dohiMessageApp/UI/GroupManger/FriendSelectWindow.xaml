@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="친구 선택" Height="300" Width="300" WindowStartupLocation="CenterOwner">
     <Grid Margin="10">
-        <ListBox x:Name="FriendListBox" DisplayMemberPath="Name" />
-        <Button Content="선택" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,0,10" Width="60" Click="Select_Click"/>
+        <ListBox x:Name="FriendListBox" DisplayMemberPath="Name" MouseDoubleClick="FriendListBox_MouseDoubleClick" Margin="0,0,0,35" />
+        <Button Content="선택" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,0,5" Height="20" Width="60" Click="Select_Click"/>
     </Grid>
 </Window>

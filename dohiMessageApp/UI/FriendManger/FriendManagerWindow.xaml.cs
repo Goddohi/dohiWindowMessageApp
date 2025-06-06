@@ -94,7 +94,7 @@ namespace WalkieDohi.UI
                     FriendList.Items.Refresh();
                     SaveFriends();
                 }
-                UpdateCancleLogic();
+                FriendUpdateCancleLogic();
                 return;
             }      
             
@@ -115,11 +115,14 @@ namespace WalkieDohi.UI
             if (selectedIndex < 0) return;
 
             var friend = viewModel.Friends[selectedIndex];
-            if (MessageBox.Show($"{friend.Name}을 삭제할까요?", "삭제 확인", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+
+            string removeShow = isEditMode ? $"수정중이신 {friend.Name}을 삭제할까요?" : $"{friend.Name}을 삭제할까요?";
+
+            if (MessageBox.Show(removeShow, "삭제 확인", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
             {
                 viewModel.Friends.RemoveAt(selectedIndex);
                 SaveFriends();
-                UpdateCancleLogic() ;
+                FriendUpdateCancleLogic() ;
             }
         }
 
@@ -195,10 +198,18 @@ namespace WalkieDohi.UI
 
         private void UpdateCancle_Click(object sender, RoutedEventArgs e)
         {
-            UpdateCancleLogic();
+            FriendUpdateCancleLogic();
         }
 
-        private void UpdateCancleLogic()
+        private void FriendUpdateCancleLogic()
+        {
+            isEditMode = false;
+            btnUpdateCancle.Visibility = Visibility.Hidden;
+            editIndex = -1;
+            btnAddFriend.Content = "추가";
+            AddBoxAllClear();
+        }
+        private void FriendUpdateStarteLogic()
         {
             isEditMode = false;
             btnUpdateCancle.Visibility = Visibility.Hidden;
