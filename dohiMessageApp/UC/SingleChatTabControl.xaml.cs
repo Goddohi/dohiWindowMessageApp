@@ -37,7 +37,7 @@ namespace WalkieDohi.UC
     /// <summary>
     /// ChatTabControl.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class ChatTabControl : UserControl, TabBasicinterface
+    public partial class SingleChatTabControl : UserControl, TabBasicinterface
     {
         public string TargetIp { get; set; }
         public int TargetPort { get; set; }
@@ -48,7 +48,7 @@ namespace WalkieDohi.UC
 
         private Dictionary<ChatMessage, string> receivedFiles = new Dictionary<ChatMessage, string>();
 
-        public ChatTabControl()
+        public SingleChatTabControl()
         {
             InitializeComponent();
             SendButton.Click += (s, e) => Send();

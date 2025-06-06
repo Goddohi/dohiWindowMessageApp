@@ -14,6 +14,7 @@
     <WarningLevel>4</WarningLevel>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
     <PublishUrl>게시\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -26,7 +27,6 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
@@ -109,8 +109,8 @@
       <DependentUpon>ToastWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\ViewModel\FriendManagerWindowViewModel.cs" />
-    <Compile Include="UC\ChatTabControl.xaml.cs">
-      <DependentUpon>ChatTabControl.xaml</DependentUpon>
+    <Compile Include="UC\SingleChatTabControl.xaml.cs">
+      <DependentUpon>SingleChatTabControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\ViewModel\GroupManagerViewModel.cs" />
     <Compile Include="Util\BoolToVisibilityConverter.cs" />
@@ -163,7 +163,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UC\ChatTabControl.xaml">
+    <Page Include="UC\SingleChatTabControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

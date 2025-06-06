@@ -514,9 +514,9 @@ namespace WalkieDohi
             return GroupchatControl;
         }
 
-        private ChatTabControl GetChatTab(string ip,int port)
+        private SingleChatTabControl GetChatTab(string ip,int port)
         {
-            var chatControl = new ChatTabControl
+            var chatControl = new SingleChatTabControl
             {
                 TargetIp = ip,
                 TargetPort = port
