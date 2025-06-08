@@ -17,6 +17,8 @@ namespace WalkieDohi.Entity
 
         public bool IsImage { get; set; }   // 이미지 여부 구분
 
+        public bool IsFailed { get; set; } = false;
+
 
         /// <summary>
         /// 해당메서드는 Display메세지를 반환하면서 받은 메세지의 경우 알림을 설정해줍니다.
@@ -32,6 +34,23 @@ namespace WalkieDohi.Entity
 
             if (msg.CheckMessageTypeFile()) return GetMsgDisplay(msg.Sender, msg.FileName, "", msg.Type, Direction);
 
+            return null;
+        }
+        public static ChatMessage GetSendMsgDisplay(string content, string baseData, MessageType messageType, MessageDirection Direction, bool result)
+        {
+            ChatMessage returnChatMessage = new ChatMessage();
+            if (Direction == MessageDirection.Send)
+            {
+                if (messageType == MessageType.Text) returnChatMessage = GetMsgDisplay("📤 나", content, baseData, messageType, Direction);
+
+                if (messageType == MessageType.File) returnChatMessage = GetMsgDisplay("📤 나(파일 전송)", content, "", messageType, Direction);
+
+                if (messageType == MessageType.Image) returnChatMessage = GetMsgDisplay("📤 나", content, baseData, messageType, Direction);
+
+                returnChatMessage.IsFailed = result;
+                return returnChatMessage;
+            }
+            
             return null;
         }
         public static ChatMessage GetSendMsgDisplay(string content, string baseData, MessageType messageType, MessageDirection Direction)
