@@ -4,11 +4,13 @@
              Height="Auto" Width="Auto">
     <StackPanel Margin="10">
         <TextBlock Text="채팅할 사람을 선택하세요" Margin="0,0,0,5"/>
-        <ComboBox x:Name="FriendComboBox" DisplayMemberPath="Name" Height="30" Margin="0,0,0,5"/>
-        <Button Content="1대1 채팅 시작" Height="30" x:Name="StartChatButton"/>
+        <ComboBox x:Name="FriendComboBox" DisplayMemberPath="Name"  Height="30" Margin="0,0,0,5"/>
+        <Button Content="1대1 채팅 시작" Height="30" x:Name="StartChatButton"
+                Style="{StaticResource RoundedBasicButtonStyle}"/>
         
         <TextBlock Text="채팅할 그룹를 선택하세요." Margin="0,10,0,5"/>
         <ComboBox x:Name="GroupComboBox" DisplayMemberPath="GroupName" Height="30" Margin="0,0,0,5"/>
-        <Button Content="그룹 채팅 시작" Height="30" x:Name="StartGroupChatButton"/>
+        <Button Content="그룹 채팅 시작" Height="30" x:Name="StartGroupChatButton"
+                Style="{StaticResource RoundedBasicButtonStyle}"/>
     </StackPanel>
 </UserControl>

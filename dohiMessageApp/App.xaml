@@ -6,10 +6,16 @@
              
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-        <util:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
-        <util:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter"/>
-        <BitmapImage x:Key="WalkieDohiLogo" UriSource="pack://application:,,,/Assets/WalkieDohi.png" />
-        <SolidColorBrush x:Key="PrimaryColor" Color="#FFBFDBD6"/>
-        <SolidColorBrush x:Key="SecondaryColor" Color="#FF70AEB4" />
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Styles/BasicWalkieDohiStyle.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            
+            <util:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+            <util:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter"/>
+
+
+
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

@@ -8,13 +8,51 @@
         mc:Ignorable="d"
         Title="WalkieDohi" Height="600" Width="900">
     <DockPanel>
-        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="10">
-            <TextBox x:Name="NicknameBox" Width="150" Margin="0,0,10,0" />
-            <Button x:Name="SaveUserButton" Content="닉네임 저장" Click="SaveUserButton_Click" Margin="0,0,10,0"/>
-            <Button x:Name="ManageFriendsButton" Content="친구 관리" Click="ManageFriends_Click" Margin="0,0,10,0"/>
-            <Button x:Name="ManageGroupsButton" Content="그룹 관리" Click="ManageGroups_Click"/>
+        <!-- 상단 사용자 영역 -->
+        <StackPanel DockPanel.Dock="Top"
+                    Orientation="Horizontal"
+                    Margin="10"
+                    VerticalAlignment="Top">
+
+            <!-- 닉네임 입력 -->
+            <TextBox x:Name="NicknameBox"
+                     Width="150"
+                     Height="30"
+                     Margin="0,0,10,0"
+                     VerticalContentAlignment="Center"
+                     FontSize="14"
+                     Padding="5"/>
+
+            <!-- 닉네임 저장 버튼 -->
+            <Button x:Name="SaveUserButton"
+                    Content="닉네임 저장"
+                    Style="{StaticResource RoundedSettingButtonStyle}"
+                    Click="SaveUserButton_Click"
+                    Margin="0,0,10,0"
+                    Height="30"/>
+
+            <!-- 친구 관리 버튼 -->
+            <Button x:Name="ManageFriendsButton"
+                    Content="친구 관리"
+                    Style="{StaticResource RoundedSettingButtonStyle}"
+                    Click="ManageFriends_Click"
+                    Margin="0,0,10,0"
+                    Height="30"/>
+
+            <!-- 그룹 관리 버튼 -->
+            <Button x:Name="ManageGroupsButton"
+                    Content="그룹 관리"
+                    Margin="0,0,10,0"
+                    Style="{StaticResource RoundedSettingButtonStyle}"
+                    Click="ManageGroups_Click"
+                    Height="30"/>
         </StackPanel>
 
-        <TabControl x:Name="ChatTabControlHost" Margin="10"/>
+        <!-- 채팅 탭 영역 -->
+        <TabControl x:Name="ChatTabControlHost"
+            Margin="10"
+            Style="{StaticResource RoundedTabControlStyle}"
+            ItemContainerStyle="{StaticResource RoundedTabItemStyle}"
+            Padding="5"/>
     </DockPanel>
 </Window>

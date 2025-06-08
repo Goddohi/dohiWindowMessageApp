@@ -62,10 +62,12 @@
                 <ColumnDefinition Width="100" />
             </Grid.ColumnDefinitions>
 
-            <TextBox Grid.Column="0" x:Name="InputBox" Width="300" Height="30" Margin="0,0,5,0" 
+            <TextBox Grid.Column="0" x:Name="InputBox"  Width="300" Height="30" Margin="0,0,5,0" 
                      PreviewKeyDown="InputBox_PreviewKeyDown" AcceptsReturn="True" />
-            <Button Grid.Column="1" x:Name="SendButton" Content="전송" Width="60" Height="30"/>
-            <Button Grid.Column="2" Content="파일 전송" Margin="10,0,0,0" Width="80" Height="30" Click="SendFileButton_Click"/>
+            <Button Grid.Column="1" x:Name="SendButton" Content="전송" 
+                    Style="{StaticResource RoundedChatButtonStyle}" Width="60" Height="30"/>
+            <Button Grid.Column="2" Content="파일 전송" Margin="10,0,0,0" 
+                    Style="{StaticResource RoundedChatButtonStyle}" Width="80" Height="30" Click="SendFileButton_Click"/>
         </Grid>
     </Grid>
 </UserControl>
