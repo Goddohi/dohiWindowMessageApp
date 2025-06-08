@@ -206,7 +206,9 @@
     <Content Include="Assets\WalkieDohi.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Resource Include="Assets\WalkieDohi.png" />
+    <Resource Include="Assets\WalkieDohi.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.7.2">

@@ -8,5 +8,8 @@
     <Application.Resources>
         <util:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
         <util:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter"/>
+        <BitmapImage x:Key="WalkieDohiLogo" UriSource="pack://application:,,,/Assets/WalkieDohi.png" />
+        <SolidColorBrush x:Key="PrimaryColor" Color="#FFBFDBD6"/>
+        <SolidColorBrush x:Key="SecondaryColor" Color="#FF70AEB4" />
     </Application.Resources>
 </Application>
