@@ -4,7 +4,7 @@
              Height="Auto" Width="Auto">
     <StackPanel Margin="20">
         <TextBlock Text="1~100 사이의 숫자를 맞춰보세요!" FontSize="16" Margin="0,0,0,10"/>
-        <TextBox x:Name="InputBox" Width="100"/>
+        <TextBox x:Name="InputBox" Width="100" PreviewKeyDown="InputBox_PreviewKeyDown"/>
         <Button x:Name="GuessButton" Content="확인" Click="GuessButton_Click" Margin="0,10,0,0"/>
         <TextBlock x:Name="ResultText" Margin="0,10,0,0"/>
     </StackPanel>

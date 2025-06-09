@@ -57,5 +57,16 @@ namespace WalkieDohi.UC.Games
             InputBox.Text = "";
             success = false;
         }
+
+        private void InputBox_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if(e.Key != System.Windows.Input.Key.Enter)
+            {
+                return;
+            }
+            GuseeLogic();
+            e.Handled = true;
+
+        }
     }
 }
