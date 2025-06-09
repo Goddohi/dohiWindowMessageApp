@@ -110,6 +110,14 @@ namespace WalkieDohi.UC
             {
                 if (File.Exists(path))
                 {
+                    if (selected.IsImage)
+                    {
+                       
+                        var preview = new ImagePreviewWindow(path);
+                        preview.ShowDialog();
+
+                        return;
+                    }
                     System.Diagnostics.Process.Start("explorer.exe", $"/select,\"{path}\"");
                 }
                 else
