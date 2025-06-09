@@ -14,12 +14,12 @@
             <TabItem Header="점심메뉴사다리(5개)">
                 <games:LadderGameControl />
             </TabItem>
-            <TabItem Header="(예정) 벽돌깨기">
-                <TextBlock Text="준비 중입니다..." HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <TabItem Header="벽돌깨기">
+                <games:BrickGameControl />
             </TabItem>
 
-            <TabItem Header="(예정) 스네이크">
-                <TextBlock Text="준비 중입니다..." HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <TabItem Header="스네이크">
+                <games:SnakeGameControl />
             </TabItem>
         </TabControl>
     </Grid>

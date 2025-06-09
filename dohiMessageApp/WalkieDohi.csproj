@@ -82,11 +82,17 @@
     <Compile Include="Core\DohiViewModelBase.cs" />
     <Compile Include="Core\TabBasicinterface.cs" />
     <Compile Include="Entity\ChatMessage.cs" />
+    <Compile Include="UC\Games\BrickGameControl.xaml.cs">
+      <DependentUpon>BrickGameControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UC\Games\LadderGameControl.xaml.cs">
       <DependentUpon>LadderGameControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="UC\Games\NumberGuessGameControl.xaml.cs">
       <DependentUpon>NumberGuessGameControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UC\Games\SnakeGameControl.xaml.cs">
+      <DependentUpon>SnakeGameControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\GroupManger\FriendSelectWindow.xaml.cs">
       <DependentUpon>FriendSelectWindow.xaml</DependentUpon>
@@ -154,11 +160,19 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="UC\Games\BrickGameControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UC\Games\LadderGameControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UC\Games\NumberGuessGameControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UC\Games\SnakeGameControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

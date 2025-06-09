@@ -8,7 +8,7 @@
 
     <Grid Margin="10">
         <StackPanel>
-            <TextBlock x:Name="HiddenTrigger" Text="설정 메뉴(준비중)"
+            <TextBlock x:Name="HiddenTrigger" Text="설정 메뉴(준비중 - 준비하는동안 선물 여기를 5번눌러주세요)"
                         MouseDown="HiddenTrigger_MouseDown" FontSize="20" FontWeight="Bold" Margin="0,0,0,20"/>
 
 

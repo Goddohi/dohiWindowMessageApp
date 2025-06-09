@@ -1,0 +1,29 @@
+﻿<UserControl x:Class="WalkieDohi.UC.Games.BrickGameControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+              Focusable="True"
+              FocusManager.FocusedElement="{Binding RelativeSource={RelativeSource Self}}"
+              KeyboardNavigation.TabNavigation="None"
+              KeyboardNavigation.DirectionalNavigation="None"
+              KeyDown="UserControl_KeyDown"
+             Width="Auto" Height="Auto">
+    <StackPanel Margin="10">
+        <TextBlock Text="🧱 벽돌 깨기" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
+
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+            <TextBlock Text="레벨: " VerticalAlignment="Center"/>
+            <ComboBox x:Name="LevelSelector" Width="100" Margin="5,0"
+                      SelectionChanged="LevelSelector_SelectionChanged">
+                <ComboBoxItem Content="쉬움" IsSelected="True"/>
+                <ComboBoxItem Content="보통"/>
+                <ComboBoxItem Content="어려움"/>
+            </ComboBox>
+            <Button Content="게임 시작" Click="StartGame_Click" Margin="10,0"/>
+        </StackPanel>
+
+        <Canvas x:Name="GameCanvas" Width="400" Height="350" Background="Black"/>
+
+        <TextBlock x:Name="ScoreText" Text="점수: 0" FontSize="16" Foreground="DarkGreen"
+                   Margin="0,10,0,0" HorizontalAlignment="Center"/>
+    </StackPanel>
+</UserControl>
