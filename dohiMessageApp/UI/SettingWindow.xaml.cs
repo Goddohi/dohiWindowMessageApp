@@ -39,5 +39,17 @@ namespace WalkieDohi.UI
         {
             this.Close();
         }
+        private int clickCount = 0;
+        private void HiddenTrigger_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            clickCount++;
+            if (clickCount >= 5)
+            {
+                var gameWindow = new MiniGameWindow();
+                gameWindow.Owner = this;
+                gameWindow.ShowDialog();
+                clickCount = 0;
+            }
+        }
     }
 }

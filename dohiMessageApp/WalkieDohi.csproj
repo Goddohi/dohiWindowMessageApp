@@ -82,6 +82,12 @@
     <Compile Include="Core\DohiViewModelBase.cs" />
     <Compile Include="Core\TabBasicinterface.cs" />
     <Compile Include="Entity\ChatMessage.cs" />
+    <Compile Include="UC\Games\LadderGameControl.xaml.cs">
+      <DependentUpon>LadderGameControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UC\Games\NumberGuessGameControl.xaml.cs">
+      <DependentUpon>NumberGuessGameControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\GroupManger\FriendSelectWindow.xaml.cs">
       <DependentUpon>FriendSelectWindow.xaml</DependentUpon>
     </Compile>
@@ -107,6 +113,9 @@
     </Compile>
     <Compile Include="UI\ImagePreviewWindow.xaml.cs">
       <DependentUpon>ImagePreviewWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\MiniGame\MiniGameWindow.xaml.cs">
+      <DependentUpon>MiniGameWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\SettingWindow.xaml.cs">
       <DependentUpon>SettingWindow.xaml</DependentUpon>
@@ -145,6 +154,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="UC\Games\LadderGameControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UC\Games\NumberGuessGameControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UC\GroupChatTabControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -170,6 +187,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\ImagePreviewWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\MiniGame\MiniGameWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
