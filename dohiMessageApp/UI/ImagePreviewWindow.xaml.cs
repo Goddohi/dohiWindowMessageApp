@@ -1,38 +1,87 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace WalkieDohi.UI
 {
-    /// <summary>
-    /// ImagePreviewWindow.xaml에 대한 상호 작용 논리
-    /// </summary>
     public partial class ImagePreviewWindow : Window
     {
         private double _scale = 1.0;
         private string imagePath;
+        private string base64Image;
+        
 
+        // 파일 경로용 생성자
         public ImagePreviewWindow(string imagePath)
         {
             InitializeComponent();
+            this.imagePath = imagePath;
+
             if (File.Exists(imagePath))
             {
-                this.imagePath = imagePath;
                 ZoomBox.Source = new BitmapImage(new Uri(imagePath));
+                btnPathOpen.Visibility = Visibility.Visible;
             }
 
+            InitZoomAndDrag();
+        }
+
+        // Base64용 생성자
+        public ImagePreviewWindow(byte[] imageBytes)
+        {
+            InitializeComponent();
+
+            ZoomBox.Source = LoadImageFromBytes(imageBytes);
+            btnPathOpen.Visibility = Visibility.Collapsed;
+            InitZoomAndDrag();
+        }
+
+        public ImagePreviewWindow(BitmapImage image)
+        {
+            InitializeComponent();
+            if (image != null)
+            {
+                ZoomBox.Source = image;
+            }
+
+            InitZoomAndDrag();
+        }
+
+        public ImagePreviewWindow(string base64Image, bool isBase64)
+        {
+            InitializeComponent();
+            this.base64Image = base64Image;
+
+            if (isBase64)
+            {
+                byte[] bytes = Convert.FromBase64String(base64Image);
+                ZoomBox.Source = LoadImageFromBytes(bytes);
+            }
+
+            InitZoomAndDrag();
+        }
+
+        private void InitZoomAndDrag()
+        {
             ZoomBox.LayoutTransform = new ScaleTransform(_scale, _scale);
+        }
+
+        private BitmapImage LoadImageFromBytes(byte[] imageData)
+        {
+            using (var stream = new MemoryStream(imageData))
+            {
+                var image = new BitmapImage();
+                image.BeginInit();
+                image.CacheOption = BitmapCacheOption.OnLoad;
+                image.StreamSource = stream;
+                image.EndInit();
+                image.Freeze();
+                return image;
+            }
         }
 
         private void ZoomIn_Click(object sender, RoutedEventArgs e)
@@ -46,11 +95,11 @@ namespace WalkieDohi.UI
             _scale = Math.Max(0.1, _scale - 0.1);
             ApplyZoom();
         }
+
         private void Window_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
             _scale += e.Delta > 0 ? 0.1 : -0.1;
             _scale = Math.Max(0.1, _scale);
-
             ApplyZoom();
         }
 
@@ -69,7 +118,7 @@ namespace WalkieDohi.UI
 
         private void PathOpen_Click(object sender, RoutedEventArgs e)
         {
-            if (File.Exists(imagePath))
+            if (!string.IsNullOrEmpty(imagePath) && File.Exists(imagePath))
             {
                 System.Diagnostics.Process.Start("explorer.exe", $"/select,\"{imagePath}\"");
             }
@@ -105,5 +154,4 @@ namespace WalkieDohi.UI
             ScrollViewerHost.ReleaseMouseCapture();
         }
     }
-
 }

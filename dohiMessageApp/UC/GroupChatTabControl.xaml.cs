@@ -112,26 +112,34 @@ namespace WalkieDohi.UC
 
         private void ChatList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if (ChatList.SelectedItem is ChatMessage selected && receivedFiles.TryGetValue(selected, out string path))
+            if (ChatList.SelectedItem is ChatMessage selected)
             {
-                if (File.Exists(path))
+                if (receivedFiles.TryGetValue(selected, out string path))
                 {
-                    if (selected.IsImage)
+                    if (File.Exists(path))
                     {
-
-                        var preview = new ImagePreviewWindow(path);
-                        preview.ShowDialog();
-
+                        if (selected.IsImage)
+                        {
+                            var preview = new ImagePreviewWindow(path);
+                            preview.ShowDialog();
+                            return;
+                        }
+                        System.Diagnostics.Process.Start("explorer.exe", $"/select,\"{path}\"");
                         return;
                     }
-                    System.Diagnostics.Process.Start("explorer.exe", $"/select,\"{path}\"");
                 }
-                else
+                if (selected.IsImage)
                 {
-                    MessageBox.Show("파일이 존재하지 않습니다.", "오류", MessageBoxButton.OK, MessageBoxImage.Error);
+                    var preview = new ImagePreviewWindow(selected.ImageData);
+                    preview.ShowDialog();
+                    return;
                 }
+                MessageBox.Show("파일이 존재하지 않습니다.", "오류", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+
+
         }
+
 
         private void ChatList_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
         {

@@ -20,7 +20,7 @@
 
         <!-- 확대/축소 버튼 -->
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="10">
-            <Button Content="경로열기" Width="60" Margin="2" Click="PathOpen_Click"
+            <Button x:Name="btnPathOpen" Content="경로열기" Width="60" Margin="2" Click="PathOpen_Click" Visibility="Collapsed"
                     Style="{StaticResource RoundedSettingButtonStyle}" />
             <Button Content="+" Width="30" Margin="2" Click="ZoomIn_Click"
                     Style="{StaticResource RoundedSettingButtonStyle}"/>
