@@ -42,7 +42,7 @@
                         <!-- 선택된 탭일 때 배경만 살짝 강조 -->
                         <Trigger Property="IsSelected" Value="True">
                             <Setter Property="Background" Value="#FFD0E4E4"/>
-                            <Setter Property="FontWeight" Value="Bold"/>
+                            <Setter Property="FontWeight" Value="Normal"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
