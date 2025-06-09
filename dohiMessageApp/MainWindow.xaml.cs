@@ -282,7 +282,7 @@ namespace WalkieDohi
                 msg.Sender = MainData.GetFriendNameOrReturnOriginal(msg.Sender, msg.SenderIp);
                 headerPanel.Children.Add(new TextBlock
                 {
-                    Text = $"({msg.Group.GroupName} - 생성자:{msg.Sender}))",
+                    Text = $"({msg.Group.GroupName})",
                     Margin = new Thickness(0, 0, 5, 0),
                     VerticalAlignment = VerticalAlignment.Center
                 });
