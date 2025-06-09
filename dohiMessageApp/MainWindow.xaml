@@ -46,6 +46,14 @@
                     Style="{StaticResource RoundedSettingButtonStyle}"
                     Click="ManageGroups_Click"
                     Height="30"/>
+            <Button x:Name="ManageGroupsButton1"
+                    HorizontalAlignment="Right"
+                    Content="설정"
+                    Margin="0,0,10,0"
+                    Style="{StaticResource RoundedSettingButtonStyle}"
+                    Click="OpenSettings_Click"
+                    Height="30"/>
+
         </StackPanel>
 
         <!-- 채팅 탭 영역 -->

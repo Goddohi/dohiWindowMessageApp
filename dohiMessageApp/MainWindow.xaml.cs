@@ -187,7 +187,14 @@ namespace WalkieDohi
             
         }
 
-
+        private void OpenSettings_Click(object sender, RoutedEventArgs e)
+        {
+            var settingWindow = new SettingWindow
+            {
+                Owner = this
+            };
+            settingWindow.ShowDialog();
+        }
 
         #region 탭 생성로직
 
