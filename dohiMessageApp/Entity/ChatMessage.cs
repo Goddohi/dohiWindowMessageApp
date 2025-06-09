@@ -28,11 +28,12 @@ namespace WalkieDohi.Entity
         /// <returns></returns>
         public static ChatMessage GetMsgDisplay(MessageEntity msg, MessageDirection Direction)
         {
+            var GroupName = msg.Group == null ? "" : msg.Group.GroupName;
             if (msg == null) return null;
-            if (msg.CheckMessageTypeImage()) return GetMsgDisplay(msg.Sender, msg.FileName, msg.Content, msg.Type, Direction);
-            if (msg.CheckMessageTypeText()) return GetMsgDisplay(msg.Sender, msg.Content, "", msg.Type, Direction);
+            if (msg.CheckMessageTypeImage()) return GetMsgDisplay(msg.Sender, msg.FileName, msg.Content, msg.Type, Direction, GroupName);
+            if (msg.CheckMessageTypeText()) return GetMsgDisplay(msg.Sender, msg.Content, "", msg.Type, Direction, GroupName);
 
-            if (msg.CheckMessageTypeFile()) return GetMsgDisplay(msg.Sender, msg.FileName, "", msg.Type, Direction);
+            if (msg.CheckMessageTypeFile()) return GetMsgDisplay(msg.Sender, msg.FileName, "", msg.Type, Direction, GroupName);
 
             return null;
         }
@@ -66,7 +67,7 @@ namespace WalkieDohi.Entity
 
             return null;
         }
-        public static ChatMessage GetMsgDisplay(string sender, string content, string baseData, MessageType messageType, MessageDirection Direction)
+        private static ChatMessage GetMsgDisplay(string sender, string content, string baseData, MessageType messageType, MessageDirection Direction, string groupName = "")
         {
             if (Direction == MessageDirection.Send)
             {
@@ -78,7 +79,15 @@ namespace WalkieDohi.Entity
             }
             if (Direction == MessageDirection.Receive)
             {
-                new ToastWindow($"📨 {sender}님이 보냄", content).Show();
+                if (groupName.Equals(""))
+                {
+                    new ToastWindow($"📨 {sender}님이 보냄", content).Show();
+                }
+                else
+                {
+
+                    new ToastWindow(groupName, $"📨 {sender}님이 보냄", content).Show();
+                }
 
                 if (messageType == MessageType.Image) return new ChatMessage { Sender = sender, Content = content, ImageData = CreateBitmapImageFromBase64(baseData), IsImage = true };
 
@@ -89,7 +98,7 @@ namespace WalkieDohi.Entity
             return null;
         }
 
-        public static BitmapImage CreateBitmapImageFromBase64(string base64)
+        private static BitmapImage CreateBitmapImageFromBase64(string base64)
         {
             byte[] binaryData = System.Convert.FromBase64String(base64);
             using (var stream = new MemoryStream(binaryData))

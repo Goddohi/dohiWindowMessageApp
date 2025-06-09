@@ -319,11 +319,11 @@ namespace WalkieDohi.UC
             if (!File.Exists(filePath)) return;
 
             FileInfo fileInfo = new FileInfo(filePath);
-            const long MaxFileSize = 10 * 1024 * 1024;
+            const long MaxFileSize = 20 * 1024 * 1024;
 
             if (fileInfo.Length > MaxFileSize)
             {
-                MessageBox.Show("❗ 10MB를 초과하는 파일은 전송할 수 없습니다.", "파일 용량 초과", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("❗ 20MB를 초과하는 파일은 전송할 수 없습니다.", "파일 용량 초과", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 

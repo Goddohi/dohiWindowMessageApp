@@ -51,6 +51,32 @@ namespace WalkieDohi.UI
         }
 
         /// <summary>
+        /// 토스트창 그룹 생성자
+        /// </summary>
+        /// <param name="title">알림 제목</param>
+        /// <param name="message">알림 메시지</param>
+        public ToastWindow(string GroupName, string title, string message)
+        {
+            // 알림창이 포커스를 훔치지 않게 설정 (입력도중 방해 금지)
+            this.ShowActivated = false;
+            this.Topmost = true;
+            this.Focusable = false;
+
+            InitializeComponent();
+            TitleText.Text = "[ "+GroupName+" ]" +title;
+            MessageText.Text = message;
+
+            Loaded += ToastWindow_Loaded;
+
+            // 타이머 초기화 (3초 후 닫기)
+            _timer = new DispatcherTimer
+            {
+                Interval = TimeSpan.FromSeconds(3)
+            };
+            _timer.Tick += CloseWithFadeOut;
+        }
+
+        /// <summary>
         /// 창이 로드될 때 위치와 페이드인 처리
         /// </summary>
         private void ToastWindow_Loaded(object sender, RoutedEventArgs e)
