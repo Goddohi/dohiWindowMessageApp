@@ -28,12 +28,11 @@ namespace WalkieDohi.Entity
         /// <returns></returns>
         public static ChatMessage GetMsgDisplay(MessageEntity msg, MessageDirection Direction)
         {
-            var GroupName = msg.Group == null ? "" : msg.Group.GroupName;
             if (msg == null) return null;
-            if (msg.CheckMessageTypeImage()) return GetMsgDisplay(msg.Sender, msg.FileName, msg.Content, msg.Type, Direction, GroupName);
-            if (msg.CheckMessageTypeText()) return GetMsgDisplay(msg.Sender, msg.Content, "", msg.Type, Direction, GroupName);
+            if (msg.CheckMessageTypeImage()) return GetMsgDisplay(msg.Sender, msg.FileName, msg.Content, msg.Type, Direction, msg.Group);
+            if (msg.CheckMessageTypeText()) return GetMsgDisplay(msg.Sender, msg.Content, "", msg.Type, Direction, msg.Group);
 
-            if (msg.CheckMessageTypeFile()) return GetMsgDisplay(msg.Sender, msg.FileName, "", msg.Type, Direction, GroupName);
+            if (msg.CheckMessageTypeFile()) return GetMsgDisplay(msg.Sender, msg.FileName, "", msg.Type, Direction, msg.Group);
 
             return null;
         }
@@ -67,7 +66,7 @@ namespace WalkieDohi.Entity
 
             return null;
         }
-        private static ChatMessage GetMsgDisplay(string sender, string content, string baseData, MessageType messageType, MessageDirection Direction, string groupName = "")
+        private static ChatMessage GetMsgDisplay(string sender, string content, string baseData, MessageType messageType, MessageDirection Direction, GroupEntity group = null)
         {
             if (Direction == MessageDirection.Send)
             {
@@ -79,15 +78,7 @@ namespace WalkieDohi.Entity
             }
             if (Direction == MessageDirection.Receive)
             {
-                if (groupName.Equals(""))
-                {
-                    new ToastWindow($"📨 {sender}님이 보냄", content).Show();
-                }
-                else
-                {
-
-                    new ToastWindow(groupName, $"📨 {sender}님이 보냄", content).Show();
-                }
+                 new ToastWindow(sender, content, group).Show();//싱글도 호환
 
                 if (messageType == MessageType.Image) return new ChatMessage { Sender = sender, Content = content, ImageData = CreateBitmapImageFromBase64(baseData), IsImage = true };
 

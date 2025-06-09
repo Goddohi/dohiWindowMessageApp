@@ -13,6 +13,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using WalkieDohi.Entity;
 
 namespace WalkieDohi.UI
 {
@@ -24,48 +25,26 @@ namespace WalkieDohi.UI
         // 자동 닫힘을 위한 타이머
         private readonly DispatcherTimer _timer;
 
+        private GroupEntity Group = null;
+        private string Sender = null;
         /// <summary>
         /// 토스트창 생성자
         /// </summary>
         /// <param name="title">알림 제목</param>
         /// <param name="message">알림 메시지</param>
-        public ToastWindow(string title, string message)
+        public ToastWindow(string sender, string message , GroupEntity group = null)
         {
             // 알림창이 포커스를 훔치지 않게 설정 (입력도중 방해 금지)
             this.ShowActivated = false;
             this.Topmost = true;
             this.Focusable = false;
-            
+            Sender = sender;
+            Group = group;
             InitializeComponent();
-            TitleText.Text = title;
+            TitleText.Text = (group == null) ? $"📨 {sender}님이 보냄" :  $"📨 [ {Group.GroupName} ] {sender}님이 보냄";
+            
             MessageText.Text = message;
             
-            Loaded += ToastWindow_Loaded;
-
-            // 타이머 초기화 (3초 후 닫기)
-            _timer = new DispatcherTimer
-            {
-                Interval = TimeSpan.FromSeconds(3)
-            };
-            _timer.Tick += CloseWithFadeOut;
-        }
-
-        /// <summary>
-        /// 토스트창 그룹 생성자
-        /// </summary>
-        /// <param name="title">알림 제목</param>
-        /// <param name="message">알림 메시지</param>
-        public ToastWindow(string GroupName, string title, string message)
-        {
-            // 알림창이 포커스를 훔치지 않게 설정 (입력도중 방해 금지)
-            this.ShowActivated = false;
-            this.Topmost = true;
-            this.Focusable = false;
-
-            InitializeComponent();
-            TitleText.Text = "[ "+GroupName+" ]" +title;
-            MessageText.Text = message;
-
             Loaded += ToastWindow_Loaded;
 
             // 타이머 초기화 (3초 후 닫기)
@@ -114,12 +93,13 @@ namespace WalkieDohi.UI
         /// </summary>
         private void Window_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            var mainWindow = Application.Current.MainWindow;
+            var mainWindow = Application.Current.MainWindow as MainWindow;
             if (mainWindow != null)
             {
                 mainWindow.Show();
                 mainWindow.WindowState = WindowState.Normal;
-                mainWindow.Activate(); 
+                mainWindow.Activate();
+                mainWindow.SelectChatTab(Sender,Group);
             }
             this.Close();
         }

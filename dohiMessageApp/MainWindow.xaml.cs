@@ -541,5 +541,46 @@ namespace WalkieDohi
 
         #endregion 탭 생성로직
 
+        #region  탭 외부 호출로직
+        public void SelectChatTab(string tabKey,GroupEntity group)
+        {
+            if(group == null)
+            {
+                if (chatTabs.ContainsKey(tabKey))
+                {
+                    var existing = ChatTabControlHost.Items.Cast<TabItem>()
+                        .FirstOrDefault(t => t.Header is StackPanel panel && panel.Tag?.ToString() == tabKey);
+
+                    if (existing != null)
+                    {
+                        ChatTabControlHost.SelectedItem = existing;
+                    }
+                }
+                return;
+            }
+
+            if (chatTabs.ContainsKey(group.GroupName))
+            {
+                var chatTab = (GroupChatTabControl)chatTabs[group.GroupName];
+
+                var incomingIps = group.Ips.Distinct().OrderBy(ip => ip).ToList();
+                var existingIps = chatTab.TargetGroup.Ips.Distinct().OrderBy(ip => ip).ToList();
+
+                if (incomingIps.SequenceEqual(existingIps))
+                {
+                    var existing = ChatTabControlHost.Items.Cast<TabItem>()
+                        .FirstOrDefault(t => t.Header is StackPanel panel && panel.Tag?.ToString() == group.GroupName);
+
+                    if (existing != null)
+                    {
+                        ChatTabControlHost.SelectedItem = existing;
+                    }
+                    
+                }
+            }
+        }
+
+        #endregion
+
     }
 }
