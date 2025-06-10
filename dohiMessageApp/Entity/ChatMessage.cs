@@ -11,6 +11,10 @@ namespace WalkieDohi.Entity
 {
     public class ChatMessage
     {
+        /// <summary>
+        /// 사용자에게만 남는 객체로 TCP와는 상관X 버전마다 변경 자유
+        /// </summary>
+        
         public string Sender { get; set; }
         public string Content { get; set; } // 텍스트나 이미지 경로
         public BitmapImage ImageData { get; set; } // 이미지 

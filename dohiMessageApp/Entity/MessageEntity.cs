@@ -10,9 +10,12 @@ using WalkieDohi.Util;
 
 namespace WalkieDohi.Entity
 {
+    /// <summary>
+    /// 메세지 수신 송신용 TCP로 전송되는 양식으로 가능한 필드 변경자체(추가는 해도 되나 기존 내용은 삭제자제)
+    /// </summary>
     public class MessageEntity : DohiEntityBase
     {
-        public MessageType Type { get; set; } // "text" or "file"
+        public MessageType Type { get; set; }
         public string Sender { get; set; }
         public GroupEntity Group { get; set; }
 
@@ -23,6 +26,9 @@ namespace WalkieDohi.Entity
         public string Content { get; set; } // 메시지 내용 또는 파일 Base64 문자열
         public string FileName { get; set; } // 파일 이름 (파일일 경우)
         public bool IsFailed { get; set; } = false;
+
+
+
 
         MessageEntity() {
             
@@ -128,6 +134,8 @@ namespace WalkieDohi.Entity
         {
             IsFailed = false;
         }
+
+
 
         public bool CheckMessageTypeFile()
         {
