@@ -39,7 +39,7 @@ namespace WalkieDohi.UC
 
         public event EventHandler<(string FileName, string Base64Content)> OnSendFile;
 
-        private Dictionary<ChatMessage, string> receivedFiles = new Dictionary<ChatMessage, string>();
+        private Dictionary<ChatMessage, string> ChatFilePaths = new Dictionary<ChatMessage, string>();
         private ChatViewModel viewModel;
         public GroupChatTabControl()
         {
@@ -118,35 +118,63 @@ namespace WalkieDohi.UC
         {
             if (ChatList.SelectedItem is ChatMessage selected)
             {
-                if (receivedFiles.TryGetValue(selected, out string path))
+                if (selected.isDirectionReceive())
                 {
-                    if (File.Exists(path))
+                    if (ChatFilePaths.TryGetValue(selected, out string path))
                     {
+                        if (ExtendFile.UnExists(path))
+                        {
+                            MessageBox.Show("파일이 존재하지 않습니다.", "오류", MessageBoxButton.OK, MessageBoxImage.Error);
+                            return;
+                        }
+
                         if (selected is ImageMessage)
                         {
                             var preview = new ImagePreviewWindow(path);
                             preview.ShowDialog();
                             return;
                         }
-                        System.Diagnostics.Process.Start("explorer.exe", $"/select,\"{path}\"");
-                        return;
+                        if (selected is FileMessage)
+                        {
+                            System.Diagnostics.Process.Start("explorer.exe", $"/select,\"{path}\"");
+                            return;
+                        }
                     }
-                }
-                if (selected is ImageMessage imageMsg)
-                {
-                    var preview = new ImagePreviewWindow(imageMsg.Image);
-                    preview.ShowDialog();
                     return;
                 }
-
                 if (selected.isDirectionSend())
                 {
+
+                    if (ChatFilePaths.TryGetValue(selected, out string path))
+                    {
+                        if (ExtendFile.UnExists(path))
+                        {
+                            MessageBox.Show("파일이 존재하지 않습니다.", "오류", MessageBoxButton.OK, MessageBoxImage.Error);
+                            return;
+                        }
+                        if (selected is ImageMessage)
+                        {
+                            var preview = new ImagePreviewWindow(path);
+                            preview.ShowDialog();
+                            return;
+                        }
+                        if (selected is FileMessage)
+                        {
+                            System.Diagnostics.Process.Start("explorer.exe", $"/select,\"{path}\"");
+                            return;
+                        }
+                    }
+                    //클립보드이미지는 경로가 없다.
+                    if (selected is ImageMessage imageMsg)
+                    {
+                        var preview = new ImagePreviewWindow(imageMsg.Image);
+                        preview.ShowDialog();
+                        return;
+                    }
+
                     return;
                 }
-                MessageBox.Show("파일이 존재하지 않습니다.", "오류", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-
-
         }
 
 
@@ -247,11 +275,11 @@ namespace WalkieDohi.UC
             AddMessage(display, MessageDirection.Receive);
             if (msg.CheckMessageTypeImage())
             {
-                receivedFiles[display] = MessageUtil.GetImagePath(msg.FileName);
+                ChatFilePaths[display] = MessageUtil.GetImagePath(msg.FileName);
             }
             else
             {
-                receivedFiles[display] = MessageUtil.GetFilePath(msg.FileName);
+                ChatFilePaths[display] = MessageUtil.GetFilePath(msg.FileName);
             }
         }
 
@@ -331,6 +359,11 @@ namespace WalkieDohi.UC
             }
         }
 
+        /// <summary>
+        /// 파일과 사진을 전송하는 로직 ( 클립보드로 인한 사진은 전송을 담당하지 않는다)
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <returns></returns>
         private async Task HandleDroppedFileAsync(string filePath)
         {
             if (!File.Exists(filePath)) return;
@@ -360,6 +393,7 @@ namespace WalkieDohi.UC
                 }
                 var display = ChatMessage.CreateSendMessage(fileMessage.FileName, fileMessage.Content, messageType);
                 AddMessage(display, MessageDirection.Send);
+                ChatFilePaths[display] = filePath;
             }
             catch (Exception ex)
             {
@@ -367,6 +401,10 @@ namespace WalkieDohi.UC
             }
         }
 
+        /// <summary>
+        /// 클립보드에 있는 사진 전송로직 (경로보기불가)
+        /// </summary>
+        /// <param name="base64"></param>
         private void SendClipboardImageMessage(string base64)
         {
             string randomName = ClipboadPasteUtil.GetRandomClipboadImgName();

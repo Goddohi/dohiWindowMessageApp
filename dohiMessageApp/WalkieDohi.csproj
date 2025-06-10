@@ -80,6 +80,7 @@
     </ApplicationDefinition>
     <Compile Include="Core\DohiEntityBase.cs" />
     <Compile Include="Core\DohiViewModelBase.cs" />
+    <Compile Include="Core\ExtendFile.cs" />
     <Compile Include="Core\TabBasicinterface.cs" />
     <Compile Include="Entity\ChatMessage.cs" />
     <Compile Include="UC\Games\BrickGameControl.xaml.cs">
