@@ -114,66 +114,44 @@ namespace WalkieDohi.UC
             }
         }
 
+        /// <summary>
+        /// 파일,이미지 채팅 더블클릭시 경로 및 미리보기 띄워주는 메소드
+        /// </summary>
         private void ChatList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             if (ChatList.SelectedItem is ChatMessage selected)
             {
-                if (selected.isDirectionReceive())
-                {
-                    if (ChatFilePaths.TryGetValue(selected, out string path))
-                    {
-                        if (ExtendFile.UnExists(path))
-                        {
-                            MessageBox.Show("파일이 존재하지 않습니다.", "오류", MessageBoxButton.OK, MessageBoxImage.Error);
-                            return;
-                        }
 
-                        if (selected is ImageMessage)
-                        {
-                            var preview = new ImagePreviewWindow(path);
-                            preview.ShowDialog();
-                            return;
-                        }
-                        if (selected is FileMessage)
-                        {
-                            System.Diagnostics.Process.Start("explorer.exe", $"/select,\"{path}\"");
-                            return;
-                        }
-                    }
-                    return;
-                }
-                if (selected.isDirectionSend())
+                if (ChatFilePaths.TryGetValue(selected, out string path))
                 {
-
-                    if (ChatFilePaths.TryGetValue(selected, out string path))
+                    if (ExtendFile.UnExists(path))
                     {
-                        if (ExtendFile.UnExists(path))
-                        {
-                            MessageBox.Show("파일이 존재하지 않습니다.", "오류", MessageBoxButton.OK, MessageBoxImage.Error);
-                            return;
-                        }
-                        if (selected is ImageMessage)
-                        {
-                            var preview = new ImagePreviewWindow(path);
-                            preview.ShowDialog();
-                            return;
-                        }
-                        if (selected is FileMessage)
-                        {
-                            System.Diagnostics.Process.Start("explorer.exe", $"/select,\"{path}\"");
-                            return;
-                        }
+                        MessageBox.Show("파일이 존재하지 않습니다.", "오류", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return;
                     }
-                    //클립보드이미지는 경로가 없다.
-                    if (selected is ImageMessage imageMsg)
+                    if (selected is ImageMessage)
                     {
-                        var preview = new ImagePreviewWindow(imageMsg.Image);
+                        var preview = new ImagePreviewWindow(path);
                         preview.ShowDialog();
                         return;
                     }
-
+                    if (selected is FileMessage)
+                    {
+                        System.Diagnostics.Process.Start("explorer.exe", $"/select,\"{path}\"");
+                        return;
+                    }
+                }
+                 //클립보드이미지는 경로가 없다.
+                if (selected is ImageMessage imageMsg)
+                {
+                    if (imageMsg.Image != null)
+                    {
+                        var preview = new ImagePreviewWindow(imageMsg.Image);
+                        preview.ShowDialog();
+                    }
                     return;
                 }
+                return;
             }
         }
 
