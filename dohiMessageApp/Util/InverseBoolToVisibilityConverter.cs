@@ -5,7 +5,9 @@ using System.Windows.Data;
 
 
 namespace WalkieDohi.Util
-{
+{   /// <summary>
+    /// 사용법    Visibility="{Binding IsImage, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
+    /// </summary>
     public class InverseBoolToVisibilityConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

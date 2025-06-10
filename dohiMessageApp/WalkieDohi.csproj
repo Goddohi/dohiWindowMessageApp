@@ -94,6 +94,7 @@
     <Compile Include="UC\Games\SnakeGameControl.xaml.cs">
       <DependentUpon>SnakeGameControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UC\ViewModel\ChatViewModel.cs" />
     <Compile Include="UI\GroupManger\FriendSelectWindow.xaml.cs">
       <DependentUpon>FriendSelectWindow.xaml</DependentUpon>
     </Compile>

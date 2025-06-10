@@ -4,8 +4,49 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:WalkieDohi.UC"
+    xmlns:entity="clr-namespace:WalkieDohi.Entity"
       mc:Ignorable="d" 
       Height="Auto" Width="Auto">
+    <UserControl.Resources>
+        <!-- 텍스트 메시지용 -->
+        <DataTemplate DataType="{x:Type entity:TextMessage}">
+            <Grid Margin="5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="{Binding Sender}" FontWeight="Bold"/>
+                <TextBlock Grid.Column="1" Text="{Binding Text}" TextWrapping="Wrap"/>
+            </Grid>
+        </DataTemplate>
+
+        <!-- 이미지 메시지용 -->
+        <DataTemplate DataType="{x:Type entity:ImageMessage}">
+            <Grid Margin="5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="{Binding Sender}" FontWeight="Bold"/>
+                <Image Grid.Column="1" MaxWidth="500" MaxHeight="300" Stretch="Uniform" Source="{Binding Image}" />
+            </Grid>
+        </DataTemplate>
+
+        <!-- 파일 메시지용 -->
+        <DataTemplate DataType="{x:Type entity:FileMessage}">
+            <Grid Margin="5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="{Binding Sender}" FontWeight="Bold"/>
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <TextBlock Text="[파일] " Foreground="Blue"  FontWeight="Bold"/>
+                    <TextBlock Text="{Binding FileName}" Foreground="Blue" ToolTip="클릭하여 파일 위치 보기"/>
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+    </UserControl.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
@@ -26,33 +67,19 @@
         <ListBox x:Name="ChatList" 
                    SelectionMode="Single"
                    AllowDrop="True"
+                   ItemsSource="{Binding ChatMessages}"
                    MouseDoubleClick="ChatList_MouseDoubleClick" 
                    MouseRightButtonUp="ChatList_MouseRightButtonUp"
                    DragEnter="ChatList_DragEnter"
                    Drop="ChatList_Drop"
                    PreviewKeyDown="ChatList_PreviewKeyDown"
+                   ScrollViewer.VerticalScrollBarVisibility="Auto"
                    Grid.Row="1" Margin="5">
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <Grid Margin="5">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="100"/>
-                            <!-- 보낸이 영역 고정폭 -->
-                            <ColumnDefinition Width="*" />
-                            <!-- 메시지 영역 자동 확장 -->
-                        </Grid.ColumnDefinitions>
-
-                        <TextBlock Grid.Column="0" Text="{Binding Sender}" FontWeight="Bold" />
-                        <Image Width="400" Height="200" Grid.Column="1"
-                                Source="{Binding ImageData}"
-                                Stretch="Uniform" 
-                                Visibility="{Binding IsImage, Converter={StaticResource BoolToVisibilityConverter}}"/>
-
-                        <TextBlock  Grid.Column="1" Text="{Binding Content}"
-                                    Visibility="{Binding IsImage, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
-                    </Grid>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <VirtualizingStackPanel IsVirtualizing="True" VirtualizationMode="Recycling" />
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
         </ListBox>
         <!-- 입력창 및 버튼 -->
         <Grid Grid.Row="2" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Left">

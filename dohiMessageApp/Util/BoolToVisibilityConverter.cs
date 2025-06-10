@@ -5,6 +5,9 @@ using System.Windows.Data;
 
 namespace WalkieDohi.Util
 {
+    /// <summary>
+    /// 사용법  Visibility="{Binding IsImage, Converter={StaticResource BoolToVisibilityConverter}}"/>
+    /// </summary>
     public class BoolToVisibilityConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

@@ -1,105 +1,116 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 using WalkieDohi.UI;
 
 namespace WalkieDohi.Entity
 {
-    public class ChatMessage
+    public abstract class ChatMessage
     {
-        /// <summary>
-        /// 사용자에게만 남는 객체로 TCP와는 상관X 버전마다 변경 자유
-        /// </summary>
-        
         public string Sender { get; set; }
-        public string Content { get; set; } // 텍스트나 이미지 경로
-        public BitmapImage ImageData { get; set; } // 이미지 
-
-        public bool IsImage { get; set; }   // 이미지 여부 구분
-
         public bool IsFailed { get; set; } = false;
+        public MessageDirection Direction { get; set; }
+        public abstract string DisplayContent { get; }
 
-
-        /// <summary>
-        /// 해당메서드는 Display메세지를 반환하면서 받은 메세지의 경우 알림을 설정해줍니다.
-        /// </summary>
-        /// <param name="msg"></param>
-        /// <param name="Direction"></param>
-        /// <returns></returns>
-        public static ChatMessage GetMsgDisplay(MessageEntity msg, MessageDirection Direction)
+        public static ChatMessage CreateFromEntity(MessageEntity msg, MessageDirection direction = MessageDirection.Receive)
         {
             if (msg == null) return null;
-            if (msg.CheckMessageTypeImage()) return GetMsgDisplay(msg.Sender, msg.FileName, msg.Content, msg.Type, Direction, msg.Group);
-            if (msg.CheckMessageTypeText()) return GetMsgDisplay(msg.Sender, msg.Content, "", msg.Type, Direction, msg.Group);
 
-            if (msg.CheckMessageTypeFile()) return GetMsgDisplay(msg.Sender, msg.FileName, "", msg.Type, Direction, msg.Group);
+            if (msg.CheckMessageTypeText())
+                return new TextMessage(msg.Sender, msg.Content, direction, msg.Group);
 
-            return null;
-        }
-        public static ChatMessage GetSendMsgDisplay(string content, string baseData, MessageType messageType, MessageDirection Direction, bool result)
-        {
-            ChatMessage returnChatMessage = new ChatMessage();
-            if (Direction == MessageDirection.Send)
-            {
-                if (messageType == MessageType.Text) returnChatMessage = GetMsgDisplay("📤 나", content, baseData, messageType, Direction);
+            if (msg.CheckMessageTypeImage())
+                return new ImageMessage(msg.Sender, msg.FileName, msg.Content, direction, msg.Group);
 
-                if (messageType == MessageType.File) returnChatMessage = GetMsgDisplay("📤 나(파일 전송)", content, "", messageType, Direction);
-
-                if (messageType == MessageType.Image) returnChatMessage = GetMsgDisplay("📤 나", content, baseData, messageType, Direction);
-
-                returnChatMessage.IsFailed = result;
-                return returnChatMessage;
-            }
-            
-            return null;
-        }
-        public static ChatMessage GetSendMsgDisplay(string content, string baseData, MessageType messageType, MessageDirection Direction)
-        {
-            if (Direction == MessageDirection.Send)
-            {
-                if (messageType == MessageType.Text) return GetMsgDisplay("📤 나", content, baseData, messageType, Direction);
-
-                if (messageType == MessageType.File) return GetMsgDisplay("📤 나(파일 전송)", content, "", messageType, Direction);
-
-                if (messageType == MessageType.Image) return GetMsgDisplay("📤 나", content, baseData, messageType, Direction);
-            }
+            if (msg.CheckMessageTypeFile())
+                return new FileMessage(msg.Sender, msg.FileName, direction, msg.Group);
 
             return null;
         }
-        private static ChatMessage GetMsgDisplay(string sender, string content, string baseData, MessageType messageType, MessageDirection Direction, GroupEntity group = null)
+
+        public static ChatMessage CreateSendMessage(string content, string base64, MessageType type, bool isFailed = false)
         {
-            if (Direction == MessageDirection.Send)
+            switch (type)
             {
-                if (messageType == MessageType.Text) return new ChatMessage { Sender = "📤 나", Content = content, IsImage = false };
-
-                if (messageType == MessageType.File) return new ChatMessage { Sender = "📤 나(파일 전송)", Content = content, IsImage = false };
-
-                if (messageType == MessageType.Image) return new ChatMessage { Sender = "📤 나", Content = content, ImageData = CreateBitmapImageFromBase64(baseData), IsImage = true };
+                case MessageType.Text:
+                    return new TextMessage("📤 나", content, MessageDirection.Send) { IsFailed = isFailed };
+                case MessageType.Image:
+                    return new ImageMessage("📤 나", content, base64, MessageDirection.Send) { IsFailed = isFailed };
+                case MessageType.File:
+                    return new FileMessage("📤 나", content, MessageDirection.Send) { IsFailed = isFailed };
+                default:
+                    return null;
             }
-            if (Direction == MessageDirection.Receive)
-            {
-                 new ToastWindow(sender, content, group).Show();//싱글도 호환
+        }
 
-                if (messageType == MessageType.Image) return new ChatMessage { Sender = sender, Content = content, ImageData = CreateBitmapImageFromBase64(baseData), IsImage = true };
+        public bool isDirectionSend()
+        {
+            return MessageDirection.Send.Equals(Direction);
+        }
+        public bool isDirectionReceive()
+        {
+            return MessageDirection.Receive.Equals(Direction);
+        }
+    }
 
-                if (messageType == MessageType.Text) return new ChatMessage { Sender = sender, Content = content, IsImage = false };
+    public class TextMessage : ChatMessage
+    {
+        public string Text { get; }
+        public override string DisplayContent => Text;
 
-                if (messageType == MessageType.File) return new ChatMessage { Sender = $"📥{sender}(파일 받음)", Content = content, IsImage = false };
-            }
-            return null;
+        public TextMessage(string sender, string text, MessageDirection dir, GroupEntity group = null)
+        {
+            Sender = FormatSender(sender, dir);
+            Direction = dir;
+            Text = text;
+            NotifyIfReceive(sender, text, dir, group);
+        }
+
+        private void NotifyIfReceive(string sender, string text, MessageDirection dir, GroupEntity group)
+        {
+            if (dir == MessageDirection.Receive)
+                new ToastWindow(sender, text, group).Show();
+        }
+
+        private string FormatSender(string sender, MessageDirection dir)
+        {
+            return dir == MessageDirection.Send ? "📤 나" : sender;
+        }
+    }
+
+    public class ImageMessage : ChatMessage
+    {
+        public string FileName { get; }
+        public BitmapImage Image { get; }
+        public override string DisplayContent => FileName;
+
+        public ImageMessage(string sender, string fileName, string base64, MessageDirection dir, GroupEntity group = null)
+        {
+            Sender = FormatSender(sender, dir);
+            Direction = dir;
+            FileName = fileName;
+            Image = CreateBitmapImageFromBase64(base64);
+            NotifyIfReceive(sender, fileName, dir, group);
+        }
+
+        private void NotifyIfReceive(string sender, string content, MessageDirection dir, GroupEntity group)
+        {
+            if (dir == MessageDirection.Receive)
+                new ToastWindow(sender, content, group).Show();
+        }
+
+        private string FormatSender(string sender, MessageDirection dir)
+        {
+            return dir == MessageDirection.Send ? "📤 나" : sender;
         }
 
         private static BitmapImage CreateBitmapImageFromBase64(string base64)
         {
-            byte[] binaryData = System.Convert.FromBase64String(base64);
+            if (string.IsNullOrWhiteSpace(base64)) return null;
+            byte[] binaryData = Convert.FromBase64String(base64);
             using (var stream = new MemoryStream(binaryData))
             {
                 var image = new BitmapImage();
-                stream.Position = 0;
                 image.BeginInit();
                 image.CacheOption = BitmapCacheOption.OnLoad;
                 image.StreamSource = stream;
@@ -107,6 +118,31 @@ namespace WalkieDohi.Entity
                 image.Freeze();
                 return image;
             }
+        }
+    }
+
+    public class FileMessage : ChatMessage
+    {
+        public string FileName { get; }
+        public override string DisplayContent => FileName;
+
+        public FileMessage(string sender, string fileName, MessageDirection dir, GroupEntity group = null)
+        {
+            Sender = FormatSender(sender, dir);
+            Direction = dir;
+            FileName = fileName;
+            NotifyIfReceive(sender, fileName, dir, group);
+        }
+
+        private void NotifyIfReceive(string sender, string content, MessageDirection dir, GroupEntity group)
+        {
+            if (dir == MessageDirection.Receive)
+                new ToastWindow(sender, content, group).Show();
+        }
+
+        private string FormatSender(string sender, MessageDirection dir)
+        {
+            return dir == MessageDirection.Receive ? $"📥{sender}" : sender;
         }
     }
 }

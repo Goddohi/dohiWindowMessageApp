@@ -19,6 +19,7 @@ using System.Windows.Shapes;
 using System.Windows.Threading;
 using WalkieDohi.Core;
 using WalkieDohi.Entity;
+using WalkieDohi.UC.ViewModel;
 using WalkieDohi.UI;
 using WalkieDohi.Util;
 using Clipboard = System.Windows.Clipboard;
@@ -47,10 +48,12 @@ namespace WalkieDohi.UC
         public event EventHandler<(string FileName, string Base64Content)> OnSendFile;
 
         private Dictionary<ChatMessage, string> receivedFiles = new Dictionary<ChatMessage, string>();
-
+        private ChatViewModel viewModel;
         public SingleChatTabControl()
         {
             InitializeComponent();
+            viewModel = new ChatViewModel();
+            this.DataContext = viewModel;
             SendButton.Click += (s, e) => Send();
         }
 
@@ -111,7 +114,7 @@ namespace WalkieDohi.UC
                 if(receivedFiles.TryGetValue(selected, out string path)) {
                     if (File.Exists(path))
                     {
-                        if (selected.IsImage)
+                        if (selected is ImageMessage)
                         {
                             var preview = new ImagePreviewWindow(path);
                             preview.ShowDialog();
@@ -121,10 +124,14 @@ namespace WalkieDohi.UC
                         return;
                     }
                 }
-                if (selected.IsImage)
+                if (selected is ImageMessage imageMsg)
                 {  
-                    var preview = new ImagePreviewWindow(selected.ImageData);
+                    var preview = new ImagePreviewWindow(imageMsg.Image);
                     preview.ShowDialog();
+                    return;
+                }
+                if (selected.isDirectionSend())
+                {
                     return;
                 }
                 MessageBox.Show("파일이 존재하지 않습니다.", "오류", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -146,7 +153,7 @@ namespace WalkieDohi.UC
                 var selected = ChatList.SelectedItem as ChatMessage;
                 if (selected != null)
                 {
-                    Clipboard.SetText(selected.Content);
+                    Clipboard.SetText(selected.DisplayContent);
                 }
             };
             menu.Items.Add(copyItem);
@@ -159,7 +166,7 @@ namespace WalkieDohi.UC
                 var selected = ChatList.SelectedItem as ChatMessage;
                 if (selected != null)
                 {
-                    Clipboard.SetText(selected.Content);
+                    Clipboard.SetText(selected.DisplayContent);
                     e.Handled = true;
                 }
             }
@@ -181,7 +188,7 @@ namespace WalkieDohi.UC
             if (!string.IsNullOrEmpty(text))
             {
                 OnSendMessage?.Invoke(this, text);
-                var display = ChatMessage.GetSendMsgDisplay(text,"", MessageType.Text, MessageDirection.Send);
+                var display = ChatMessage.CreateSendMessage(text,"", MessageType.Text);
                 AddMessage(display, MessageDirection.Send);
                 InputBox.Clear();
 
@@ -194,14 +201,14 @@ namespace WalkieDohi.UC
 
         public void AddMessage(ChatMessage display, MessageDirection type)
         {
-            ChatList.Items.Add(display);
+            viewModel.ChatMessages.Add(display);
             //스크롤 내려주는 코드 
             Dispatcher.BeginInvoke(
                new Action(() =>
                {
-                   if (ChatList.Items.Count > 0)
+                   if (viewModel.ChatMessages.Count > 0)
                    {
-                       var lastItem = ChatList.Items[ChatList.Items.Count - 1];
+                       var lastItem = viewModel.ChatMessages[viewModel.ChatMessages.Count - 1];
                        ChatList.ScrollIntoView(lastItem);
                    }
                }),
@@ -211,7 +218,7 @@ namespace WalkieDohi.UC
 
         public void AddReceivedMessage(MessageEntity msg)
         {
-            ChatMessage display = ChatMessage.GetMsgDisplay(msg, MessageDirection.Receive);
+            ChatMessage display = ChatMessage.CreateFromEntity(msg);
             AddMessage(display, MessageDirection.Receive);
         }
 
@@ -223,7 +230,7 @@ namespace WalkieDohi.UC
                 msg.Type = MessageType.Image;
             }
 
-            ChatMessage display = ChatMessage.GetMsgDisplay(msg, MessageDirection.Receive);
+            ChatMessage display = ChatMessage.CreateFromEntity(msg);
             AddMessage(display, MessageDirection.Receive);
             if (msg.CheckMessageTypeImage())
             {
@@ -341,7 +348,7 @@ namespace WalkieDohi.UC
                 {
                     messageType = MessageType.Image;
                 }
-                var display = ChatMessage.GetSendMsgDisplay(fileMessage.FileName, fileMessage.Content, messageType, MessageDirection.Send);
+                var display = ChatMessage.CreateSendMessage(fileMessage.FileName, fileMessage.Content, messageType);
                 AddMessage(display, MessageDirection.Send);
             }
             catch (Exception ex)
@@ -356,7 +363,7 @@ namespace WalkieDohi.UC
             var fileMessage = MessageEntity.OfSendFileMassage(base64, randomName);
 
             OnSendFile?.Invoke(this, (fileMessage.FileName, base64));
-            var display = ChatMessage.GetSendMsgDisplay(fileMessage.FileName, fileMessage.Content, MessageType.Image, MessageDirection.Send);
+            var display = ChatMessage.CreateSendMessage(fileMessage.FileName, fileMessage.Content, MessageType.Image);
 
             AddMessage(display, MessageDirection.Send);
         }
