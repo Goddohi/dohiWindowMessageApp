@@ -78,6 +78,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Core\app\NativeMethods.cs" />
     <Compile Include="Core\DohiEntityBase.cs" />
     <Compile Include="Core\DohiViewModelBase.cs" />
     <Compile Include="Core\ExtendFile.cs" />

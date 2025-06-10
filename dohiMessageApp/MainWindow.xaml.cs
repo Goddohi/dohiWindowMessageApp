@@ -18,6 +18,7 @@ using System.Security.Cryptography;
 using WalkieDohi.Core;
 using System.Windows.Interop;
 using System.Threading.Tasks;
+using WalkieDohi.Core.app;
 
 namespace WalkieDohi
 {
@@ -28,18 +29,37 @@ namespace WalkieDohi
         private MessengerSender msgSender = new MessengerSender();
         private Dictionary<string, TabBasicinterface> chatTabs = new Dictionary<string, TabBasicinterface>();
         private StartChatTabControl _startTabControl; // 추가
-        
+
 
         public MainWindow()
         {
             InitializeComponent();
+
             InitTrayIcon();
             LoadUser();
             JsonDataLoadingHelper.LoadFriends();
             JsonDataLoadingHelper.LoadGroups();
             StartReceiver();
             AddStartTab();
+
+            this.SourceInitialized += OnSourceInitialized;
         }
+        private void OnSourceInitialized(object sender, EventArgs e)
+        {
+            var handle = new WindowInteropHelper(this).Handle;
+            HwndSource.FromHwnd(handle)?.AddHook(WndProc);
+        }
+
+        private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+        {
+            if (msg == NativeMethods.WM_SHOWME)
+            {
+                ShowMainWindow();
+                handled = true;
+            }
+            return IntPtr.Zero;
+        }
+
 
         private void LoadUser()
         {
