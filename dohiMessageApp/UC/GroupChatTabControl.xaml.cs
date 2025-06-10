@@ -433,7 +433,24 @@ namespace WalkieDohi.UC
             GC.WaitForPendingFinalizers();
         }
 
+        private void ChatList_ScrollChanged(object sender, MouseWheelEventArgs e)
+        {
+            var scrollViewer = GetScrollViewer(ChatList);
+            if (scrollViewer == null) return;
 
+            bool isAtBottom = Math.Abs(scrollViewer.VerticalOffset - scrollViewer.ScrollableHeight) < 1.0;
+            ScrollToBottomButton.Visibility = isAtBottom ? Visibility.Collapsed : Visibility.Visible;
+        }
+
+        private void ScrollToBottomButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (viewModel.ChatMessages.Count > 0)
+            {
+                var lastItem = viewModel.ChatMessages[viewModel.ChatMessages.Count - 1];
+                ChatList.ScrollIntoView(lastItem);
+            }
+            ScrollToBottomButton.Visibility = Visibility.Collapsed;
+        }
     }
 
 }

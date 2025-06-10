@@ -13,6 +13,8 @@
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0" Text="{Binding Sender}" FontWeight="Bold"/>
                 <TextBlock Grid.Column="1" Text="{Binding Text}" TextWrapping="Wrap"/>
+                
+                
             </Grid>
         </DataTemplate>
 
@@ -57,6 +59,7 @@
                  ItemsSource="{Binding ChatMessages}"
                  MouseDoubleClick="ChatList_MouseDoubleClick" 
                  MouseRightButtonUp="ChatList_MouseRightButtonUp"
+                 PreviewMouseWheel="ChatList_ScrollChanged"
                  PreviewKeyDown="ChatList_PreviewKeyDown" 
                  DragEnter="ChatList_DragEnter"
                  Drop="ChatList_Drop"
@@ -69,7 +72,16 @@
                 </ItemsPanelTemplate>
             </ListBox.ItemsPanel>
         </ListBox>
-
+        
+        <Button x:Name="ScrollToBottomButton"
+            Content="▼ "
+            Width="30" Height="30"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Bottom"
+            Margin="10,10,30,15"
+            Visibility="Collapsed"
+            Style="{StaticResource RoundedChatButtonStyle}"
+            Click="ScrollToBottomButton_Click"/>
 
         <Grid Grid.Row="1" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Left">
             <Grid.ColumnDefinitions>
