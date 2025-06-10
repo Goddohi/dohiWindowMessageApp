@@ -259,16 +259,7 @@ namespace WalkieDohi
                     Height = 16
                 };
 
-                closeBtn.Click += (s, e) =>
-            {
-                var tabToRemove = ChatTabControlHost.Items.Cast<TabItem>()
-                    .FirstOrDefault(t => t.Header is StackPanel panel && panel.Tag?.ToString() == key);
-                if (tabToRemove != null)
-                {
-                    ChatTabControlHost.Items.Remove(tabToRemove);
-                    chatTabs.Remove(key);
-                }
-            };
+                closeBtn.Click += (s, e) => DisposeTab(key);
 
                 headerPanel.Children.Add(closeBtn);
 
@@ -327,16 +318,7 @@ namespace WalkieDohi
                     Height = 16
                 };
 
-                closeBtn.Click += (s, e) =>
-                {
-                    var tabToRemove = ChatTabControlHost.Items.Cast<TabItem>()
-                        .FirstOrDefault(t => t.Header is StackPanel panel && panel.Tag?.ToString() == key);
-                    if (tabToRemove != null)
-                    {
-                        ChatTabControlHost.Items.Remove(tabToRemove);
-                        chatTabs.Remove(key);
-                    }
-                };
+                closeBtn.Click += (s, e) => DisposeTab(key);
 
                 headerPanel.Children.Add(closeBtn);
 
@@ -391,16 +373,7 @@ namespace WalkieDohi
                 Height = 16
             };
 
-            closeBtn.Click += (s, e) =>
-            {
-                var tabToRemove = ChatTabControlHost.Items.Cast<TabItem>()
-                    .FirstOrDefault(t => t.Header is StackPanel panel && panel.Tag?.ToString() == key);
-                if (tabToRemove != null)
-                {
-                    ChatTabControlHost.Items.Remove(tabToRemove);
-                    chatTabs.Remove(key);
-                }
-            };
+            closeBtn.Click += (s, e) => DisposeTab(key);
 
             headerPanel.Children.Add(closeBtn);
 
@@ -482,16 +455,7 @@ namespace WalkieDohi
                 Height = 16
             };
 
-            closeBtn.Click += (s, e) =>
-            {
-                var tabToRemove = ChatTabControlHost.Items.Cast<TabItem>()
-                    .FirstOrDefault(t => t.Header is StackPanel panel && panel.Tag?.ToString() == key);
-                if (tabToRemove != null)
-                {
-                    ChatTabControlHost.Items.Remove(tabToRemove);
-                    chatTabs.Remove(key);
-                }
-            };
+            closeBtn.Click += (s, e) => DisposeTab(key);
 
             headerPanel.Children.Add(closeBtn);
 
@@ -608,6 +572,32 @@ namespace WalkieDohi
         }
 
         #endregion
+
+        private void DisposeTab(string key)
+        {
+            var tabToRemove = ChatTabControlHost.Items.Cast<TabItem>()
+                .FirstOrDefault(t => t.Header is StackPanel panel && panel.Tag?.ToString() == key);
+
+            if (tabToRemove != null)
+            {
+                if (chatTabs.TryGetValue(key, out var tabControl))
+                {
+                    if (tabControl is GroupChatTabControl groupTab)
+                    {
+                        groupTab.Cleanup(); 
+                    }
+                    else if (tabControl is SingleChatTabControl singleTab)
+                    {
+                        singleTab.Cleanup(); 
+                    }
+                }
+
+                ChatTabControlHost.Items.Remove(tabToRemove);
+                chatTabs.Remove(key);
+            }
+        }
+
+
 
     }
 }

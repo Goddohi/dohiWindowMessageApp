@@ -385,6 +385,33 @@ namespace WalkieDohi.UC
 
             AddMessage(display, MessageDirection.Send);
         }
+        public void Cleanup()
+        {
+            foreach (var msg in viewModel.ChatMessages.OfType<ImageMessage>())
+            {
+                if (msg.Image is BitmapImage bmp && bmp.StreamSource != null)
+                {
+                    bmp.StreamSource.Dispose();
+                }
+            }
+            // ViewModel 데이터 정리
+            viewModel?.ChatMessages?.Clear();
+
+            // 파일 경로 딕셔너리 정리
+            ChatFilePaths?.Clear();
+
+            // 이벤트 핸들러 해제
+            OnSendMessage = null;
+            OnSendFile = null;
+
+            // 바인딩 해제
+            ChatList.ItemsSource = null;
+            this.DataContext = null;
+
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+        }
+
 
 
     }
