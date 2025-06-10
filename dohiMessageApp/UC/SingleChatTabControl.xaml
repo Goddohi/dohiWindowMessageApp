@@ -51,16 +51,17 @@
         </Grid.RowDefinitions>
 
         <ListBox x:Name="ChatList" 
-         SelectionMode="Single"
-         AllowDrop="True"
-         ItemsSource="{Binding ChatMessages}"
-         MouseDoubleClick="ChatList_MouseDoubleClick" 
-         MouseRightButtonUp="ChatList_MouseRightButtonUp"
-         PreviewKeyDown="ChatList_PreviewKeyDown" 
-         DragEnter="ChatList_DragEnter"
-         Drop="ChatList_Drop"
-         ScrollViewer.VerticalScrollBarVisibility="Auto"
-         Grid.Row="0" Margin="5">
+                 SelectionMode="Single"
+                 VirtualizingPanel.ScrollUnit="Pixel" 
+                 AllowDrop="True"
+                 ItemsSource="{Binding ChatMessages}"
+                 MouseDoubleClick="ChatList_MouseDoubleClick" 
+                 MouseRightButtonUp="ChatList_MouseRightButtonUp"
+                 PreviewKeyDown="ChatList_PreviewKeyDown" 
+                 DragEnter="ChatList_DragEnter"
+                 Drop="ChatList_Drop"
+                 ScrollViewer.VerticalScrollBarVisibility="Auto"
+                 Grid.Row="0" Margin="5">
 
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>

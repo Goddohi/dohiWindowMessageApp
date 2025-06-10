@@ -66,6 +66,7 @@
         <!-- 채팅 메시지 리스트 -->
         <ListBox x:Name="ChatList" 
                    SelectionMode="Single"
+                   VirtualizingPanel.ScrollUnit="Pixel" 
                    AllowDrop="True"
                    ItemsSource="{Binding ChatMessages}"
                    MouseDoubleClick="ChatList_MouseDoubleClick" 
