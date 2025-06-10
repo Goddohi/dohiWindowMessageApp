@@ -138,7 +138,6 @@
     </Compile>
     <Compile Include="UI\ViewModel\GroupManagerViewModel.cs" />
     <Compile Include="Util\BoolToVisibilityConverter.cs" />
-    <Compile Include="Util\TempChatStorageHelper.cs" />
     <Compile Include="Util\ClipboadPasteUtil.cs" />
     <Compile Include="Util\InverseBoolToVisibilityConverter.cs" />
     <Compile Include="Util\JsonDataLoadingHelper.cs" />

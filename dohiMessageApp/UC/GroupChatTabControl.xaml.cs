@@ -215,10 +215,23 @@ namespace WalkieDohi.UC
             }
         }
 
+        private const int MAX_MESSAGE_COUNT = 200;
+        private const int REMOVE_MESSAGE_COUNT = 50;
 
         public void AddMessage(ChatMessage display, MessageDirection type)
         {
             viewModel.ChatMessages.Add(display);
+
+            if (viewModel.ChatMessages.Count > MAX_MESSAGE_COUNT)
+            {
+                int removeCount = viewModel.ChatMessages.Count - MAX_MESSAGE_COUNT + REMOVE_MESSAGE_COUNT;
+                for (int i = 0; i < removeCount; i++)
+                {
+                    viewModel.ChatMessages.RemoveAt(0);
+                }
+
+            }
+
 
             //스크롤 내려주는 코드 (스크롤튀는 현상 방지를 위해 느리게 실행)
             Dispatcher.BeginInvoke(
