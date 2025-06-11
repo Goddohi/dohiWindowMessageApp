@@ -17,12 +17,8 @@ namespace WalkieDohi.Util.IO
         private readonly string filePath = "user.json";
         public User LoadUser()
         {
-            if (File.Exists(filePath))
-            {
-                return JsonConvert.DeserializeObject<User>(File.ReadAllText(filePath));
-            }
-
-            User user = User.GetDefaultUser();
+            // 이전버전 사용자를 위한 자동 업데이트 로직
+            User user = File.Exists(filePath) ? JsonConvert.DeserializeObject<User>(File.ReadAllText(filePath)) :  User.GetDefaultUser();
             SaveUser(user);
             return user;
         }
@@ -40,6 +36,37 @@ namespace WalkieDohi.Util.IO
             catch(Exception e)
             {
                 return false; 
+            }
+        }
+
+
+        public void MergePreferences(User fileUser)
+        {
+            var defaultPrefs = User.GetDefaultUser().Preferences;
+            var userPrefs = fileUser.Preferences;
+
+            if (userPrefs == null)
+            {
+                fileUser.Preferences = defaultPrefs;
+                return;
+            }
+
+            var props = typeof(UserPreferences).GetProperties();
+            bool isDefaultcnt = false;
+            foreach (var prop in props)
+            {
+                var userValue = prop.GetValue(userPrefs);
+                var isDefault = userValue == null || (prop.PropertyType == typeof(string) && string.IsNullOrWhiteSpace((string)userValue));
+
+                if (isDefault)
+                {
+                    var defaultValue = prop.GetValue(defaultPrefs);
+                    prop.SetValue(userPrefs, defaultValue);
+                }
+            }
+            if (isDefaultcnt)
+            {
+                SaveUser(fileUser);
             }
         }
     }

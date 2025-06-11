@@ -10,7 +10,7 @@ namespace WalkieDohi
 {
     public static class MainData
     {
-        public static int port = 9000;
+        public static int GetPort() { return MainData.currentUser.getPreferencesPort(); }
         private static ObservableCollection<GroupEntity> groups = new ObservableCollection<GroupEntity>();
 
         public static ObservableCollection<GroupEntity> Groups

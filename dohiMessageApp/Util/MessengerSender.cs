@@ -22,7 +22,7 @@ namespace WalkieDohi.Util
 
                 using (var client = new TcpClient())
                 {
-                    await client.ConnectAsync(ip, MainData.port);
+                    await client.ConnectAsync(ip, MainData.GetPort());
                     using (var stream = client.GetStream())
                     {
                         await stream.WriteAsync(data, 0, data.Length);

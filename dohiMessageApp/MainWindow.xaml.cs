@@ -103,7 +103,7 @@ namespace WalkieDohi
 
         private void StartReceiver()
         {
-            msgReceiver = new MessengerReceiver(MainData.port);
+            msgReceiver = new MessengerReceiver(MainData.GetPort());
             msgReceiver.OnMessageReceived += async (msg) =>
             {
                 await Dispatcher.InvokeAsync(async () =>
