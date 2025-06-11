@@ -4,7 +4,20 @@
              Height="Auto" Width="Auto">
     <StackPanel Margin="10">
         <TextBlock Text="채팅할 사람을 선택하세요" Margin="0,0,0,5"/>
-        <ComboBox x:Name="FriendComboBox" DisplayMemberPath="Name"  Height="30" Margin="0,0,0,5"/>
+        <ComboBox x:Name="FriendComboBox"   Height="30" Margin="0,0,0,5">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock>
+                        <TextBlock.Text>
+                            <MultiBinding StringFormat="{}{0}  ({1})">
+                                <Binding Path="Name"/>
+                                <Binding Path="Ip"/>
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
         <Button Content="1대1 채팅 시작" Height="30" x:Name="StartChatButton"
                 Style="{StaticResource RoundedBasicButtonStyle}"/>
         

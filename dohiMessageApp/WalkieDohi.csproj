@@ -143,6 +143,7 @@
     <Compile Include="Util\IO\FriendJsonFileHandler.cs" />
     <Compile Include="Util\IO\GroupJsonFileHandler.cs" />
     <Compile Include="Util\IO\UserJsonFileHandler.cs" />
+    <Compile Include="Util\IPAddressComparer.cs" />
     <Compile Include="Util\MessageImageUtil.cs" />
     <Compile Include="Util\MessageUtil.cs" />
     <Compile Include="Util\MessengerReceiver.cs" />

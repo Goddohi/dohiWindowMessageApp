@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Collections.ObjectModel;
+using System.Net;
+using WalkieDohi.Util;
 
 namespace WalkieDohi
 {
@@ -75,7 +77,7 @@ namespace WalkieDohi
             var sortType = MainData.currentUser.Preferences.FriendSortOrder;
 
             return (sortType == FriendSortType.ByIp)
-                ? new ObservableCollection<Friend>(MainData.Friends.OrderBy(f => f.Ip))
+                ? new ObservableCollection<Friend>(MainData.Friends.OrderBy(f => IPAddress.Parse(f.Ip), new IPAddressComparer()))
                 : new ObservableCollection<Friend>(MainData.Friends.OrderBy(f => f.Name));
         }
 
