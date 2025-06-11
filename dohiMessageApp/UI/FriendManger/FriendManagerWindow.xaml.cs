@@ -35,7 +35,7 @@ namespace WalkieDohi.UI
         {
             InitializeComponent();
             this.DataContext = viewModel;
-            viewModel.Friends = new ObservableCollection<Friend>(MainData.Friends); // 복사본
+            viewModel.Friends = new ObservableCollection<Friend>(MainData.GetsortedFriends()); // 복사본
 
         }
 
