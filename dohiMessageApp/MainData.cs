@@ -9,6 +9,7 @@ namespace WalkieDohi
 {
     public static class MainData
     {
+        public static int port = 9000;
         private static List<GroupEntity> groups = new List<GroupEntity>();
 
         public static List<GroupEntity> Groups

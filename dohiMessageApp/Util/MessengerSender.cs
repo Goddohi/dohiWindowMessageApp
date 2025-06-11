@@ -12,7 +12,7 @@ namespace WalkieDohi.Util
 {
     public class MessengerSender
     {
-        public async Task SendMessageAsync(string ip, int port, MessageEntity message)
+        public async Task SendMessageAsync(string ip, MessageEntity message)
         {
             try
             {
@@ -22,7 +22,7 @@ namespace WalkieDohi.Util
 
                 using (var client = new TcpClient())
                 {
-                    await client.ConnectAsync(ip, port);
+                    await client.ConnectAsync(ip, MainData.port);
                     using (var stream = client.GetStream())
                     {
                         await stream.WriteAsync(data, 0, data.Length);

@@ -98,7 +98,7 @@ namespace WalkieDohi.UI
                 return;
             }      
             
-            viewModel.Friends.Add(new Friend { Name = name, Ip = ip, Port = 9000 });
+            viewModel.Friends.Add(new Friend { Name = name, Ip = ip});
             SaveFriends();
 
             AddBoxAllClear();

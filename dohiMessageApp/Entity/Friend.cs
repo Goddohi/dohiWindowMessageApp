@@ -19,7 +19,6 @@ namespace WalkieDohi.Entity
         #region private 필드
         private string _name;
         private string _ip;
-        private int _port;
         #endregion
 
         #region public 필드
@@ -33,10 +32,6 @@ namespace WalkieDohi.Entity
         public string Ip {
             get => _ip;
             set { _ip = value; OnPropertyChanged(nameof(Ip)); }
-        }
-        public int Port {
-            get => _port;
-            set { _port = value; OnPropertyChanged(nameof(Port)); }
         }
         #endregion
 

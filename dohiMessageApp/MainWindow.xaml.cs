@@ -93,14 +93,14 @@ namespace WalkieDohi
 
         private void StartReceiver()
         {
-            msgReceiver = new MessengerReceiver(9000);
+            msgReceiver = new MessengerReceiver(MainData.port);
             msgReceiver.OnMessageReceived += async (msg) =>
             {
                 await Dispatcher.InvokeAsync(async () =>
                 {
                     //상대방의 이름이 ip기준으로 내가 저장한 이름으로 출력되도록 수정 
                     msg.Sender = MainData.GetFriendNameOrReturnOriginal(msg.Sender, msg.SenderIp);
-                    var tab = AddOrFocusChatTab(msg, 9000);
+                    var tab = AddOrFocusChatTab(msg);
                     if(tab == null) { return;}
                     if (msg.CheckMessageTypeFile())
                     {
@@ -137,7 +137,7 @@ namespace WalkieDohi
             _startTabControl.OnStartChat += friend =>
             {
                 MainData.GetFriendNameOrReturnOriginal(friend);
-                AddChatTab(friend.Name, friend.Ip, friend.Port);
+                AddChatTab(friend.Name, friend.Ip);
 
             };
 
@@ -218,7 +218,7 @@ namespace WalkieDohi
 
         #region 탭 생성로직
 
-        private TabBasicinterface AddOrFocusChatTab(MessageEntity msg, int port)
+        private TabBasicinterface AddOrFocusChatTab(MessageEntity msg)
         {
             string key = msg.Group?.GroupName ?? msg.SenderIp;
 
@@ -229,7 +229,7 @@ namespace WalkieDohi
                     return chatTabs[key];
                 }
 
-                var chatControl = GetChatTab(msg.SenderIp, port);
+                var chatControl = GetChatTab(msg.SenderIp);
 
                 var headerPanel = new StackPanel
                 {
@@ -330,7 +330,7 @@ namespace WalkieDohi
             }
         }
 
-        private void AddChatTab(string name, string ip, int port)
+        private void AddChatTab(string name, string ip)
         {
             string key = ip;
 
@@ -346,7 +346,7 @@ namespace WalkieDohi
                 return;
             }
 
-            var chatControl = GetChatTab(ip, port);
+            var chatControl = GetChatTab(ip);
 
             var headerPanel = new StackPanel
             {
@@ -474,8 +474,7 @@ namespace WalkieDohi
 
             var GroupchatControl = new GroupChatTabControl
             {
-                TargetGroup = group,
-                TargetPort = group.Port
+                TargetGroup = group
             };
             GroupchatControl.SetGroupMembers(MainData.Friends);
             GroupchatControl.OnSendMessage += async (s, messageText) =>
@@ -483,7 +482,7 @@ namespace WalkieDohi
                 var msgEntity = MessageEntity.OfGroupSendTextMassage(GroupchatControl.TargetGroup, messageText);
                 var tasks = GroupchatControl.TargetGroup.Ips
                             .Where(ip => ip != NetworkHelper.GetLocalIPv4())
-                            .Select(ip => msgSender.SendMessageAsync(ip, GroupchatControl.TargetGroup.Port, msgEntity));
+                            .Select(ip => msgSender.SendMessageAsync(ip, msgEntity));
 
                 await Task.WhenAll(tasks);
             };
@@ -497,7 +496,7 @@ namespace WalkieDohi
                 }
                 var tasks = GroupchatControl.TargetGroup.Ips
                             .Where(ip => ip != NetworkHelper.GetLocalIPv4())
-                            .Select(ip => msgSender.SendMessageAsync(ip, GroupchatControl.TargetGroup.Port, msgEntity));
+                            .Select(ip => msgSender.SendMessageAsync(ip, msgEntity));
 
                 await Task.WhenAll(tasks);
             };
@@ -505,18 +504,17 @@ namespace WalkieDohi
             return GroupchatControl;
         }
 
-        private SingleChatTabControl GetChatTab(string ip,int port)
+        private SingleChatTabControl GetChatTab(string ip)
         {
             var chatControl = new SingleChatTabControl
             {
                 TargetIp = ip,
-                TargetPort = port
             };
 
             chatControl.OnSendMessage += async (s, messageText) =>
             {
                 var msgEntity = MessageEntity.OfSendTextMassage(messageText);
-                await msgSender.SendMessageAsync(ip, port, msgEntity);
+                await msgSender.SendMessageAsync(ip, msgEntity);
             };
             chatControl.OnSendFile += async (s, fileInfo) =>
             {
@@ -525,7 +523,7 @@ namespace WalkieDohi
                 {
                     msgEntity.Type = MessageType.Image;
                 }
-                await msgSender.SendMessageAsync(ip, port, msgEntity);
+                await msgSender.SendMessageAsync(ip, msgEntity);
             };
             return chatControl;
         }

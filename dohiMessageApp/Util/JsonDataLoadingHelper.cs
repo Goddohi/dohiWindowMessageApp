@@ -41,7 +41,7 @@ namespace WalkieDohi.Util
             if (!File.Exists(path))
             {
                 MainData.Friends = new List<Friend> {
-                    new Friend { Name = "로컬 테스트", Ip = "127.0.0.1", Port = 9000 }
+                    new Friend { Name = "로컬 테스트", Ip = "127.0.0.1"}
                 };
                 File.WriteAllText(path, JsonConvert.SerializeObject(MainData.Friends, Formatting.Indented));
                 MessageBox.Show("기본 친구 목록을 생성했습니다.");
