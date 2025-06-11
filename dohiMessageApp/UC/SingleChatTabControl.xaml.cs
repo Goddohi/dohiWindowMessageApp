@@ -452,6 +452,25 @@ namespace WalkieDohi.UC
 
         #endregion
 
+                public void SaveMessages()
+        {
+            try
+            {
+                var logDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ChatLogs", TargetIp);
+                Directory.CreateDirectory(logDir);
+
+                var filePath = Path.Combine(logDir, $"chat_{DateTime.Now:yyyyMMdd_HHmmss}.json");
+                var entities = viewModel.ChatMessages.Select(msg => msg.ToEntity()).ToList();
+                var json = JsonUtil.Serialize(entities);
+
+                File.WriteAllText(filePath, json);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("채팅 저장 실패: " + ex.Message);
+            }
+        }
+
 
     }
 

@@ -30,9 +30,7 @@ namespace WalkieDohi.Entity
 
 
 
-        MessageEntity() {
-            
-        }
+        public MessageEntity() {}
 
         public static MessageEntity OfTextMassage(string sender, string senderIp, string content)
         {

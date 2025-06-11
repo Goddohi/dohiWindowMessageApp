@@ -473,6 +473,41 @@ namespace WalkieDohi.UC
         }
         #endregion
 
+        private const string ChatLogDir = "ChatLogs";
+
+        public void SaveMessages()
+        {
+            try
+            {
+                if (TargetGroup == null || string.IsNullOrWhiteSpace(TargetGroup.GroupName)) return;
+
+                var safeName = MakeSafeFileName(TargetGroup.GroupName);
+                var dir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ChatLogDir, $"group_{safeName}");
+                Directory.CreateDirectory(dir);
+
+                var filePath = Path.Combine(dir, "chat_latest.json");
+                var entities = viewModel.ChatMessages.Select(m => m.ToEntity()).ToList();
+                var json = JsonUtil.Serialize(entities, indented: true);
+
+                File.WriteAllText(filePath, json);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("그룹 채팅 저장 실패: " + ex.Message);
+            }
+        }
+
+        private string MakeSafeFileName(string name)
+        {
+            foreach (char c in Path.GetInvalidFileNameChars())
+            {
+                name = name.Replace(c, '_');
+            }
+            return name;
+        }
+
+
+
     }
 
 }
