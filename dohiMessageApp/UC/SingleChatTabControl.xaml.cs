@@ -41,7 +41,7 @@ namespace WalkieDohi.UC
     public partial class SingleChatTabControl : UserControl, TabBasicinterface
     {
         public string TargetIp { get; set; }
-        public int TargetPort { get; set; }
+        //public int TargetPort { get; set; }
 
         public event EventHandler<string> OnSendMessage;
 
@@ -49,6 +49,8 @@ namespace WalkieDohi.UC
 
         private Dictionary<ChatMessage, string> ChatFilePaths = new Dictionary<ChatMessage, string>();
         private ChatViewModel viewModel;
+
+        #region 초기화
         public SingleChatTabControl()
         {
             InitializeComponent();
@@ -57,6 +59,7 @@ namespace WalkieDohi.UC
             SendButton.Click += (s, e) => Send();
         }
 
+        #endregion
 
         #region UI 이벤트
 
@@ -72,15 +75,13 @@ namespace WalkieDohi.UC
                 PasteImageIfExists();
             }
 
-
-
             if (e.Key != Key.Enter)
             {
                 return;
             }
 
-            if ((Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift)
-            {//쉬프트+엔터
+            if ((Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift)//쉬프트+엔터
+            {
                 return;
             }
 
@@ -88,23 +89,6 @@ namespace WalkieDohi.UC
             Send(); // 메시지 전송
 
 
-        }
-        private void PasteImageIfExists()
-        {
-            if (Clipboard.ContainsImage())
-            {
-                BitmapSource image = Clipboard.GetImage();
-                var encoder = new PngBitmapEncoder();
-                encoder.Frames.Add(BitmapFrame.Create(image));
-                using (var stream = new MemoryStream())
-                {
-                    encoder.Save(stream);
-                    byte[] imageBytes = stream.ToArray();
-                    string base64 = Convert.ToBase64String(imageBytes);
-
-                    SendClipboardImageMessage(base64);
-                }
-            }
         }
 
         /// <summary>
@@ -181,14 +165,55 @@ namespace WalkieDohi.UC
                 }
             }
         }
+        private void ChatList_ScrollChanged(object sender, MouseWheelEventArgs e)
+        {
+            var scrollViewer = GetScrollViewer(ChatList);
+            if (scrollViewer == null) return;
+
+            bool isAtBottom = Math.Abs(scrollViewer.VerticalOffset - scrollViewer.ScrollableHeight) < 1.0;
+            ScrollToBottomButton.Visibility = isAtBottom ? Visibility.Collapsed : Visibility.Visible;
+        }
+
+        private void ScrollToBottomButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (viewModel.ChatMessages.Count > 0)
+            {
+                var lastItem = viewModel.ChatMessages[viewModel.ChatMessages.Count - 1];
+                ChatList.ScrollIntoView(lastItem);
+            }
+            ScrollToBottomButton.Visibility = Visibility.Collapsed;
+        }
+
+
+        private void ChatList_DragEnter(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                e.Effects = DragDropEffects.Copy;
+            }
+            else
+            {
+                e.Effects = DragDropEffects.None;
+            }
+        }
+
+        private async void ChatList_Drop(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                string[] droppedFiles = (string[])e.Data.GetData(DataFormats.FileDrop);
+
+                foreach (var filePath in droppedFiles)
+                {
+                    HandleDroppedFile(filePath);
+                }
+            }
+        }
+
 
         #endregion
 
-
-
-
-
-
+        #region    메세지로직
         /// <summary>
         /// 메세지 보내는 로직
         /// </summary>
@@ -208,6 +233,115 @@ namespace WalkieDohi.UC
                 }), DispatcherPriority.Background);
             }
         }
+
+        private string GetOpenFilePath()
+        {
+            try
+            {
+                var dialog = new Microsoft.Win32.OpenFileDialog();
+                dialog.Title = "보낼 파일 선택";
+                dialog.Filter = "모든 파일 (*.*)|*.*";
+                if (dialog.ShowDialog() == true)
+                {
+                    return dialog.FileName;
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show("파일 오픈 실패: " + ex.Message);
+            }
+            return "";
+
+        }
+
+
+
+        private void PasteImageIfExists()
+        {
+            if (Clipboard.ContainsImage())
+            {
+                BitmapSource image = Clipboard.GetImage();
+                var encoder = new PngBitmapEncoder();
+                encoder.Frames.Add(BitmapFrame.Create(image));
+                using (var stream = new MemoryStream())
+                {
+                    encoder.Save(stream);
+                    byte[] imageBytes = stream.ToArray();
+                    string base64 = Convert.ToBase64String(imageBytes);
+
+                    SendClipboardImageMessage(base64);
+                }
+            }
+        }
+
+
+        private async void SendFileMessageAsync()
+        {
+            string filePath = GetOpenFilePath();
+            if (!string.IsNullOrEmpty(filePath))
+            {
+                HandleDroppedFile(filePath);
+            }
+        }
+
+
+        /// <summary>
+        /// 파일과 사진을 전송하는 로직 ( 클립보드로 인한 사진은 전송을 담당하지 않는다)
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <returns></returns>
+        private void HandleDroppedFile(string filePath)
+        {
+            if (!File.Exists(filePath)) return;
+
+            FileInfo fileInfo = new FileInfo(filePath);
+            const long MaxFileSize = 20 * 1024 * 1024;
+
+            if (fileInfo.Length > MaxFileSize)
+            {
+                MessageBox.Show("❗ 20MB를 초과하는 파일은 전송할 수 없습니다.", "파일 용량 초과", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            try
+            {
+                var messageType = MessageType.File;
+                byte[] fileData = File.ReadAllBytes(filePath);
+                string base64 = Convert.ToBase64String(fileData);
+
+                var fileMessage = MessageEntity.OfSendFileMassage(base64, Path.GetFileName(filePath));
+
+                OnSendFile?.Invoke(this, (fileMessage.FileName, base64));
+                if (MessageImageUtil.isImagecheck(fileMessage.FileName))
+                {
+                    messageType = MessageType.Image;
+                }
+
+                var display = ChatMessage.CreateSendMessage(fileMessage.FileName, fileMessage.Content, messageType);
+                AddMessage(display, MessageDirection.Send);
+                ChatFilePaths[display] = filePath;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("파일 전송 실패: " + ex.Message);
+            }
+        }
+        /// <summary>
+        /// 클립보드에 있는 사진 전송로직 (경로보기불가)
+        /// </summary>
+        /// <param name="base64"></param>
+        private void SendClipboardImageMessage(string base64)
+        {
+            string randomName = ClipboadPasteUtil.GetRandomClipboadImgName();
+            var fileMessage = MessageEntity.OfSendFileMassage(base64, randomName);
+
+            OnSendFile?.Invoke(this, (fileMessage.FileName, base64));
+            var display = ChatMessage.CreateSendMessage(fileMessage.FileName, fileMessage.Content, MessageType.Image);
+
+            AddMessage(display, MessageDirection.Send);
+        }
+
+
 
         private const int MAX_MESSAGE_COUNT = 200;
         private const int REMOVE_MESSAGE_COUNT = 50;
@@ -266,39 +400,6 @@ namespace WalkieDohi.UC
         }
 
 
-
-
-        private string getOpenFilePath()
-        {
-            try
-            {
-                var dialog = new Microsoft.Win32.OpenFileDialog();
-                dialog.Title = "보낼 파일 선택";
-                dialog.Filter = "모든 파일 (*.*)|*.*";
-                if (dialog.ShowDialog() == true)
-                {
-                    return dialog.FileName;
-                }
-            }
-            catch (Exception ex)
-            {
-                System.Windows.MessageBox.Show("파일 오픈 실패: " + ex.Message);
-            }
-            return "";
-
-        }
-
-
-
-
-
-
-        private bool IsScrolledToBottom(ScrollViewer scroll)
-        {
-            // ScrollableHeight와 VerticalOffset의 차이가 작으면 맨 아래로 판단
-            return scroll.VerticalOffset >= scroll.ScrollableHeight;
-        }
-
         private ScrollViewer GetScrollViewer(DependencyObject obj)
         {
             if (obj is ScrollViewer viewer) return viewer;
@@ -311,93 +412,17 @@ namespace WalkieDohi.UC
             }
             return null;
         }
-        private async void SendFileMessageAsync()
-        {
-            string filePath = getOpenFilePath();
-            if (!string.IsNullOrEmpty(filePath))
-            {
-                await HandleDroppedFileAsync(filePath);
-            }
-        }
-        private void ChatList_DragEnter(object sender, DragEventArgs e)
-        {
-            if (e.Data.GetDataPresent(DataFormats.FileDrop))
-            {
-                e.Effects = DragDropEffects.Copy;
-            }
-            else
-            {
-                e.Effects = DragDropEffects.None;
-            }
-        }
 
-        private async void ChatList_Drop(object sender, DragEventArgs e)
-        {
-            if (e.Data.GetDataPresent(DataFormats.FileDrop))
-            {
-                string[] droppedFiles = (string[])e.Data.GetData(DataFormats.FileDrop);
+        #endregion
 
-                foreach (var filePath in droppedFiles)
-                {
-                    await HandleDroppedFileAsync(filePath);
-                }
-            }
-        }
-        /// <summary>
-        /// 파일과 사진을 전송하는 로직 ( 클립보드로 인한 사진은 전송을 담당하지 않는다)
-        /// </summary>
-        /// <param name="filePath"></param>
-        /// <returns></returns>
-        private async Task HandleDroppedFileAsync(string filePath)
-        {
-            if (!File.Exists(filePath)) return;
 
-            FileInfo fileInfo = new FileInfo(filePath);
-            const long MaxFileSize = 20 * 1024 * 1024;
 
-            if (fileInfo.Length > MaxFileSize)
-            {
-                MessageBox.Show("❗ 20MB를 초과하는 파일은 전송할 수 없습니다.", "파일 용량 초과", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
+        #region    내부사용로직
 
-            try
-            {
-                var messageType = MessageType.File;
-                byte[] fileData = File.ReadAllBytes(filePath);
-                string base64 = Convert.ToBase64String(fileData);
+        #endregion
 
-                var fileMessage = MessageEntity.OfSendFileMassage(base64, Path.GetFileName(filePath));
 
-                OnSendFile?.Invoke(this, (fileMessage.FileName, base64));
-                if (MessageImageUtil.isImagecheck(fileMessage.FileName))         
-                {
-                    messageType = MessageType.Image;
-                }
-                
-                var display = ChatMessage.CreateSendMessage(fileMessage.FileName, fileMessage.Content, messageType);
-                AddMessage(display, MessageDirection.Send);
-                ChatFilePaths[display] = filePath; 
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("파일 전송 실패: " + ex.Message);
-            }
-        }
-        /// <summary>
-        /// 클립보드에 있는 사진 전송로직 (경로보기불가)
-        /// </summary>
-        /// <param name="base64"></param>
-        private void SendClipboardImageMessage(string base64)
-        {
-            string randomName = ClipboadPasteUtil.GetRandomClipboadImgName();
-            var fileMessage = MessageEntity.OfSendFileMassage(base64, randomName);
-
-            OnSendFile?.Invoke(this, (fileMessage.FileName, base64));
-            var display = ChatMessage.CreateSendMessage(fileMessage.FileName, fileMessage.Content, MessageType.Image);
-
-            AddMessage(display, MessageDirection.Send);
-        }
+        #region   외부 사용로직 
         public void Cleanup()
         {
             foreach (var msg in viewModel.ChatMessages.OfType<ImageMessage>())
@@ -425,24 +450,9 @@ namespace WalkieDohi.UC
             GC.WaitForPendingFinalizers();
         }
 
-        private void ChatList_ScrollChanged(object sender, MouseWheelEventArgs e)
-        {
-            var scrollViewer = GetScrollViewer(ChatList);
-            if (scrollViewer == null) return;
+        #endregion
 
-            bool isAtBottom = Math.Abs(scrollViewer.VerticalOffset - scrollViewer.ScrollableHeight) < 1.0;
-            ScrollToBottomButton.Visibility = isAtBottom ? Visibility.Collapsed : Visibility.Visible;
-        }
 
-        private void ScrollToBottomButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (viewModel.ChatMessages.Count > 0)
-            {
-                var lastItem = viewModel.ChatMessages[viewModel.ChatMessages.Count - 1];
-                ChatList.ScrollIntoView(lastItem);
-            }
-            ScrollToBottomButton.Visibility = Visibility.Collapsed;
-        }
     }
 
 
