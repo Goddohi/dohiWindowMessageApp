@@ -93,6 +93,9 @@
     <Compile Include="UC\Games\NumberGuessGameControl.xaml.cs">
       <DependentUpon>NumberGuessGameControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UC\Games\ShootingGameControl.xaml.cs">
+      <DependentUpon>ShootingGameControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UC\Games\SnakeGameControl.xaml.cs">
       <DependentUpon>SnakeGameControl.xaml</DependentUpon>
     </Compile>
@@ -178,6 +181,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UC\Games\NumberGuessGameControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UC\Games\ShootingGameControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

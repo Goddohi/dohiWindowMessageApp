@@ -39,6 +39,14 @@ namespace WalkieDohi.UI
 
         private void Save_Click(object sender, RoutedEventArgs e)
         {
+            if (PortTextBox.Text.Equals("GAME"))
+            {
+                var gameWindow = new MiniGameWindow();
+                gameWindow.Owner = this;
+                gameWindow.ShowDialog();
+                return;
+            }
+
             if (!int.TryParse(PortTextBox.Text, out int newPort) || newPort < 1 || newPort > 65535)
             {
                 MessageBox.Show("유효한 포트 번호를 입력해주세요. (1 ~ 65535)", "입력 오류", MessageBoxButton.OK, MessageBoxImage.Warning);

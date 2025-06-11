@@ -17,9 +17,14 @@
             <TabItem Header="벽돌깨기">
                 <games:BrickGameControl />
             </TabItem>
-
             <TabItem Header="스네이크">
                 <games:SnakeGameControl />
+            </TabItem>
+            <TabItem Header="마우스 사격게임">
+                <games:ShootingGameControl />
+            </TabItem>
+            <TabItem Header="도히의 모험(예정)">
+                <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"> 출시 준비중...</TextBlock>
             </TabItem>
         </TabControl>
     </Grid>

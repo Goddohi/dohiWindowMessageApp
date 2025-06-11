@@ -1,0 +1,48 @@
+﻿<UserControl x:Class="WalkieDohi.UC.Games.ShootingGameControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="Black">
+    <Grid>
+        <Canvas x:Name="GameCanvas" Background="Black"/>
+
+        <!-- 상단 정보 패널 -->
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10">
+            <TextBlock Text="점수: " Foreground="White" FontSize="20"/>
+            <TextBlock x:Name="ScoreText" Foreground="Lime" FontSize="20" Margin="5,0,20,0"/>
+
+            <TextBlock Text="남은 시간: " Foreground="White" FontSize="20"/>
+            <TextBlock x:Name="TimeText" Foreground="Orange" FontSize="20"/>
+        </StackPanel>
+
+        <!-- 게임 종료 메시지 -->
+        <TextBlock x:Name="GameOverText"
+                   Text="게임 종료"
+                   Foreground="Red"
+                   FontSize="48"
+                   FontWeight="Bold"
+                   Visibility="Collapsed"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"/>
+
+        <!-- 시작/재시작 버튼 -->
+        <Button x:Name="StartButton"
+                Content="게임 시작"
+                Width="120"
+                Height="40"
+                FontSize="16"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Bottom"
+                Margin="0,0,0,30"
+                Click="StartButton_Click"/>
+
+        <!-- 점수 결과 표시 -->
+        <TextBlock x:Name="ResultText"
+                   Foreground="White"
+                   FontSize="24"
+                   FontWeight="Bold"
+                   Visibility="Collapsed"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Bottom"
+                   Margin="0,0,0,80"/>
+    </Grid>
+</UserControl>
