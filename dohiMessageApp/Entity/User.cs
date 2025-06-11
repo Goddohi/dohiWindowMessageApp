@@ -10,5 +10,11 @@ namespace WalkieDohi.Entity
     public class User : DohiEntityBase
     {
         public string Nickname { get; set; } = "사용자";
+
+
+        public static User GetDefaultUser()
+        {
+            return new User();
+        }
     }
 }

@@ -36,13 +36,14 @@ namespace WalkieDohi
 
         private GroupFileProvider groupFilePrvider = new GroupJsonFileHandler();
 
+        private UserFileProvider userFilePrvider = new UserJsonFileHandler();
+
         public MainWindow()
         {
             InitializeComponent();
 
             InitTrayIcon();
             LoadUser();
-            friendFilePrvider = new FriendJsonFileHandler();
             MainData.Friends = friendFilePrvider.LoadFriends();
 
             MainData.Groups = groupFilePrvider.LoadGroups();
@@ -70,7 +71,9 @@ namespace WalkieDohi
 
         private void LoadUser()
         {
-            NicknameBox.Text = JsonDataLoadingHelper.LoadUser();
+            //userFilePrvider = new UserJsonFileHandler();
+            MainData.currentUser = userFilePrvider.LoadUser();
+            NicknameBox.Text = MainData.currentUser.Nickname;
         }
         private void InitTrayIcon()
         {
@@ -193,7 +196,11 @@ namespace WalkieDohi
 
         private void SaveUserButton_Click(object sender, RoutedEventArgs e)
         {
-            JsonDataLoadingHelper.SaveUser(NicknameBox.Text.Trim(), true);
+            MainData.currentUser.Nickname = NicknameBox.Text.Trim();
+            if (userFilePrvider.SaveUser(MainData.currentUser))
+            {
+                MessageBox.Show("닉네임이 저장되었습니다.");
+            }
         }
 
         private void ManageFriends_Click(object sender, RoutedEventArgs e)

@@ -8,6 +8,7 @@ using System.Net;
 using System.Net.Sockets;
 using Newtonsoft.Json;
 using WalkieDohi.Entity;
+using System.Windows;
 
 namespace WalkieDohi.Util
 {
@@ -26,12 +27,18 @@ namespace WalkieDohi.Util
 
         public void Start()
         {
-            listener = new TcpListener(IPAddress.Any, port);
-            listener.Start();
-            isRunning = true;
+            try {
+                listener = new TcpListener(IPAddress.Any, port);
+                listener.Start();
+                isRunning = true;
 
-            Task.Run(() => ListenLoop());
-            Console.WriteLine($"[수신 대기 중] 포트: {port}");
+                Task.Run(() => ListenLoop());
+                Console.WriteLine($"[수신 대기 중] 포트: {port}");
+
+            }catch(Exception e)
+            {//임시
+                MessageBox.Show("포트설정필요^___^\n" + e.Message);
+            }
         }
 
         public void Stop()
