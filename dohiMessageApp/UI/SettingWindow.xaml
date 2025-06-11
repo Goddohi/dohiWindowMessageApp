@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="설정"
         Height="400" Width="600"
+        Loaded="Window_Loaded"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize">
 
@@ -10,7 +11,19 @@
         <StackPanel>
             <TextBlock x:Name="HiddenTrigger" Text="설정 메뉴(준비중 - 준비하는동안 선물 여기를 5번눌러주세요)"
                         MouseDown="HiddenTrigger_MouseDown" FontSize="20" FontWeight="Bold" Margin="0,0,0,20"/>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                <TextBlock Text="포트 번호:" Width="100" VerticalAlignment="Center"/>
+                <TextBox x:Name="PortTextBox" Width="100" />
+            </StackPanel>
 
+            <!-- 친구 정렬 설정 -->
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                <TextBlock Text="친구 정렬:" Width="100" VerticalAlignment="Center"/>
+                <ComboBox x:Name="SortOptionComboBox" Width="150" SelectedIndex="0">
+                    <ComboBoxItem Content="이름순"/>
+                    <ComboBoxItem Content="IP순"/>
+                </ComboBox>
+            </StackPanel>
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
                 <Button Content="저장" Width="80" Margin="0,0,10,0" Click="Save_Click"/>

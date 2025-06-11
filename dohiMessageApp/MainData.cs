@@ -41,6 +41,10 @@ namespace WalkieDohi
             
         }
 
+
+        public static User currentUser = new User();
+
+
         /// <summary>
         /// IP 주소에 해당하는 친구의 이름으로 수정하여 반환합니다.
         /// 친구 목록에서 IP가 일치하는 첫 번째 친구의 이름을 찾습니다.
@@ -65,12 +69,17 @@ namespace WalkieDohi
             name = MainData.Friends.FirstOrDefault(f => f.Ip == ip)?.Name ?? name;
             return name;
         }
+        
+        public static ObservableCollection<Friend> GetsortedFriends()
+        {
+            var sortType = MainData.currentUser.Preferences.FriendSortOrder;
+
+            return (sortType == FriendSortType.ByIp)
+                ? new ObservableCollection<Friend>(MainData.Friends.OrderBy(f => f.Ip))
+                : new ObservableCollection<Friend>(MainData.Friends.OrderBy(f => f.Name));
+        }
 
 
-
-        public static User currentUser = new User();
-
-        public static Dictionary<string, string> receivedFiles = new Dictionary<string, string>();
 
 
 

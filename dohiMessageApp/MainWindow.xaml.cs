@@ -21,6 +21,7 @@ using System.Threading.Tasks;
 using WalkieDohi.Core.app;
 using WalkieDohi.Util.IO;
 using WalkieDohi.Util.Provider;
+using System.Collections.ObjectModel;
 
 namespace WalkieDohi
 {
@@ -143,7 +144,7 @@ namespace WalkieDohi
         private void AddStartTab()
         {
             _startTabControl = new StartChatTabControl();
-            _startTabControl.SetFriends(MainData.Friends);
+            _startTabControl.SetFriends(MainData.GetsortedFriends());
             _startTabControl.OnStartChat += friend =>
             {
                 MainData.GetFriendNameOrReturnOriginal(friend);
@@ -208,7 +209,7 @@ namespace WalkieDohi
             var popup = new FriendManagerWindow { Owner = this };
             popup.ShowDialog();
          
-            _startTabControl?.SetFriends(MainData.Friends);
+            _startTabControl?.SetFriends(MainData.GetsortedFriends());
       
 
         }
@@ -228,6 +229,8 @@ namespace WalkieDohi
                 Owner = this
             };
             settingWindow.ShowDialog();
+
+            _startTabControl?.SetFriends(MainData.GetsortedFriends());
         }
 
         #region 탭 생성로직

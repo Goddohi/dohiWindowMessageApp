@@ -21,30 +21,42 @@ namespace WalkieDohi.Entity
                 Preferences = new UserPreferences{ Port = 9000 }
             };
         }
-        //비교
+        #region    비교메서드
+
+
+        #endregion 비교메서드
 
 
 
-        #region Getter Setter
+        #region    Getter Setter
         public int getPreferencesPort()
         {
             return Preferences.Port;
         }
 
-        #endregion
+        #endregion Getter Setter
 
 
 
 
-        #region 조회메서드
+        #region   조회메서드
 
 
-        #endregion
+        #endregion 조회메서드
 
 
     }
     public class UserPreferences
     {
         public int Port { get; set; } = 9000;
+        public FriendSortType FriendSortOrder { get; set; } = FriendSortType.ByIp;
+
+
+
+
+    }
+    public enum FriendSortType
+    {
+        ByIp, ByName
     }
 }
