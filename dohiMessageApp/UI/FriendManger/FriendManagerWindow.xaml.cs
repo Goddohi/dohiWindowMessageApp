@@ -18,6 +18,8 @@ using System.Windows.Shapes;
 using WalkieDohi;
 using WalkieDohi.UI.ViewModel;
 using System.Collections.ObjectModel;
+using WalkieDohi.Util.IO;
+using WalkieDohi.Util.Provider;
 
 namespace WalkieDohi.UI
 {
@@ -27,7 +29,7 @@ namespace WalkieDohi.UI
     public partial class FriendManagerWindow : Window
     {
         public FriendManagerWindowViewModel viewModel = new FriendManagerWindowViewModel();
-        private readonly string filePath = "friends.json";
+        FriendFileProvider friendFilePrvider = new FriendJsonFileHandler();
         
         public FriendManagerWindow()
         {
@@ -128,9 +130,7 @@ namespace WalkieDohi.UI
 
         private void SaveFriends()
         {
-            string json = JsonConvert.SerializeObject(viewModel.Friends, Formatting.Indented);
-            File.WriteAllText(filePath, json);
-            MainData.Friends = viewModel.Friends.ToList();
+            friendFilePrvider.SaveFriends(viewModel.Friends);
         }
 
         private void IpBox_PreviewTextInput(object sender, TextCompositionEventArgs e)

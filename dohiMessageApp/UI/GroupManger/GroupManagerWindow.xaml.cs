@@ -129,7 +129,7 @@ namespace WalkieDohi.UI
         {
             var json = JsonConvert.SerializeObject(Groups, Formatting.Indented);
             File.WriteAllText(GroupJsonPath, json);
-            MainData.Groups = Groups.ToList<GroupEntity>();
+            MainData.Groups = Groups;
         }
 
 #region 그룹원 삭제

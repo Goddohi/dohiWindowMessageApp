@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -32,7 +33,7 @@ namespace WalkieDohi.UC
             StartGroupChatButton.Click += StartGroupChatButton_Click;
         }
 
-        public void SetFriends(List<Friend> friends)
+        public void SetFriends(ObservableCollection<Friend> friends)
         {
             FriendComboBox.ItemsSource = null;
             FriendComboBox.ItemsSource = friends;
@@ -40,7 +41,7 @@ namespace WalkieDohi.UC
                 FriendComboBox.SelectedIndex = 0;
         }
 
-        public void SetGroups(List<GroupEntity> groups)
+        public void SetGroups(ObservableCollection<GroupEntity> groups)
         {
             GroupComboBox.ItemsSource = null;
             GroupComboBox.ItemsSource = groups;

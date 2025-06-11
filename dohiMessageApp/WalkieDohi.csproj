@@ -140,12 +140,16 @@
     <Compile Include="Util\BoolToVisibilityConverter.cs" />
     <Compile Include="Util\ClipboadPasteUtil.cs" />
     <Compile Include="Util\InverseBoolToVisibilityConverter.cs" />
+    <Compile Include="Util\IO\FriendJsonFileHandler.cs" />
+    <Compile Include="Util\IO\GroupJsonFileHandler.cs" />
     <Compile Include="Util\JsonDataLoadingHelper.cs" />
     <Compile Include="Util\MessageImageUtil.cs" />
     <Compile Include="Util\MessageUtil.cs" />
     <Compile Include="Util\MessengerReceiver.cs" />
     <Compile Include="Util\MessengerSender.cs" />
     <Compile Include="Util\NetworkHelper.cs" />
+    <Compile Include="Util\Provider\FriendFileProvider.cs" />
+    <Compile Include="Util\Provider\GroupFileProvider.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

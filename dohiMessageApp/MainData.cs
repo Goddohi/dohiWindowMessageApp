@@ -4,15 +4,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Collections.ObjectModel;
 
 namespace WalkieDohi
 {
     public static class MainData
     {
         public static int port = 9000;
-        private static List<GroupEntity> groups = new List<GroupEntity>();
+        private static ObservableCollection<GroupEntity> groups = new ObservableCollection<GroupEntity>();
 
-        public static List<GroupEntity> Groups
+        public static ObservableCollection<GroupEntity> Groups
         {
             get { return groups; }
             set
@@ -26,9 +27,9 @@ namespace WalkieDohi
         }
 
 
-        private static List<Friend> friends = new List<Friend>();
+        private static ObservableCollection<Friend> friends = new ObservableCollection<Friend>();
 
-        public static List<Friend> Friends
+        public static ObservableCollection<Friend> Friends
         {
             get { return friends; }
             set {

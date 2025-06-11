@@ -19,6 +19,8 @@ using WalkieDohi.Core;
 using System.Windows.Interop;
 using System.Threading.Tasks;
 using WalkieDohi.Core.app;
+using WalkieDohi.Util.IO;
+using WalkieDohi.Util.Provider;
 
 namespace WalkieDohi
 {
@@ -30,6 +32,9 @@ namespace WalkieDohi
         private Dictionary<string, TabBasicinterface> chatTabs = new Dictionary<string, TabBasicinterface>();
         private StartChatTabControl _startTabControl; // 추가
 
+        private FriendFileProvider friendFilePrvider = new FriendJsonFileHandler();
+
+        private GroupFileProvider groupFilePrvider = new GroupJsonFileHandler();
 
         public MainWindow()
         {
@@ -37,8 +42,10 @@ namespace WalkieDohi
 
             InitTrayIcon();
             LoadUser();
-            JsonDataLoadingHelper.LoadFriends();
-            JsonDataLoadingHelper.LoadGroups();
+            friendFilePrvider = new FriendJsonFileHandler();
+            MainData.Friends = friendFilePrvider.LoadFriends();
+
+            MainData.Groups = groupFilePrvider.LoadGroups();
             StartReceiver();
             AddStartTab();
 

@@ -23,6 +23,7 @@ using DataFormats = System.Windows.DataFormats;
 using DragDropEffects = System.Windows.DragDropEffects;
 using DragEventArgs = System.Windows.DragEventArgs;
 using WalkieDohi.UC.ViewModel;
+using System.Collections.ObjectModel;
 
 namespace WalkieDohi.UC
 {
@@ -51,7 +52,7 @@ namespace WalkieDohi.UC
 
         #region UI 이벤트
 
-        public void SetGroupMembers(List<Friend> allFriends)
+        public void SetGroupMembers(ObservableCollection<Friend> allFriends)
         {
             if (TargetGroup == null) return;
 
