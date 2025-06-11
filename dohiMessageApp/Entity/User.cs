@@ -12,14 +12,13 @@ namespace WalkieDohi.Entity
         public string Nickname { get; set; } = "사용자";
         public UserPreferences Preferences { get; set; } = new UserPreferences();
 
-
+        /// <summary>
+        /// 기본생성자로 초기값이 설정됨 (메서드명칭으로 확실히알려주기위해 생성)
+        /// </summary>
+        /// <returns></returns>
         public static User GetDefaultUser()
         {
-            return new User()
-            {
-                Nickname = "사용자",
-                Preferences = new UserPreferences{ Port = 9000 }
-            };
+            return new User();
         }
         #region    비교메서드
 
@@ -50,8 +49,6 @@ namespace WalkieDohi.Entity
     {
         public int Port { get; set; } = 9000;
         public FriendSortType FriendSortOrder { get; set; } = FriendSortType.ByIp;
-
-
 
 
     }
