@@ -22,10 +22,16 @@ namespace WalkieDohi.Util
             return System.IO.Path.Combine(FOLDER_IMAGE_PATH, FileName);
         }
 
-        public static void CheckFileDrietory()
+
+        public static void CheckFolderDrietory()
         {
             if (!Directory.Exists(FOLDER_PATH))
                 Directory.CreateDirectory(FOLDER_PATH);
+        }
+
+        public static void CheckFileDrietory()
+        {
+            CheckFolderDrietory();
             if (!Directory.Exists(FOLDER_FILE_PATH))
                 Directory.CreateDirectory(FOLDER_FILE_PATH);
         }
