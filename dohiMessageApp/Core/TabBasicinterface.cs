@@ -17,5 +17,7 @@ namespace WalkieDohi.Core
 
         void AddReceivedFile(MessageEntity msg);
 
+        void SaveMessagesOnClose();
+
     }
 }

@@ -13,10 +13,29 @@
             <Grid Margin="5">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="100"/>
-                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0" Text="{Binding Sender}" FontWeight="Bold"/>
-                <TextBlock Grid.Column="1" Text="{Binding Text}" TextWrapping="Wrap"/>
+
+                <Grid Grid.Column="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <!-- 메시지 내용 -->
+                    <TextBlock Grid.Column="0"
+                   Text="{Binding Text}"
+                   TextWrapping="Wrap"
+                   VerticalAlignment="Top" />
+
+                    <!-- 시간: 오른쪽 고정 -->
+                    <TextBlock Grid.Column="1"
+                   Text="{Binding Timestamp, StringFormat='{}{0:MM-dd HH:mm}'}"
+                   VerticalAlignment="Top"
+                   HorizontalAlignment="Right"
+                   Margin="10,0,0,0"/>
+                </Grid>
             </Grid>
         </DataTemplate>
 
@@ -25,10 +44,34 @@
             <Grid Margin="5">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="100"/>
-                    <ColumnDefinition Width="*" />
+                    <!-- Sender -->
+                    <ColumnDefinition Width="*"/>
+                    <!-- Image + Time -->
                 </Grid.ColumnDefinitions>
+
+                <!-- Sender -->
                 <TextBlock Grid.Column="0" Text="{Binding Sender}" FontWeight="Bold"/>
-                <Image Grid.Column="1" MaxWidth="500" MaxHeight="300" Stretch="Uniform" Source="{Binding Image}" />
+
+                <!-- 내부 메시지 + 시간 정렬 -->
+                <Grid Grid.Column="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- 이미지 -->
+                    <Image Grid.Column="0"
+                   MaxWidth="500"
+                   MaxHeight="300"
+                   Stretch="Uniform"
+                   Source="{Binding Image}" />
+
+                    <!-- 시간 -->
+                    <TextBlock Grid.Column="1"
+                       Text="{Binding Timestamp, StringFormat='{}{0:MM-dd HH:mm}'}"
+                       VerticalAlignment="Bottom"
+                       Margin="10,0,0,0"/>
+                </Grid>
             </Grid>
         </DataTemplate>
 
@@ -37,13 +80,33 @@
             <Grid Margin="5">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="100"/>
-                    <ColumnDefinition Width="*" />
+                    <!-- Sender -->
+                    <ColumnDefinition Width="*"/>
+                    <!-- File + Time -->
                 </Grid.ColumnDefinitions>
+
+                <!-- Sender -->
                 <TextBlock Grid.Column="0" Text="{Binding Sender}" FontWeight="Bold"/>
-                <StackPanel Grid.Column="1" Orientation="Horizontal">
-                    <TextBlock Text="[파일] " Foreground="Blue"  FontWeight="Bold"/>
-                    <TextBlock Text="{Binding FileName}" Foreground="Blue" ToolTip="클릭하여 파일 위치 보기"/>
-                </StackPanel>
+
+                <!-- 내부 파일 + 시간 정렬 -->
+                <Grid Grid.Column="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- 파일 내용 -->
+                    <StackPanel Grid.Column="0" Orientation="Horizontal">
+                        <TextBlock Text="[파일] " Foreground="Blue" FontWeight="Bold"/>
+                        <TextBlock Text="{Binding FileName}" Foreground="Blue" ToolTip="클릭하여 파일 위치 보기"/>
+                    </StackPanel>
+
+                    <!-- 시간 -->
+                    <TextBlock Grid.Column="1"
+                       Text="{Binding Timestamp, StringFormat='{}{0:MM-dd HH:mm}'}"
+                       VerticalAlignment="Center"
+                       Margin="10,0,0,0"/>
+                </Grid>
             </Grid>
         </DataTemplate>
     </UserControl.Resources>
@@ -77,6 +140,11 @@
                    PreviewMouseWheel="ChatList_ScrollChanged" 
                    ScrollViewer.VerticalScrollBarVisibility="Auto"
                    Grid.Row="1" Margin="5">
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                </Style>
+            </ListBox.ItemContainerStyle>
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
                     <VirtualizingStackPanel IsVirtualizing="True" VirtualizationMode="Recycling" />

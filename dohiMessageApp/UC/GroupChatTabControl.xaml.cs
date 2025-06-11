@@ -183,6 +183,11 @@ namespace WalkieDohi.UC
             var scrollViewer = GetScrollViewer(ChatList);
             if (scrollViewer == null) return;
 
+            if (scrollViewer.VerticalOffset <= 0)
+            {
+                LoadNextOldMessageFile();
+            }
+
             bool isAtBottom = Math.Abs(scrollViewer.VerticalOffset - scrollViewer.ScrollableHeight) < 1.0;
             ScrollToBottomButton.Visibility = isAtBottom ? Visibility.Collapsed : Visibility.Visible;
         }
@@ -357,7 +362,7 @@ namespace WalkieDohi.UC
 
         //추후 설정으로 추가
         private const int MAX_MESSAGE_COUNT = 300;
-        private const int REMOVE_MESSAGE_COUNT = 100;
+
         /// <summary>
         /// 메세지리스트에 추가를 한다 
         /// </summary>
@@ -367,10 +372,9 @@ namespace WalkieDohi.UC
         {
             viewModel.ChatMessages.Add(display);
 
-            if (viewModel.ChatMessages.Count > MAX_MESSAGE_COUNT)
+            if (viewModel.ChatMessages.Count >= MAX_MESSAGE_COUNT)
             {
-                SaveAndRemoveOldMessages();
-
+                SaveOldMessages();
             }
 
 
@@ -474,34 +478,7 @@ namespace WalkieDohi.UC
 
 
 
-        private void SaveAndRemoveOldMessages()
-        {
-            try
-            {
-                string dir = GetChatDirectory();
-                Directory.CreateDirectory(dir);
-
-                int nextPage = GetNextPageNumber(dir);
-                string filePath = Path.Combine(dir, $"chat_{nextPage:D4}.json");
-
-                var messagesToSave = viewModel.ChatMessages.Take(REMOVE_MESSAGE_COUNT).ToList();
-                var entities = messagesToSave.Select(m => m.ToEntity()).ToList();
-                var json = JsonUtil.Serialize(entities, indented: true);
-
-                File.WriteAllText(filePath, json);
-
-                // 제거
-                var toRemove = viewModel.ChatMessages.Take(50).ToList();
-                foreach (var item in toRemove)
-                {
-                    viewModel.ChatMessages.Remove(item);
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("이전 메시지 저장 실패: " + ex.Message);
-            }
-        }
+        private DateTime _lastSavedMessageTime = DateTime.MinValue;
 
 
         private string GetChatDirectory()
@@ -517,6 +494,41 @@ namespace WalkieDohi.UC
             throw new InvalidOperationException("대상이 없습니다.");
         }
 
+        private void SaveOldMessages()
+        {
+            try
+            {
+                string dir = GetChatDirectory();
+                Directory.CreateDirectory(dir);
+
+                // 저장 대상: ReLoad 아닌 메시지 중 마지막 저장 시간 이후 메시지, 최대 200개
+                var messagesToSave = viewModel.ChatMessages
+                    .Where(m => m.Direction != MessageDirection.ReLoad && m.Timestamp > _lastSavedMessageTime)
+                    .Take(MAX_MESSAGE_COUNT)
+                    .ToList();
+
+                if (!messagesToSave.Any())
+                    return; // 저장할 메시지 없음
+
+                int nextPage = GetNextPageNumber(dir);
+                string filePath = Path.Combine(dir, $"chat_{nextPage:D4}.json");
+
+                var entities = messagesToSave.Select(m => m.ToEntity()).ToList();
+                var json = JsonUtil.Serialize(entities, indented: true);
+
+                File.WriteAllText(filePath, json);
+
+                // 저장 시점 갱신
+                _lastSavedMessageTime = messagesToSave.Last().Timestamp;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("메시지 저장 실패: " + ex.Message);
+            }
+        }
+
+
+
         public void SaveMessagesOnClose()
         {
             try
@@ -527,9 +539,15 @@ namespace WalkieDohi.UC
                 int nextPage = GetNextPageNumber(dir);
                 string filePath = Path.Combine(dir, $"chat_{nextPage:D4}.json");
 
-                var entities = viewModel.ChatMessages.Select(m => m.ToEntity()).ToList();
-                var json = JsonUtil.Serialize(entities, indented: true);
+                var entities = viewModel.ChatMessages
+                    .Where(m => m.Direction != MessageDirection.ReLoad) // ReLoad 제외
+                    .Select(m => m.ToEntity())
+                    .ToList();
 
+                if (!entities.Any())
+                    return; // 저장할 메시지가 없으면 중단
+
+                var json = JsonUtil.Serialize(entities, indented: true);
                 File.WriteAllText(filePath, json);
             }
             catch (Exception ex)
@@ -563,7 +581,68 @@ namespace WalkieDohi.UC
             return name;
         }
 
+        private Queue<string> _remainingFiles; // 아직 안 연 파일들 (과거순으로)
+        private HashSet<string> _loadedFiles; // 이미 연 파일들
 
+        private void InitializeMessageFiles()
+        {
+            string dir = GetChatDirectory();
+            if (!Directory.Exists(dir)) return;
+
+            var files = Directory.GetFiles(dir, "chat_*.json")
+                .OrderByDescending(f => f) // 최신 → 과거 순
+                .ToList();
+
+            _remainingFiles = new Queue<string>(files);
+            _loadedFiles = new HashSet<string>();
+        }
+        public void LoadLatestMessages()
+        {
+            InitializeMessageFiles(); // 파일 큐 초기화
+
+            LoadNextOldMessageFile(); // 최신 1개 로드
+            Dispatcher.BeginInvoke(new Action(() =>
+            {
+                if (viewModel.ChatMessages.Count > 0)
+                {
+                    var last = viewModel.ChatMessages.Last();
+                    ChatList.ScrollIntoView(last);
+                }
+            }), DispatcherPriority.Background);
+        }
+
+        public void LoadNextOldMessageFile()
+        {
+            if (_remainingFiles == null || _remainingFiles.Count == 0)
+                return;
+
+            string nextFile = _remainingFiles.Dequeue();
+
+            if (_loadedFiles.Contains(nextFile))
+                return; // 이미 읽은 파일은 무시
+
+            try
+            {
+                var json = File.ReadAllText(nextFile);
+                var entities = JsonUtil.Deserialize<List<MessageEntity>>(json);
+
+                var messages = entities
+                    .Select(e => e.ToChatMessage())
+                    .Where(m => m != null)
+                    .ToList();
+
+                foreach (var msg in messages)
+                {
+                    viewModel.ChatMessages.Insert(0, msg); // 위에 추가
+                }
+
+                _loadedFiles.Add(nextFile);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("이전 메시지 로딩 실패: " + ex.Message);
+            }
+        }
 
     }
 

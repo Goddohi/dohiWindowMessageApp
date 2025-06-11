@@ -14,7 +14,7 @@ namespace WalkieDohi.Util
             {
                 Sender = msg.Sender,
                 IsFailed = msg.IsFailed,
-                
+                Timestamp = msg.Timestamp     
             };
 
             if (msg is TextMessage t)

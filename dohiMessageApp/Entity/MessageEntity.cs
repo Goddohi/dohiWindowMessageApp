@@ -26,6 +26,7 @@ namespace WalkieDohi.Entity
         public string Content { get; set; } // 메시지 내용 또는 파일 Base64 문자열
         public string FileName { get; set; } // 파일 이름 (파일일 경우)
         public bool IsFailed { get; set; } = false;
+        public DateTime Timestamp { get; set; } = DateTime.Now;
 
 
 

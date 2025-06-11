@@ -192,6 +192,13 @@ namespace WalkieDohi
         protected override void OnClosed(EventArgs e)
         {
             msgReceiver?.Stop();
+            foreach (var tabItem in ChatTabControlHost.Items)
+            {
+                if (tabItem is TabItem item && item.Content is TabBasicinterface chatTab)
+                {
+                    chatTab.SaveMessagesOnClose();
+                }
+            }
             base.OnClosed(e);
         }
 
@@ -493,6 +500,7 @@ namespace WalkieDohi
             {
                 TargetGroup = group
             };
+            GroupchatControl.LoadLatestMessages();
             GroupchatControl.SetGroupMembers(MainData.Friends);
             GroupchatControl.OnSendMessage += async (s, messageText) =>
             {
@@ -527,7 +535,7 @@ namespace WalkieDohi
             {
                 TargetIp = ip,
             };
-
+            chatControl.LoadLatestMessages();
             chatControl.OnSendMessage += async (s, messageText) =>
             {
                 var msgEntity = MessageEntity.OfSendTextMassage(messageText);
