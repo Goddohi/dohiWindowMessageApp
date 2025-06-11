@@ -343,19 +343,15 @@ namespace WalkieDohi.UC
 
 
 
-        private const int MAX_MESSAGE_COUNT = 200;
-        private const int REMOVE_MESSAGE_COUNT = 50;
+        private const int MAX_MESSAGE_COUNT = 300;
+        private const int REMOVE_MESSAGE_COUNT = 100;
         public void AddMessage(ChatMessage display, MessageDirection type)
         {
             viewModel.ChatMessages.Add(display);
 
             if (viewModel.ChatMessages.Count > MAX_MESSAGE_COUNT)
             {
-                int removeCount = viewModel.ChatMessages.Count - MAX_MESSAGE_COUNT + REMOVE_MESSAGE_COUNT;
-                for (int i = 0; i < removeCount; i++)
-                {
-                    viewModel.ChatMessages.RemoveAt(0);
-                }
+                SaveAndRemoveOldMessages();
 
             }
 
@@ -452,16 +448,47 @@ namespace WalkieDohi.UC
 
         #endregion
 
-                public void SaveMessages()
+        private void SaveAndRemoveOldMessages()
         {
             try
             {
-                var logDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ChatLogs", TargetIp);
-                Directory.CreateDirectory(logDir);
+                string dir = GetChatDirectory();
+                Directory.CreateDirectory(dir);
 
-                var filePath = Path.Combine(logDir, $"chat_{DateTime.Now:yyyyMMdd_HHmmss}.json");
-                var entities = viewModel.ChatMessages.Select(msg => msg.ToEntity()).ToList();
-                var json = JsonUtil.Serialize(entities);
+                int nextPage = GetNextPageNumber(dir);
+                string filePath = Path.Combine(dir, $"chat_{nextPage:D4}.json");
+
+                var messagesToSave = viewModel.ChatMessages.Take(REMOVE_MESSAGE_COUNT).ToList();
+                var entities = messagesToSave.Select(m => m.ToEntity()).ToList();
+                var json = JsonUtil.Serialize(entities, indented: true);
+
+                File.WriteAllText(filePath, json);
+
+                // 제거
+                var toRemove = viewModel.ChatMessages.Take(50).ToList();
+                foreach (var item in toRemove)
+                {
+                    viewModel.ChatMessages.Remove(item);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("이전 메시지 저장 실패: " + ex.Message);
+            }
+        }
+
+        public void SaveMessagesOnClose()
+        {
+            try
+            {
+                string dir = GetChatDirectory();
+                Directory.CreateDirectory(dir);
+
+                int nextPage = GetNextPageNumber(dir);
+                string filePath = Path.Combine(dir, $"chat_{nextPage:D4}.json");
+
+                var entities = viewModel.ChatMessages.Select(m => m.ToEntity()).ToList();
+                var json = JsonUtil.Serialize(entities, indented: true);
 
                 File.WriteAllText(filePath, json);
             }
@@ -471,6 +498,31 @@ namespace WalkieDohi.UC
             }
         }
 
+
+        private int GetNextPageNumber(string dir)
+        {
+            var files = Directory.GetFiles(dir, "chat_*.json")
+                .Select(f => Path.GetFileNameWithoutExtension(f))
+                .Where(name => name.StartsWith("chat_"))
+                .Select(name =>
+                {
+                    if (int.TryParse(name.Substring(5), out int num)) return num;
+                    return 0;
+                }).ToList();
+
+            return files.Any() ? files.Max() + 1 : 1;
+        }
+        private string GetChatDirectory()
+        {
+            string baseDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ChatLogs");
+
+            if (!string.IsNullOrWhiteSpace(TargetIp))
+            {
+                return Path.Combine(baseDir, TargetIp);
+            }
+
+            throw new InvalidOperationException("대상이 없습니다.");
+        }
 
     }
 

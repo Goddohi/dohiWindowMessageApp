@@ -599,12 +599,12 @@ namespace WalkieDohi
                 {
                     if (tabControl is GroupChatTabControl groupTab)
                     {
-                        groupTab.SaveMessages();
+                        groupTab.SaveMessagesOnClose();
                         groupTab.Cleanup(); 
                     }
                     else if (tabControl is SingleChatTabControl singleTab)
                     {
-                        singleTab.SaveMessages();
+                        singleTab.SaveMessagesOnClose();
                         singleTab.Cleanup(); 
                     }
                 }

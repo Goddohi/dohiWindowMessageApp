@@ -167,6 +167,7 @@ namespace WalkieDohi.Entity
     public enum MessageDirection
     {
         Send,
-        Receive
+        Receive,
+        ReLoad
     }
 }

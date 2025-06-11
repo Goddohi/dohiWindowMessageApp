@@ -356,8 +356,8 @@ namespace WalkieDohi.UC
         }
 
         //추후 설정으로 추가
-        private const int MAX_MESSAGE_COUNT = 200;
-        private const int REMOVE_MESSAGE_COUNT = 50;
+        private const int MAX_MESSAGE_COUNT = 300;
+        private const int REMOVE_MESSAGE_COUNT = 100;
         /// <summary>
         /// 메세지리스트에 추가를 한다 
         /// </summary>
@@ -369,11 +369,7 @@ namespace WalkieDohi.UC
 
             if (viewModel.ChatMessages.Count > MAX_MESSAGE_COUNT)
             {
-                int removeCount = viewModel.ChatMessages.Count - MAX_MESSAGE_COUNT + REMOVE_MESSAGE_COUNT;
-                for (int i = 0; i < removeCount; i++)
-                {
-                    viewModel.ChatMessages.RemoveAt(0);
-                }
+                SaveAndRemoveOldMessages();
 
             }
 
@@ -475,17 +471,62 @@ namespace WalkieDohi.UC
 
         private const string ChatLogDir = "ChatLogs";
 
-        public void SaveMessages()
+
+
+
+        private void SaveAndRemoveOldMessages()
         {
             try
             {
-                if (TargetGroup == null || string.IsNullOrWhiteSpace(TargetGroup.GroupName)) return;
-
-                var safeName = MakeSafeFileName(TargetGroup.GroupName);
-                var dir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ChatLogDir, $"group_{safeName}");
+                string dir = GetChatDirectory();
                 Directory.CreateDirectory(dir);
 
-                var filePath = Path.Combine(dir, "chat_latest.json");
+                int nextPage = GetNextPageNumber(dir);
+                string filePath = Path.Combine(dir, $"chat_{nextPage:D4}.json");
+
+                var messagesToSave = viewModel.ChatMessages.Take(REMOVE_MESSAGE_COUNT).ToList();
+                var entities = messagesToSave.Select(m => m.ToEntity()).ToList();
+                var json = JsonUtil.Serialize(entities, indented: true);
+
+                File.WriteAllText(filePath, json);
+
+                // 제거
+                var toRemove = viewModel.ChatMessages.Take(50).ToList();
+                foreach (var item in toRemove)
+                {
+                    viewModel.ChatMessages.Remove(item);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("이전 메시지 저장 실패: " + ex.Message);
+            }
+        }
+
+
+        private string GetChatDirectory()
+        {
+            string baseDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ChatLogs");
+
+            if (TargetGroup != null)
+            {
+                var safeGroup = MakeSafeFileName(TargetGroup.GroupName);
+                return Path.Combine(baseDir, $"group_{safeGroup}");
+            }
+           
+            throw new InvalidOperationException("대상이 없습니다.");
+        }
+
+        public void SaveMessagesOnClose()
+        {
+            try
+            {
+                string dir = GetChatDirectory();
+                Directory.CreateDirectory(dir);
+
+                int nextPage = GetNextPageNumber(dir);
+                string filePath = Path.Combine(dir, $"chat_{nextPage:D4}.json");
+
                 var entities = viewModel.ChatMessages.Select(m => m.ToEntity()).ToList();
                 var json = JsonUtil.Serialize(entities, indented: true);
 
@@ -493,9 +534,25 @@ namespace WalkieDohi.UC
             }
             catch (Exception ex)
             {
-                MessageBox.Show("그룹 채팅 저장 실패: " + ex.Message);
+                MessageBox.Show("채팅 저장 실패: " + ex.Message);
             }
         }
+
+
+        private int GetNextPageNumber(string dir)
+        {
+            var files = Directory.GetFiles(dir, "chat_*.json")
+                .Select(f => Path.GetFileNameWithoutExtension(f))
+                .Where(name => name.StartsWith("chat_"))
+                .Select(name =>
+                {
+                    if (int.TryParse(name.Substring(5), out int num)) return num;
+                    return 0;
+                }).ToList();
+
+            return files.Any() ? files.Max() + 1 : 1;
+        }
+
 
         private string MakeSafeFileName(string name)
         {

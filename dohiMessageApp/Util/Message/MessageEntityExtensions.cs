@@ -9,9 +9,21 @@ namespace WalkieDohi.Util
             if (msg == null) return null;
 
             // IP 기준으로 방향 추론
-            var direction = msg.SenderIp == NetworkHelper.GetLocalIPv4()
-                ? MessageDirection.Send
-                : MessageDirection.Receive;
+            MessageDirection direction;
+
+            if (msg.SenderIp == null) //이전내역받기는 ip안불러옴
+            { 
+                direction = MessageDirection.ReLoad; 
+            }
+            else if (msg.SenderIp == NetworkHelper.GetLocalIPv4())
+            {
+                direction = MessageDirection.Send;
+            }
+            else
+            { 
+                direction = MessageDirection.Receive; 
+            }
+
 
             if (msg.CheckMessageTypeText())
             {

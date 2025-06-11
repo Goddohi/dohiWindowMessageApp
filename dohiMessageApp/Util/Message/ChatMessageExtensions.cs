@@ -14,7 +14,7 @@ namespace WalkieDohi.Util
             {
                 Sender = msg.Sender,
                 IsFailed = msg.IsFailed,
-                Group = null // 필요 시 msg.Group에서 복원 가능
+                
             };
 
             if (msg is TextMessage t)
@@ -32,7 +32,7 @@ namespace WalkieDohi.Util
             {
                 entity.Type = MessageType.File;
                 entity.FileName = f.FileName;
-                entity.Content = ""; // FileMessage에는 Base64 없음
+                entity.Content = ""; // 파일은 에바데스
             }
 
             return entity;
