@@ -631,9 +631,9 @@ namespace WalkieDohi.UC
                     .Where(m => m != null)
                     .ToList();
 
-                foreach (var msg in messages)
+                for (int i = messages.Count - 1; i >= 0; i--)
                 {
-                    viewModel.ChatMessages.Insert(0, msg); // 위에 추가
+                    viewModel.ChatMessages.Insert(0, messages[i]);
                 }
 
                 _loadedFiles.Add(nextFile);
