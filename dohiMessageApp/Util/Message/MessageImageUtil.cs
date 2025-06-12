@@ -9,20 +9,32 @@ using System.Windows.Media.Imaging;
 
 namespace WalkieDohi.Util
 {
-    public static class ClipboadPasteUtil
+    public static class MessageImageUtil
     {
-        private static string GenerateRandomString(int length)
+
+        private static readonly string[] SupportedImageExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".bmp" };
+
+        public static bool isImagecheck(string FileName)
         {
-            const string chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-            var random = new Random();
-            return new string(Enumerable.Repeat(chars, length)
-                .Select(s => s[random.Next(s.Length)]).ToArray());
+            if (FileName == null) return false;
+            string ext = Path.GetExtension(FileName).ToLower();
+
+            if (SupportedImageExtensions.Contains(ext))
+            {
+                return true;
+            }
+            return false;
         }
+
         public static string GetRandomClipboadImgName()
         {
-            return "clipboard_image_" + GenerateRandomString(10) + ".png";
+            return "clipboard_image_" + StringUtil.GenerateRandomString(10) + ".png";
         }
-        public static string PasteImageIfExists()
+
+        /// <summary>
+        /// 클립보드의 이미지를 Base64String으로 반환
+        /// </summary>
+        public static string ClipboardPasteImageIfExistsReturnBase64String()
         {
             if (Clipboard.ContainsImage())
             {
@@ -38,11 +50,12 @@ namespace WalkieDohi.Util
                     return base64;
                 }
             }
-            return "";
+            throw new InvalidOperationException("클립보드에 이미지 없음");
         }
 
         public static BitmapImage LoadImageFromBase64(string base64String)
         {
+            if (string.IsNullOrWhiteSpace(base64String)) return null;
             byte[] binaryData = Convert.FromBase64String(base64String);
             using (var stream = new MemoryStream(binaryData))
             {
@@ -55,7 +68,5 @@ namespace WalkieDohi.Util
                 return image;
             }
         }
-
-
     }
 }

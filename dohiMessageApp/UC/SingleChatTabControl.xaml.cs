@@ -73,7 +73,15 @@ namespace WalkieDohi.UC
         {
             if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.V)
             {
-                PasteImageIfExists();
+                try
+                {
+                    var base64 = MessageImageUtil.ClipboardPasteImageIfExistsReturnBase64String();
+                    SendClipboardImageMessage(base64);
+                }
+                catch (InvalidOperationException)
+                {
+                    return; // 클립보드에 이미지 없으면 종료
+                }
             }
 
             if (e.Key != Key.Enter)
@@ -261,25 +269,6 @@ namespace WalkieDohi.UC
 
 
 
-        private void PasteImageIfExists()
-        {
-            if (Clipboard.ContainsImage())
-            {
-                BitmapSource image = Clipboard.GetImage();
-                var encoder = new PngBitmapEncoder();
-                encoder.Frames.Add(BitmapFrame.Create(image));
-                using (var stream = new MemoryStream())
-                {
-                    encoder.Save(stream);
-                    byte[] imageBytes = stream.ToArray();
-                    string base64 = Convert.ToBase64String(imageBytes);
-
-                    SendClipboardImageMessage(base64);
-                }
-            }
-        }
-
-
         private async void SendFileMessageAsync()
         {
             string filePath = GetOpenFilePath();
@@ -337,7 +326,7 @@ namespace WalkieDohi.UC
         /// <param name="base64"></param>
         private void SendClipboardImageMessage(string base64)
         {
-            string randomName = ClipboadPasteUtil.GetRandomClipboadImgName();
+            string randomName = MessageImageUtil.GetRandomClipboadImgName();
             var fileMessage = MessageEntity.OfSendFileMassage(base64, randomName);
 
             OnSendFile?.Invoke(this, (fileMessage.FileName, base64));

@@ -2,6 +2,7 @@
 using System.IO;
 using System.Windows.Media.Imaging;
 using WalkieDohi.UI;
+using WalkieDohi.Util;
 
 namespace WalkieDohi.Entity
 {
@@ -91,7 +92,7 @@ namespace WalkieDohi.Entity
             Sender = FormatSender(sender, dir);
             Direction = dir;
             FileName = fileName;
-            Image = CreateBitmapImageFromBase64(base64);
+            Image = MessageImageUtil.LoadImageFromBase64(base64);
             NotifyIfReceive(sender, fileName, dir, group);
         }
 
@@ -106,21 +107,6 @@ namespace WalkieDohi.Entity
             return dir == MessageDirection.Send ? "📤 나" : sender;
         }
 
-        private static BitmapImage CreateBitmapImageFromBase64(string base64)
-        {
-            if (string.IsNullOrWhiteSpace(base64)) return null;
-            byte[] binaryData = Convert.FromBase64String(base64);
-            using (var stream = new MemoryStream(binaryData))
-            {
-                var image = new BitmapImage();
-                image.BeginInit();
-                image.CacheOption = BitmapCacheOption.OnLoad;
-                image.StreamSource = stream;
-                image.EndInit();
-                image.Freeze();
-                return image;
-            }
-        }
     }
 
     public class FileMessage : ChatMessage

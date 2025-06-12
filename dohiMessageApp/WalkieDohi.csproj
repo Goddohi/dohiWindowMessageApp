@@ -141,19 +141,19 @@
     </Compile>
     <Compile Include="UI\ViewModel\GroupManagerViewModel.cs" />
     <Compile Include="Util\BoolToVisibilityConverter.cs" />
-    <Compile Include="Util\ClipboadPasteUtil.cs" />
+    <Compile Include="Util\StringUtil.cs" />
     <Compile Include="Util\InverseBoolToVisibilityConverter.cs" />
     <Compile Include="Util\IO\FriendJsonFileHandler.cs" />
     <Compile Include="Util\IO\GroupJsonFileHandler.cs" />
     <Compile Include="Util\IO\UserJsonFileHandler.cs" />
     <Compile Include="Util\IPAddressComparer.cs" />
-    <Compile Include="Util\MessageImageUtil.cs" />
-    <Compile Include="Util\MessageUtil.cs" />
+    <Compile Include="Util\Message\MessageImageUtil.cs" />
+    <Compile Include="Util\Message\MessageUtil.cs" />
     <Compile Include="Util\Message\ChatMessageExtensions.cs" />
-    <Compile Include="Util\Message\JsonUtil.cs" />
+    <Compile Include="Util\Json\JsonUtil.cs" />
     <Compile Include="Util\Message\MessageEntityExtensions.cs" />
-    <Compile Include="Util\MessengerReceiver.cs" />
-    <Compile Include="Util\MessengerSender.cs" />
+    <Compile Include="Util\Tcp\MessengerReceiver.cs" />
+    <Compile Include="Util\Tcp\MessengerSender.cs" />
     <Compile Include="Util\NetworkHelper.cs" />
     <Compile Include="Util\Provider\FriendFileProvider.cs" />
     <Compile Include="Util\Provider\GroupFileProvider.cs" />
