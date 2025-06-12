@@ -635,7 +635,8 @@ namespace WalkieDohi.UC
                 {
                     viewModel.ChatMessages.Insert(0, messages[i]);
                 }
-
+                var LoadlastItem = viewModel.ChatMessages[messages.Count - 1];
+                ChatList.ScrollIntoView(LoadlastItem);
                 _loadedFiles.Add(nextFile);
             }
             catch (Exception ex)
