@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Converters;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -125,7 +127,7 @@ namespace WalkieDohi.Entity
         }
 
 
-        public void ResultSetFail()
+        public void ResultSetFail() 
         {
             IsFailed = true;
         }
@@ -134,21 +136,11 @@ namespace WalkieDohi.Entity
             IsFailed = false;
         }
 
+        public bool IsGroupMessage => Group != null;
 
-
-        public bool CheckMessageTypeFile()
-        {
-
-            return this.Type == MessageType.File;
-        }
-        public bool CheckMessageTypeText()
-        {
-            return this.Type == MessageType.Text;
-        }
-        public bool CheckMessageTypeImage()
-        {
-            return this.Type == MessageType.Image;
-        }
+        public bool CheckMessageTypeFile()  => this.Type == MessageType.File;
+        public bool CheckMessageTypeText()  => this.Type == MessageType.Text;
+        public bool CheckMessageTypeImage() => this.Type == MessageType.Image;
     }
 
 
@@ -159,12 +151,13 @@ namespace WalkieDohi.Entity
 
 
 
-
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum MessageType
     {
         Text,File, Image
     }
 
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum MessageDirection
     {
         Send,

@@ -22,13 +22,14 @@ using WalkieDohi.Core.app;
 using WalkieDohi.Util.IO;
 using WalkieDohi.Util.Provider;
 using System.Collections.ObjectModel;
+using WalkieDohi.Util.Tcp;
 
 namespace WalkieDohi
 {
     public partial class MainWindow : Window
     {
         private NotifyIcon trayIcon;
-        private MessengerReceiver msgReceiver;
+        private PacketReceiver MainReceiver;
         private MessengerSender msgSender = new MessengerSender();
         private Dictionary<string, TabBasicinterface> chatTabs = new Dictionary<string, TabBasicinterface>();
         private StartChatTabControl _startTabControl; // 추가
@@ -104,8 +105,8 @@ namespace WalkieDohi
 
         private void StartReceiver()
         {
-            msgReceiver = new MessengerReceiver(MainData.GetPort());
-            msgReceiver.OnMessageReceived += async (msg) =>
+            MainReceiver = new PacketReceiver(MainData.GetPort());
+            MainReceiver.OnMessageReceived += async (msg) =>
             {
                 await Dispatcher.InvokeAsync(async () =>
                 {
@@ -135,7 +136,7 @@ namespace WalkieDohi
                     }
                 });
             };
-            msgReceiver.Start();
+            MainReceiver.Start();
         }
 
        /// <summary>
@@ -191,7 +192,7 @@ namespace WalkieDohi
 
         protected override void OnClosed(EventArgs e)
         {
-            msgReceiver?.Stop();
+            MainReceiver?.Stop();
             foreach (var tabItem in ChatTabControlHost.Items)
             {
                 if (tabItem is TabItem item && item.Content is TabBasicinterface chatTab)

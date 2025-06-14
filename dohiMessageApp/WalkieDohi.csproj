@@ -84,6 +84,7 @@
     <Compile Include="Core\ExtendFile.cs" />
     <Compile Include="Core\TabBasicinterface.cs" />
     <Compile Include="Entity\ChatMessage.cs" />
+    <Compile Include="Entity\PacketEntity.cs" />
     <Compile Include="UC\Games\BrickGameControl.xaml.cs">
       <DependentUpon>BrickGameControl.xaml</DependentUpon>
     </Compile>
@@ -152,12 +153,13 @@
     <Compile Include="Util\Message\ChatMessageExtensions.cs" />
     <Compile Include="Util\Json\JsonUtil.cs" />
     <Compile Include="Util\Message\MessageEntityExtensions.cs" />
-    <Compile Include="Util\Tcp\MessengerReceiver.cs" />
     <Compile Include="Util\Tcp\MessengerSender.cs" />
     <Compile Include="Util\NetworkHelper.cs" />
     <Compile Include="Util\Provider\FriendFileProvider.cs" />
     <Compile Include="Util\Provider\GroupFileProvider.cs" />
     <Compile Include="Util\Provider\UserFileProvider.cs" />
+    <Compile Include="Util\Tcp\PacketReceiver.cs" />
+    <Compile Include="Util\Tcp\PacketSender.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
