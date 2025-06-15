@@ -138,9 +138,11 @@ namespace WalkieDohi.Entity
 
         public bool IsGroupMessage => Group != null;
 
-        public bool CheckMessageTypeFile()  => this.Type == MessageType.File;
-        public bool CheckMessageTypeText()  => this.Type == MessageType.Text;
-        public bool CheckMessageTypeImage() => this.Type == MessageType.Image;
+        public bool IsSingleMessage => Group == null;
+
+        public bool CheckMessageTypeFile  => this.Type == MessageType.File;
+        public bool CheckMessageTypeText  => this.Type == MessageType.Text;
+        public bool CheckMessageTypeImage => this.Type == MessageType.Image;
     }
 
 

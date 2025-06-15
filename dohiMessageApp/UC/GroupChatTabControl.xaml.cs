@@ -398,7 +398,7 @@ namespace WalkieDohi.UC
             
             ChatMessage display = ChatMessage.CreateFromEntity(msg);
             AddMessage(display, MessageDirection.Receive);
-            if (msg.CheckMessageTypeImage())
+            if (msg.CheckMessageTypeImage)
             {
                 ChatFilePaths[display] = MessageUtil.GetImagePath(msg.FileName);
             }

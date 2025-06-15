@@ -114,7 +114,7 @@ namespace WalkieDohi
                     msg.Sender = MainData.GetFriendNameOrReturnOriginal(msg.Sender, msg.SenderIp);
                     var tab = AddOrFocusChatTab(msg);
                     if(tab == null) { return;}
-                    if (msg.CheckMessageTypeFile())
+                    if (msg.CheckMessageTypeFile)
                     {
                         MessageUtil.CheckFileDrietory();
                         //파일을 읽어오는 곳
@@ -122,7 +122,7 @@ namespace WalkieDohi
 
                         tab.AddReceivedFile(msg);
                     }
-                    else if (msg.CheckMessageTypeImage())
+                    else if (msg.CheckMessageTypeImage)
                     {
                         MessageUtil.CheckImageDrietory();
                         //파일을 읽어오는 곳
@@ -246,8 +246,8 @@ namespace WalkieDohi
         private TabBasicinterface AddOrFocusChatTab(MessageEntity msg)
         {
             string key = msg.Group?.GroupName ?? msg.SenderIp;
-
-            if (msg.Group == null)
+            
+            if (msg.IsSingleMessage)
             {
                 if (chatTabs.ContainsKey(key))
                 {
@@ -294,7 +294,7 @@ namespace WalkieDohi
                 chatTabs[key] = chatControl;
                 return chatControl;
             }
-            else
+            else //(msg.IsGroupMessage)
             {
 
                 if (chatTabs.ContainsKey(key))
@@ -353,6 +353,8 @@ namespace WalkieDohi
                 chatTabs[key] = GroupchatControl;
                 return GroupchatControl;
             }
+
+
         }
 
         private void AddChatTab(string name, string ip)

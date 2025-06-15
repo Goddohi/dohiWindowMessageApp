@@ -25,17 +25,17 @@ namespace WalkieDohi.Util
             }
 
 
-            if (msg.CheckMessageTypeText())
+            if (msg.CheckMessageTypeText)
             {
                 return new TextMessage(msg.Sender, msg.Content, direction,msg.Timestamp ,msg.Group);
             }
 
-            if (msg.CheckMessageTypeImage())
+            if (msg.CheckMessageTypeImage)
             {
                 return new ImageMessage(msg.Sender, msg.FileName, msg.Content, direction, msg.Timestamp, msg.Group);
             }
 
-            if (msg.CheckMessageTypeFile())
+            if (msg.CheckMessageTypeFile)
             {
                 return new FileMessage(msg.Sender, msg.FileName, direction, msg.Timestamp, msg.Group);
             }
