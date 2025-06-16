@@ -23,6 +23,7 @@ using WalkieDohi.Util.IO;
 using WalkieDohi.Util.Provider;
 using System.Collections.ObjectModel;
 using WalkieDohi.Util.Tcp;
+using WalkieDohi.Data;
 
 namespace WalkieDohi
 {
@@ -246,7 +247,7 @@ namespace WalkieDohi
         private TabBasicinterface AddOrFocusChatTab(MessageEntity msg)
         {
             string key = msg.Group?.GroupName ?? msg.SenderIp;
-            
+            ChatListManager.UpdateChatList(msg);
             if (msg.IsSingleMessage)
             {
                 if (chatTabs.ContainsKey(key))
@@ -359,6 +360,7 @@ namespace WalkieDohi
 
         private void AddChatTab(string name, string ip)
         {
+            ChatListManager.UpdateChatList(name, ip);
             string key = ip;
 
             if (chatTabs.ContainsKey(key))
@@ -415,6 +417,7 @@ namespace WalkieDohi
             ChatTabControlHost.SelectedItem = tab;
         }
 
+
         private void AddChatTab(GroupEntity group)
         {
             if (!group.Ips.Contains(NetworkHelper.GetLocalIPv4()))
@@ -422,6 +425,8 @@ namespace WalkieDohi
                 MessageBox.Show("본인이 포함되어있지 않은 그룹은 생성불가입니다.");
                 return;
             }
+
+            ChatListManager.UpdateChatList(group);
             string key = group.GroupName;
 
             if (chatTabs.ContainsKey(key))
@@ -431,19 +436,7 @@ namespace WalkieDohi
                 var incomingIps = group.Ips.Distinct().OrderBy(ip => ip).ToList();
                 var existingIps = chatTab.TargetGroup.Ips.Distinct().OrderBy(ip => ip).ToList();
 
-                if (incomingIps.SequenceEqual(existingIps))
-                {
-                    var existing = ChatTabControlHost.Items.Cast<TabItem>()
-                        .FirstOrDefault(t => t.Header is StackPanel panel && panel.Tag?.ToString() == key);
-
-                    if (existing != null)
-                    {
-                        ChatTabControlHost.SelectedItem = existing;
-                    }
-                    return;
-                }
-                //이전 버전 사용자용
-                if (chatTab.TargetGroup.Key == group.Key)
+                if (incomingIps.SequenceEqual(existingIps) || chatTab.TargetGroup.Key == group.Key)
                 {
                     var existing = ChatTabControlHost.Items.Cast<TabItem>()
                         .FirstOrDefault(t => t.Header is StackPanel panel && panel.Tag?.ToString() == key);
@@ -455,8 +448,11 @@ namespace WalkieDohi
                     return;
                 }
             }
+
             group.SetRandomKey();
             var GroupchatControl = GetGroupChatTab(group);
+
+
             var headerPanel = new StackPanel
             {
                 Orientation = System.Windows.Controls.Orientation.Horizontal,
@@ -496,6 +492,7 @@ namespace WalkieDohi
             chatTabs[key] = GroupchatControl;
             ChatTabControlHost.SelectedItem = tab;
         }
+
 
         private GroupChatTabControl GetGroupChatTab(GroupEntity group) {
 
