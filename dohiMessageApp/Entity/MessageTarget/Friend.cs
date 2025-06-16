@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace WalkieDohi.Entity
 
@@ -33,6 +34,9 @@ namespace WalkieDohi.Entity
             get => _ip;
             set { _ip = value; OnPropertyChanged(nameof(Ip)); }
         }
+
+        [JsonIgnore]
+        public string DisplayName => $"{Name} ({Ip})";
         #endregion
 
     }

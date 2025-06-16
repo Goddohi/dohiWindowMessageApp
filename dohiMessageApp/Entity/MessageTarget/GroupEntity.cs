@@ -1,10 +1,12 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using WalkieDohi.Core;
+using WalkieDohi.Util;
 
 namespace WalkieDohi.Entity
 {
@@ -18,6 +20,23 @@ namespace WalkieDohi.Entity
         public void SetRandomKey()
         {
             Key = Guid.NewGuid().ToString();
+        }
+
+        [JsonIgnore]
+        public string TooltipText
+        {
+            get
+            {
+                var names = Ips.Select(ip =>
+                {
+                    if (ip == NetworkHelper.GetLocalIPv4())
+                        return $"본인 ({ip})";
+                    var friend = MainData.Friends.FirstOrDefault(f => f.Ip == ip);
+                    return $"{(friend?.Name ?? "이름 없음")} ({ip})";
+                });
+
+                return string.Join("\n", names);
+            }
         }
     }
 }

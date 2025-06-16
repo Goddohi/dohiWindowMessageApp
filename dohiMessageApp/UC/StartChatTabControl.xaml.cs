@@ -2,74 +2,97 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using WalkieDohi.Core;
 using WalkieDohi.Entity;
+using WalkieDohi.UI;
 
 namespace WalkieDohi.UC
 {
-    /// <summary>
-    /// StartChatTabControl.xaml에 대한 상호 작용 논리
-    /// </summary>
     public partial class StartChatTabControl : UserControl
     {
         public event Action<Friend> OnStartChat;
         public event Action<GroupEntity> OnStartGroupChat;
 
+        private ObservableCollection<Friend> _allFriends = new ObservableCollection<Friend>();
+        private ObservableCollection<GroupEntity> _allGroups = new ObservableCollection<GroupEntity>();
+
         public StartChatTabControl()
         {
             InitializeComponent();
-            StartChatButton.Click += StartChatButton_Click;
-            StartGroupChatButton.Click += StartGroupChatButton_Click;
+
+            FriendSearchBox.TextChanged += FriendSearchBox_TextChanged;
+            GroupSearchBox.TextChanged += GroupSearchBox_TextChanged;
+
+            FriendListBox.MouseDoubleClick += FriendListBox_MouseDoubleClick;
+            GroupListBox.MouseDoubleClick += GroupListBox_MouseDoubleClick;
+        }
+
+        private void ManageFriends_Click(object sender, RoutedEventArgs e)
+        {
+            var popup = new FriendManagerWindow();
+            popup.ShowDialog();
+
+            SetFriends(MainData.GetsortedFriends());
+        }
+        private void ManageGroups_Click(object sender, RoutedEventArgs e)
+        {
+            var popup = new GroupManagerWindow();
+            popup.ShowDialog();
+
+            SetGroups(MainData.Groups); // 최신 그룹 다시 로드
         }
 
         public void SetFriends(ObservableCollection<Friend> friends)
         {
-            FriendComboBox.ItemsSource = null;
-            FriendComboBox.ItemsSource = friends;
-            if (friends.Count > 0)
-                FriendComboBox.SelectedIndex = 0;
+            _allFriends = friends;
+            FriendListBox.ItemsSource = new ObservableCollection<Friend>(_allFriends);
         }
 
         public void SetGroups(ObservableCollection<GroupEntity> groups)
         {
-            GroupComboBox.ItemsSource = null;
-            GroupComboBox.ItemsSource = groups;
-            if (groups.Count > 0)
-                GroupComboBox.SelectedIndex = 0;
+            _allGroups = groups;
+            GroupListBox.ItemsSource = new ObservableCollection<GroupEntity>(_allGroups);
         }
 
-        private void StartChatButton_Click(object sender, RoutedEventArgs e)
+        private void FriendSearchBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if (FriendComboBox.SelectedItem is Friend selected)
+            string keyword = FriendSearchBox.Text.Trim().ToLower();
+
+            var filtered = _allFriends.Where(f =>
+                (!string.IsNullOrEmpty(f.Name) && f.Name.ToLower().Contains(keyword)) ||
+                (!string.IsNullOrEmpty(f.Ip) && f.Ip.ToLower().Contains(keyword))
+            );
+
+            FriendListBox.ItemsSource = new ObservableCollection<Friend>(filtered);
+        }
+
+        private void GroupSearchBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            string keyword = GroupSearchBox.Text.Trim().ToLower();
+
+            var filtered = _allGroups.Where(g =>
+                (!string.IsNullOrEmpty(g.GroupName) && g.GroupName.ToLower().Contains(keyword)) ||
+                g.Ips.Any(ip => ip.ToLower().Contains(keyword))
+            );
+
+            GroupListBox.ItemsSource = new ObservableCollection<GroupEntity>(filtered);
+        }
+
+        private void FriendListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (FriendListBox.SelectedItem is Friend selected)
             {
                 OnStartChat?.Invoke(selected);
             }
-            else
-            {
-                MessageBox.Show("친구를 선택하세요.");
-            }
         }
 
-        private void StartGroupChatButton_Click(object sender, RoutedEventArgs e)
+        private void GroupListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if (GroupComboBox.SelectedItem is GroupEntity selected)
+            if (GroupListBox.SelectedItem is GroupEntity selected)
             {
                 OnStartGroupChat?.Invoke(selected);
-            }
-            else
-            {
-                MessageBox.Show("그룹을 선택하세요.");
             }
         }
     }
