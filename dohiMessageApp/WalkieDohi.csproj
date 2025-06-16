@@ -142,10 +142,10 @@
       <DependentUpon>SingleChatTabControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\ViewModel\GroupManagerViewModel.cs" />
-    <Compile Include="Util\BoolToVisibilityConverter.cs" />
-    <Compile Include="Util\StringNullOrEmptyToVisibilityConverter.cs" />
+    <Compile Include="Util\Converter\BoolToVisibilityConverter.cs" />
+    <Compile Include="Util\Converter\StringNullOrEmptyToVisibilityConverter.cs" />
     <Compile Include="Util\StringUtil.cs" />
-    <Compile Include="Util\InverseBoolToVisibilityConverter.cs" />
+    <Compile Include="Util\Converter\InverseBoolToVisibilityConverter.cs" />
     <Compile Include="Util\IO\FriendJsonFileHandler.cs" />
     <Compile Include="Util\IO\GroupJsonFileHandler.cs" />
     <Compile Include="Util\IO\UserJsonFileHandler.cs" />
