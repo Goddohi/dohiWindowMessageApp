@@ -27,17 +27,17 @@ namespace WalkieDohi.Util
 
             if (msg.CheckMessageTypeText)
             {
-                return new TextMessage(msg.Sender, msg.Content, direction,msg.Timestamp ,msg.Group);
+                return new TextMessage(msg.Sender, msg.Content, direction,msg.Timestamp , msg.SenderIp, msg.Group);
             }
 
             if (msg.CheckMessageTypeImage)
             {
-                return new ImageMessage(msg.Sender, msg.FileName, msg.Content, direction, msg.Timestamp, msg.Group);
+                return new ImageMessage(msg.Sender, msg.FileName, msg.Content, direction, msg.Timestamp, msg.SenderIp, msg.Group);
             }
 
             if (msg.CheckMessageTypeFile)
             {
-                return new FileMessage(msg.Sender, msg.FileName, direction, msg.Timestamp, msg.Group);
+                return new FileMessage(msg.Sender, msg.FileName, direction, msg.Timestamp, msg.SenderIp, msg.Group);
             }
 
             return null;

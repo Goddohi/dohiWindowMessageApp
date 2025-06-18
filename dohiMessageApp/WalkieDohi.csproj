@@ -86,6 +86,9 @@
     <Compile Include="Data\ChatListManager.cs" />
     <Compile Include="Entity\Message\ChatMessage.cs" />
     <Compile Include="Entity\PacketEntity.cs" />
+    <Compile Include="UC\ChatRoomListTabControl.xaml.cs">
+      <DependentUpon>ChatRoomListTabControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UC\Games\BrickGameControl.xaml.cs">
       <DependentUpon>BrickGameControl.xaml</DependentUpon>
     </Compile>
@@ -176,6 +179,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Styles\BasicWalkieDohiStyle.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UC\ChatRoomListTabControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

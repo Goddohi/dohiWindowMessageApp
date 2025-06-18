@@ -7,9 +7,9 @@ using WalkieDohi.Entity;
 
 namespace WalkieDohi.Core
 {
-   interface TabBasicinterface
+    public interface TabBasicinterface
     {
-         event EventHandler<string> OnSendMessage;
+        event EventHandler<string> OnSendMessage;
 
         event EventHandler<(string FileName, string Base64Content)> OnSendFile;
 
@@ -17,7 +17,6 @@ namespace WalkieDohi.Core
 
         void AddReceivedFile(MessageEntity msg);
 
-        void SaveMessagesOnClose();
 
     }
 }

@@ -84,7 +84,10 @@ namespace WalkieDohi.UC
         {
             if (FriendListBox.SelectedItem is Friend selected)
             {
-                OnStartChat?.Invoke(selected);
+                if (Window.GetWindow(this) is MainWindow mainWindow)
+                {
+                    mainWindow.ShowChatRoomFromStart(selected.Name,selected.Ip);
+                }
             }
         }
 
@@ -92,8 +95,12 @@ namespace WalkieDohi.UC
         {
             if (GroupListBox.SelectedItem is GroupEntity selected)
             {
-                OnStartGroupChat?.Invoke(selected);
+                if (Window.GetWindow(this) is MainWindow mainWindow)
+                {
+                    mainWindow.ShowChatRoomFromStart(selected);
+                }
             }
         }
+
     }
 }

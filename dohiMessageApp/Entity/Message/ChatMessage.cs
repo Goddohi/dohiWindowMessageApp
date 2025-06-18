@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Windows.Interop;
 using System.Windows.Media.Imaging;
 using WalkieDohi.UI;
 using WalkieDohi.Util;
@@ -12,6 +13,7 @@ namespace WalkieDohi.Entity
         public bool IsFailed { get; set; } = false;
         public MessageDirection Direction { get; set; }
         public abstract string DisplayContent { get; }
+        public string Ip { get; set; }
         public DateTime Timestamp { get; set; } = DateTime.Now;
 
         public static ChatMessage CreateFromEntity(MessageEntity msg, MessageDirection direction = MessageDirection.Receive)
@@ -19,13 +21,13 @@ namespace WalkieDohi.Entity
             if (msg == null) return null;
 
             if (msg.CheckMessageTypeText)
-                return new TextMessage(msg.Sender, msg.Content, direction,msg.Timestamp ,msg.Group);
+                return new TextMessage(msg.Sender, msg.Content, direction,msg.Timestamp ,msg.SenderIp,msg.Group);
 
             if (msg.CheckMessageTypeImage)
-                return new ImageMessage(msg.Sender, msg.FileName, msg.Content, direction, msg.Timestamp, msg.Group);
+                return new ImageMessage(msg.Sender, msg.FileName, msg.Content, direction, msg.Timestamp, msg.SenderIp, msg.Group);
 
             if (msg.CheckMessageTypeFile)
-                return new FileMessage(msg.Sender, msg.FileName, direction, msg.Timestamp, msg.Group);
+                return new FileMessage(msg.Sender, msg.FileName, direction, msg.Timestamp, msg.SenderIp, msg.Group);
 
             return null;
         }
@@ -35,11 +37,11 @@ namespace WalkieDohi.Entity
             switch (type)
             {
                 case MessageType.Text:
-                    return new TextMessage("📤 나", content, MessageDirection.Send, DateTime.Now) { IsFailed = isFailed };
+                    return new TextMessage("📤 나", content, MessageDirection.Send, DateTime.Now,NetworkHelper.GetLocalIPv4()) { IsFailed = isFailed };
                 case MessageType.Image:
-                    return new ImageMessage("📤 나", content, base64, MessageDirection.Send, DateTime.Now) { IsFailed = isFailed };
+                    return new ImageMessage("📤 나", content, base64, MessageDirection.Send, DateTime.Now, NetworkHelper.GetLocalIPv4()) { IsFailed = isFailed };
                 case MessageType.File:
-                    return new FileMessage("📤 나", content, MessageDirection.Send, DateTime.Now) { IsFailed = isFailed };
+                    return new FileMessage("📤 나", content, MessageDirection.Send, DateTime.Now, NetworkHelper.GetLocalIPv4()) { IsFailed = isFailed };
                 default:
                     return null;
             }
@@ -60,19 +62,20 @@ namespace WalkieDohi.Entity
         public string Text { get; }
         public override string DisplayContent => Text;
 
-        public TextMessage(string sender, string text, MessageDirection dir, DateTime timestamp, GroupEntity group = null)
+        public TextMessage(string sender, string text, MessageDirection dir, DateTime timestamp,string ip, GroupEntity group = null)
         {
             Sender = FormatSender(sender, dir);
             Direction = dir;
             Text = text;
             Timestamp = timestamp;
-            NotifyIfReceive(sender, text, dir, group);
+            Ip = ip;
+            NotifyIfReceive(sender, ip, text, dir, group);
         }
 
-        private void NotifyIfReceive(string sender, string text, MessageDirection dir, GroupEntity group)
+        private void NotifyIfReceive(string sender, string ip, string text, MessageDirection dir, GroupEntity group)
         {
             if (dir == MessageDirection.Receive)
-                new ToastWindow(sender, text, group).Show();
+                new ToastWindow(sender, ip, text, group).Show();
         }
 
         private string FormatSender(string sender, MessageDirection dir)
@@ -87,19 +90,20 @@ namespace WalkieDohi.Entity
         public BitmapImage Image { get; }
         public override string DisplayContent => FileName;
 
-        public ImageMessage(string sender, string fileName, string base64, MessageDirection dir, DateTime timestamp, GroupEntity group = null)
+        public ImageMessage(string sender, string fileName, string base64, MessageDirection dir, DateTime timestamp, string ip, GroupEntity group = null)
         {
             Sender = FormatSender(sender, dir);
             Direction = dir;
             FileName = fileName;
+            Ip = ip;
             Image = MessageImageUtil.LoadImageFromBase64(base64);
-            NotifyIfReceive(sender, fileName, dir, group);
+            NotifyIfReceive(sender,ip, fileName, dir, group);
         }
 
-        private void NotifyIfReceive(string sender, string content, MessageDirection dir, GroupEntity group)
+        private void NotifyIfReceive(string sender,string ip, string content, MessageDirection dir, GroupEntity group)
         {
             if (dir == MessageDirection.Receive)
-                new ToastWindow(sender, content, group).Show();
+                new ToastWindow(sender, ip, content, group).Show();
         }
 
         private string FormatSender(string sender, MessageDirection dir)
@@ -114,18 +118,19 @@ namespace WalkieDohi.Entity
         public string FileName { get; }
         public override string DisplayContent => FileName;
 
-        public FileMessage(string sender, string fileName, MessageDirection dir, DateTime timestamp, GroupEntity group = null)
+        public FileMessage(string sender, string fileName, MessageDirection dir, DateTime timestamp, string ip, GroupEntity group = null)
         {
             Sender = FormatSender(sender, dir);
             Direction = dir;
             FileName = fileName;
-            NotifyIfReceive(sender, fileName, dir, group);
+            Ip = ip;
+            NotifyIfReceive(sender, ip, fileName, dir, group);
         }
 
-        private void NotifyIfReceive(string sender, string content, MessageDirection dir, GroupEntity group)
+        private void NotifyIfReceive(string sender,string ip, string content, MessageDirection dir, GroupEntity group)
         {
             if (dir == MessageDirection.Receive)
-                new ToastWindow(sender, content, group).Show();
+                new ToastWindow(sender, ip, content, group).Show();
         }
 
         private string FormatSender(string sender, MessageDirection dir)

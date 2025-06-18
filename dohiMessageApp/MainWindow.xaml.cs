@@ -1,29 +1,20 @@
-﻿using WalkieDohi.Entity;
-using WalkieDohi.Util;
-using WalkieDohi.UC;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Drawing;
-using Application = System.Windows.Application;
-using MessageBox = System.Windows.MessageBox;
-using WalkieDohi.UI;
-using Orientation = System.Windows.Controls.Orientation;
-using System.Security.Cryptography;
-using WalkieDohi.Core;
 using System.Windows.Interop;
-using System.Threading.Tasks;
-using WalkieDohi.Core.app;
-using WalkieDohi.Util.IO;
-using WalkieDohi.Util.Provider;
-using System.Collections.ObjectModel;
-using WalkieDohi.Util.Tcp;
 using WalkieDohi.Data;
+using WalkieDohi.Entity;
+using WalkieDohi.Util;
+using WalkieDohi.UC;
+using WalkieDohi.Util.Tcp;
+using WalkieDohi.Core.app;
+using MessageBox = System.Windows.MessageBox;
+using Application = System.Windows.Application;
+using System.Windows.Input;
 
 namespace WalkieDohi
 {
@@ -32,14 +23,8 @@ namespace WalkieDohi
         private NotifyIcon trayIcon;
         private PacketReceiver MainReceiver;
         private MessengerSender msgSender = new MessengerSender();
-        private Dictionary<string, TabBasicinterface> chatTabs = new Dictionary<string, TabBasicinterface>();
-        private StartChatTabControl _startTabControl; // 추가
-
-        private FriendFileProvider friendFilePrvider = new FriendJsonFileHandler();
-
-        private GroupFileProvider groupFilePrvider = new GroupJsonFileHandler();
-
-        private UserFileProvider userFilePrvider = new UserJsonFileHandler();
+        private ChatRoomListTabControl _chatRoomListTabControl;
+        private StartChatTabControl _startTabControl;
 
         public MainWindow()
         {
@@ -47,14 +32,16 @@ namespace WalkieDohi
 
             InitTrayIcon();
             LoadUser();
-            MainData.Friends = friendFilePrvider.LoadFriends();
+            MainData.Friends = new Util.IO.FriendJsonFileHandler().LoadFriends();
+            MainData.Groups = new Util.IO.GroupJsonFileHandler().LoadGroups();
 
-            MainData.Groups = groupFilePrvider.LoadGroups();
             StartReceiver();
             AddStartTab();
+            AddChatRoomTab();
 
             this.SourceInitialized += OnSourceInitialized;
         }
+
         private void OnSourceInitialized(object sender, EventArgs e)
         {
             var handle = new WindowInteropHelper(this).Handle;
@@ -71,13 +58,12 @@ namespace WalkieDohi
             return IntPtr.Zero;
         }
 
-
         private void LoadUser()
         {
-            //userFilePrvider = new UserJsonFileHandler();
-            MainData.currentUser = userFilePrvider.LoadUser();
+            MainData.currentUser = new Util.IO.UserJsonFileHandler().LoadUser();
             NicknameBox.Text = MainData.currentUser.Nickname;
         }
+
         private void InitTrayIcon()
         {
             trayIcon = new NotifyIcon
@@ -109,40 +95,16 @@ namespace WalkieDohi
             MainReceiver = new PacketReceiver(MainData.GetPort());
             MainReceiver.OnMessageReceived += async (msg) =>
             {
-                await Dispatcher.InvokeAsync(async () =>
+                await Dispatcher.InvokeAsync(() =>
                 {
-                    //상대방의 이름이 ip기준으로 내가 저장한 이름으로 출력되도록 수정 
                     msg.Sender = MainData.GetFriendNameOrReturnOriginal(msg.Sender, msg.SenderIp);
-                    var tab = AddOrFocusChatTab(msg);
-                    if(tab == null) { return;}
-                    if (msg.CheckMessageTypeFile)
-                    {
-                        MessageUtil.CheckFileDrietory();
-                        //파일을 읽어오는 곳
-                        File.WriteAllBytes(MessageUtil.GetFilePath(msg.FileName), Convert.FromBase64String(msg.Content));
-
-                        tab.AddReceivedFile(msg);
-                    }
-                    else if (msg.CheckMessageTypeImage)
-                    {
-                        MessageUtil.CheckImageDrietory();
-                        //파일을 읽어오는 곳
-                        File.WriteAllBytes(MessageUtil.GetImagePath(msg.FileName), Convert.FromBase64String(msg.Content));
-
-                        tab.AddReceivedFile(msg);
-                    }
-                    else
-                    {
-                        tab.AddReceivedMessage(msg);
-                    }
+                    ChatListManager.UpdateChatList(msg);
+                    _chatRoomListTabControl?.HandleIncomingMessage(msg);
                 });
             };
             MainReceiver.Start();
         }
 
-       /// <summary>
-       /// 시작 탭
-       /// </summary>
         private void AddStartTab()
         {
             _startTabControl = new StartChatTabControl();
@@ -150,22 +112,32 @@ namespace WalkieDohi
             _startTabControl.OnStartChat += friend =>
             {
                 MainData.GetFriendNameOrReturnOriginal(friend);
-                AddChatTab(friend.Name, friend.Ip);
-
+                ChatListManager.UpdateChatList(friend.Name, friend.Ip);
             };
-
             _startTabControl.SetGroups(MainData.Groups);
             _startTabControl.OnStartGroupChat += group =>
             {
-                
-                AddChatTab(group);
-
+                ChatListManager.UpdateChatList(group);
             };
+
             var tab = new TabItem
             {
                 Header = "➕ 채팅 시작하기",
                 Content = _startTabControl
             };
+            ChatTabControlHost.Items.Add(tab);
+        }
+
+        private void AddChatRoomTab()
+        {
+            _chatRoomListTabControl = new ChatRoomListTabControl();
+
+            var tab = new TabItem
+            {
+                Header = "💬 채팅방",
+                Content = _chatRoomListTabControl
+            };
+
             ChatTabControlHost.Items.Add(tab);
         }
 
@@ -187,27 +159,18 @@ namespace WalkieDohi
         {
             e.Cancel = true;
             this.Hide();
-            //알람이 불편하다 하여 수정 
-            //trayIcon.ShowBalloonTip(3000, "워키도히", "백그라운드에서 실행 중입니다.", ToolTipIcon.Info);
         }
 
         protected override void OnClosed(EventArgs e)
         {
             MainReceiver?.Stop();
-            foreach (var tabItem in ChatTabControlHost.Items)
-            {
-                if (tabItem is TabItem item && item.Content is TabBasicinterface chatTab)
-                {
-                    chatTab.SaveMessagesOnClose();
-                }
-            }
             base.OnClosed(e);
         }
 
         private void SaveUserButton_Click(object sender, RoutedEventArgs e)
         {
             MainData.currentUser.Nickname = NicknameBox.Text.Trim();
-            if (userFilePrvider.SaveUser(MainData.currentUser))
+            if (new Util.IO.UserJsonFileHandler().SaveUser(MainData.currentUser))
             {
                 MessageBox.Show("닉네임이 저장되었습니다.");
             }
@@ -215,414 +178,81 @@ namespace WalkieDohi
 
         private void ManageFriends_Click(object sender, RoutedEventArgs e)
         {
-            var popup = new FriendManagerWindow { Owner = this };
+            var popup = new UI.FriendManagerWindow { Owner = this };
             popup.ShowDialog();
-         
             _startTabControl?.SetFriends(MainData.GetsortedFriends());
-      
-
         }
+
         private void ManageGroups_Click(object sender, RoutedEventArgs e)
         {
-            var popup = new GroupManagerWindow { Owner = this };
+            var popup = new UI.GroupManagerWindow { Owner = this };
             popup.ShowDialog();
-           
-               _startTabControl?.SetGroups(MainData.Groups);
-            
+            _startTabControl?.SetGroups(MainData.Groups);
         }
 
         private void OpenSettings_Click(object sender, RoutedEventArgs e)
         {
-            var settingWindow = new SettingWindow
-            {
-                Owner = this
-            };
+            var settingWindow = new UI.SettingWindow { Owner = this };
             settingWindow.ShowDialog();
-
             _startTabControl?.SetFriends(MainData.GetsortedFriends());
         }
 
-        #region 탭 생성로직
-
-        private TabBasicinterface AddOrFocusChatTab(MessageEntity msg)
+        public void ShowChatRoomFromStart(string name, string ip)
         {
-            string key = msg.Group?.GroupName ?? msg.SenderIp;
-            ChatListManager.UpdateChatList(msg);
-            if (msg.IsSingleMessage)
-            {
-                if (chatTabs.ContainsKey(key))
-                {
-                    return chatTabs[key];
-                }
+            ChatListManager.UpdateChatList(MainData.GetFriendNameOrReturnOriginal(name,ip), ip);
+            ActivateChatRoomTab();
 
-                var chatControl = GetChatTab(msg.SenderIp);
-
-                var headerPanel = new StackPanel
-                {
-                    Orientation = Orientation.Horizontal,
-                    Tag = key
-                };
-
-                //그전에 처리하긴 하지만 그래도 혹시나하여 안빼고 처리 
-                msg.Sender = MainData.GetFriendNameOrReturnOriginal(msg.Sender, msg.SenderIp);
-                headerPanel.Children.Add(new TextBlock
-                {
-                    Text = $"{msg.Sender}({msg.SenderIp})",
-                    Margin = new Thickness(0, 0, 5, 0),
-                    VerticalAlignment = VerticalAlignment.Center
-                });
-
-                var closeBtn = new System.Windows.Controls.Button
-                {
-                    Content = "×",
-                    Background = System.Windows.Media.Brushes.Transparent,
-                    BorderBrush = System.Windows.Media.Brushes.Transparent,
-                    Padding = new Thickness(0),
-                    Cursor = System.Windows.Input.Cursors.Hand,
-                    Foreground = System.Windows.Media.Brushes.Gray,
-                    FontWeight = FontWeights.Bold,
-                    Width = 16,
-                    Height = 16
-                };
-
-                closeBtn.Click += (s, e) => DisposeTab(key);
-
-                headerPanel.Children.Add(closeBtn);
-
-                var tab = new TabItem { Header = headerPanel, Content = chatControl };
-                ChatTabControlHost.Items.Add(tab);
-                ChatTabControlHost.SelectedItem = tab;
-                chatTabs[key] = chatControl;
-                return chatControl;
-            }
-            else //(msg.IsGroupMessage)
-            {
-
-                if (chatTabs.ContainsKey(key))
-                {
-                    var chatTab = (GroupChatTabControl)chatTabs[key];
-
-                    var incomingIps = msg.Group.Ips.Distinct().OrderBy(ip => ip).ToList();
-                    var existingIps = chatTab.TargetGroup.Ips.Distinct().OrderBy(ip => ip).ToList();
-
-                    if (incomingIps.SequenceEqual(existingIps))
-                    {
-                        return chatTabs[key]; // 동일한 IP 리스트를 가진 기존 그룹
-                    }
-                    if (chatTab.TargetGroup.Key == msg.Group.Key) //이전 버전 사용자용 
-                    {
-                        return chatTabs[key];
-                    }
-                }
-
-                var GroupchatControl = GetGroupChatTab(msg.Group);
-                var headerPanel = new StackPanel
-                {
-                    Orientation = Orientation.Horizontal,
-                    Tag = key
-                };
-
-                //그전에 처리하긴 하지만 그래도 혹시나하여 안빼고 처리 
-                msg.Sender = MainData.GetFriendNameOrReturnOriginal(msg.Sender, msg.SenderIp);
-                headerPanel.Children.Add(new TextBlock
-                {
-                    Text = $"({msg.Group.GroupName})",
-                    Margin = new Thickness(0, 0, 5, 0),
-                    VerticalAlignment = VerticalAlignment.Center
-                });
-
-                var closeBtn = new System.Windows.Controls.Button
-                {
-                    Content = "×",
-                    Background = System.Windows.Media.Brushes.Transparent,
-                    BorderBrush = System.Windows.Media.Brushes.Transparent,
-                    Padding = new Thickness(0),
-                    Cursor = System.Windows.Input.Cursors.Hand,
-                    Foreground = System.Windows.Media.Brushes.Gray,
-                    FontWeight = FontWeights.Bold,
-                    Width = 16,
-                    Height = 16
-                };
-
-                closeBtn.Click += (s, e) => DisposeTab(key);
-
-                headerPanel.Children.Add(closeBtn);
-
-                var tab = new TabItem { Header = headerPanel, Content = GroupchatControl };
-                ChatTabControlHost.Items.Add(tab);
-                ChatTabControlHost.SelectedItem = tab;
-                chatTabs[key] = GroupchatControl;
-                return GroupchatControl;
-            }
-
-
+            _chatRoomListTabControl?.SelectChatByKey(ip);
         }
-
-        private void AddChatTab(string name, string ip)
+        public void ShowChatRoomFromStart(GroupEntity group)
         {
-            ChatListManager.UpdateChatList(name, ip);
-            string key = ip;
-
-            if (chatTabs.ContainsKey(key))
-            {
-                var existing = ChatTabControlHost.Items.Cast<TabItem>()
-                    .FirstOrDefault(t => t.Header is StackPanel panel && panel.Tag?.ToString() == key);
-
-                if (existing != null)
-                {
-                    ChatTabControlHost.SelectedItem = existing;
-                }
+            if (group != null)
+                ChatListManager.UpdateChatList(group);
+            else
                 return;
-            }
 
-            var chatControl = GetChatTab(ip);
+            ActivateChatRoomTab();
 
-            var headerPanel = new StackPanel
-            {
-                Orientation = System.Windows.Controls.Orientation.Horizontal,
-                Tag = key
-            };
-
-            headerPanel.Children.Add(new TextBlock
-            {
-                Text = $"{name}({ip})",
-                Margin = new Thickness(0, 0, 5, 0)
-            });
-
-            var closeBtn = new System.Windows.Controls.Button
-            {
-                Content = "×",
-                Background = System.Windows.Media.Brushes.Transparent,
-                BorderBrush = System.Windows.Media.Brushes.Transparent,
-                Padding = new Thickness(0),
-                Cursor = System.Windows.Input.Cursors.Hand,
-                Foreground = System.Windows.Media.Brushes.Gray,
-                FontWeight = FontWeights.Bold,
-                Width = 16,
-                Height = 16
-            };
-
-            closeBtn.Click += (s, e) => DisposeTab(key);
-
-            headerPanel.Children.Add(closeBtn);
-
-            var tab = new TabItem
-            {
-                Header = headerPanel,
-                Content = chatControl
-            };
-
-            ChatTabControlHost.Items.Add(tab);
-            chatTabs[key] = chatControl;
-            ChatTabControlHost.SelectedItem = tab;
+            _chatRoomListTabControl?.SelectChatByKey(group.GroupName);
         }
 
 
-        private void AddChatTab(GroupEntity group)
+        public void BringToFrontAndShowChat(string name,string ip)
         {
-            if (!group.Ips.Contains(NetworkHelper.GetLocalIPv4()))
+            Show();
+            WindowState = WindowState.Normal;
+            Activate();
+
+            ChatListManager.UpdateChatList(MainData.GetFriendNameOrReturnOriginal(name, ip), ip);
+            ActivateChatRoomTab();
+            _chatRoomListTabControl?.SelectChatByKey(ip);
+
+
+        }
+        public void BringToFrontAndShowChat(GroupEntity group) 
+        {
+            Show();
+            WindowState = WindowState.Normal;
+            Activate();
+            if (group == null)
             {
-                MessageBox.Show("본인이 포함되어있지 않은 그룹은 생성불가입니다.");
                 return;
             }
-
             ChatListManager.UpdateChatList(group);
-            string key = group.GroupName;
-
-            if (chatTabs.ContainsKey(key))
-            {
-                var chatTab = (GroupChatTabControl)chatTabs[key];
-
-                var incomingIps = group.Ips.Distinct().OrderBy(ip => ip).ToList();
-                var existingIps = chatTab.TargetGroup.Ips.Distinct().OrderBy(ip => ip).ToList();
-
-                if (incomingIps.SequenceEqual(existingIps) || chatTab.TargetGroup.Key == group.Key)
-                {
-                    var existing = ChatTabControlHost.Items.Cast<TabItem>()
-                        .FirstOrDefault(t => t.Header is StackPanel panel && panel.Tag?.ToString() == key);
-
-                    if (existing != null)
-                    {
-                        ChatTabControlHost.SelectedItem = existing;
-                    }
-                    return;
-                }
-            }
-
-            group.SetRandomKey();
-            var GroupchatControl = GetGroupChatTab(group);
-
-
-            var headerPanel = new StackPanel
-            {
-                Orientation = System.Windows.Controls.Orientation.Horizontal,
-                Tag = key
-            };
-
-            headerPanel.Children.Add(new TextBlock
-            {
-                Text = $"({GroupchatControl.TargetGroup.GroupName})",
-                Margin = new Thickness(0, 0, 5, 0)
-            });
-
-            var closeBtn = new System.Windows.Controls.Button
-            {
-                Content = "×",
-                Background = System.Windows.Media.Brushes.Transparent,
-                BorderBrush = System.Windows.Media.Brushes.Transparent,
-                Padding = new Thickness(0),
-                Cursor = System.Windows.Input.Cursors.Hand,
-                Foreground = System.Windows.Media.Brushes.Gray,
-                FontWeight = FontWeights.Bold,
-                Width = 16,
-                Height = 16
-            };
-
-            closeBtn.Click += (s, e) => DisposeTab(key);
-
-            headerPanel.Children.Add(closeBtn);
-
-            var tab = new TabItem
-            {
-                Header = headerPanel,
-                Content = GroupchatControl
-            };
-
-            ChatTabControlHost.Items.Add(tab);
-            chatTabs[key] = GroupchatControl;
-            ChatTabControlHost.SelectedItem = tab;
+            ActivateChatRoomTab();
+            _chatRoomListTabControl?.SelectChatByKey(group.GroupName);
         }
 
-
-        private GroupChatTabControl GetGroupChatTab(GroupEntity group) {
-
-            var GroupchatControl = new GroupChatTabControl
-            {
-                TargetGroup = group
-            };
-            GroupchatControl.LoadLatestMessages();
-            GroupchatControl.SetGroupMembers(MainData.Friends);
-            GroupchatControl.OnSendMessage += async (s, messageText) =>
-            {
-                var msgEntity = MessageEntity.OfGroupSendTextMassage(GroupchatControl.TargetGroup, messageText);
-                var tasks = GroupchatControl.TargetGroup.Ips
-                            .Where(ip => ip != NetworkHelper.GetLocalIPv4())
-                            .Select(ip => msgSender.SendMessageAsync(ip, msgEntity));
-
-                await Task.WhenAll(tasks);
-            };
-
-            GroupchatControl.OnSendFile += async (s, fileInfo) =>
-            {
-                var msgEntity = MessageEntity.OfGroupSendFileMassage(GroupchatControl.TargetGroup, fileInfo.Base64Content, fileInfo.FileName);
-                if (MessageImageUtil.isImagecheck(msgEntity.FileName))
-                {
-                    msgEntity.Type = MessageType.Image;
-                }
-                var tasks = GroupchatControl.TargetGroup.Ips
-                            .Where(ip => ip != NetworkHelper.GetLocalIPv4())
-                            .Select(ip => msgSender.SendMessageAsync(ip, msgEntity));
-
-                await Task.WhenAll(tasks);
-            };
-
-            return GroupchatControl;
-        }
-
-        private SingleChatTabControl GetChatTab(string ip)
+        private void ActivateChatRoomTab()
         {
-            var chatControl = new SingleChatTabControl
+            foreach (TabItem tab in ChatTabControlHost.Items)
             {
-                TargetIp = ip,
-            };
-            chatControl.LoadLatestMessages();
-            chatControl.OnSendMessage += async (s, messageText) =>
-            {
-                var msgEntity = MessageEntity.OfSendTextMassage(messageText);
-                await msgSender.SendMessageAsync(ip, msgEntity);
-            };
-            chatControl.OnSendFile += async (s, fileInfo) =>
-            {
-                var msgEntity = MessageEntity.OfSendFileMassage(fileInfo.Base64Content, fileInfo.FileName);
-                if (MessageImageUtil.isImagecheck(msgEntity.FileName))
+                if (tab.Content is ChatRoomListTabControl)
                 {
-                    msgEntity.Type = MessageType.Image;
-                }
-                await msgSender.SendMessageAsync(ip, msgEntity);
-            };
-            return chatControl;
-        }
-
-        #endregion 탭 생성로직
-
-        #region  탭 외부 호출로직
-        public void SelectChatTab(string tabKey,GroupEntity group)
-        {
-            if(group == null)
-            {
-                if (chatTabs.ContainsKey(tabKey))
-                {
-                    var existing = ChatTabControlHost.Items.Cast<TabItem>()
-                        .FirstOrDefault(t => t.Header is StackPanel panel && panel.Tag?.ToString() == tabKey);
-
-                    if (existing != null)
-                    {
-                        ChatTabControlHost.SelectedItem = existing;
-                    }
-                }
-                return;
-            }
-
-            if (chatTabs.ContainsKey(group.GroupName))
-            {
-                var chatTab = (GroupChatTabControl)chatTabs[group.GroupName];
-
-                var incomingIps = group.Ips.Distinct().OrderBy(ip => ip).ToList();
-                var existingIps = chatTab.TargetGroup.Ips.Distinct().OrderBy(ip => ip).ToList();
-
-                if (incomingIps.SequenceEqual(existingIps))
-                {
-                    var existing = ChatTabControlHost.Items.Cast<TabItem>()
-                        .FirstOrDefault(t => t.Header is StackPanel panel && panel.Tag?.ToString() == group.GroupName);
-
-                    if (existing != null)
-                    {
-                        ChatTabControlHost.SelectedItem = existing;
-                    }
-                    
+                    ChatTabControlHost.SelectedItem = tab;
+                    break;
                 }
             }
         }
-
-        #endregion
-
-        private void DisposeTab(string key)
-        {
-            var tabToRemove = ChatTabControlHost.Items.Cast<TabItem>()
-                .FirstOrDefault(t => t.Header is StackPanel panel && panel.Tag?.ToString() == key);
-
-            if (tabToRemove != null)
-            {
-                if (chatTabs.TryGetValue(key, out var tabControl))
-                {
-                    if (tabControl is GroupChatTabControl groupTab)
-                    {
-                        groupTab.SaveMessagesOnClose();
-                        groupTab.Cleanup(); 
-                    }
-                    else if (tabControl is SingleChatTabControl singleTab)
-                    {
-                        singleTab.SaveMessagesOnClose();
-                        singleTab.Cleanup(); 
-                    }
-                }
-
-                ChatTabControlHost.Items.Remove(tabToRemove);
-                chatTabs.Remove(key);
-            }
-        }
-
-
-
     }
 }

@@ -13,6 +13,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using WalkieDohi.Data;
 using WalkieDohi.Entity;
 
 namespace WalkieDohi.UI
@@ -27,12 +28,13 @@ namespace WalkieDohi.UI
 
         private GroupEntity Group = null;
         private string Sender = null;
+        private string Ip=null;
         /// <summary>
         /// 토스트창 생성자
         /// </summary>
         /// <param name="title">알림 제목</param>
         /// <param name="message">알림 메시지</param>
-        public ToastWindow(string sender, string message , GroupEntity group = null)
+        public ToastWindow(string sender, string ip, string message , GroupEntity group = null)
         {
             // 알림창이 포커스를 훔치지 않게 설정 (입력도중 방해 금지)
             this.ShowActivated = false;
@@ -40,6 +42,7 @@ namespace WalkieDohi.UI
             this.Focusable = false;
             Sender = sender;
             Group = group;
+            Ip = ip;
             InitializeComponent();
             TitleText.Text = (group == null) ? $"📨 {sender}님이 보냄" :  $"📨 [ {Group.GroupName} ] {sender}님이 보냄";
             
@@ -99,7 +102,16 @@ namespace WalkieDohi.UI
                 mainWindow.Show();
                 mainWindow.WindowState = WindowState.Normal;
                 mainWindow.Activate();
-                mainWindow.SelectChatTab(Sender,Group);
+                if(Group == null)
+                {
+                    ChatListManager.UpdateChatList(Sender, Ip);
+                    mainWindow?.BringToFrontAndShowChat(Sender, Ip);
+                }
+                else
+                {
+                    ChatListManager.UpdateChatList(Group);
+                    mainWindow?.BringToFrontAndShowChat(Group);
+                }
             }
             this.Close();
         }

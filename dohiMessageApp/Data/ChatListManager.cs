@@ -24,6 +24,12 @@ namespace WalkieDohi.Data
                 UpdateChatList(name, msg.SenderIp);
             }
         }
+        public static void RemoveChatListItem(string key)
+        {
+            var item = _chatList.FirstOrDefault(c => c.UniqueKey == key);
+            if (item != null)
+                _chatList.Remove(item);
+        }
         public static void UpdateChatList(string name, string ip)
         {
             var existing = _chatList.FirstOrDefault(c => c.Ip == ip);
@@ -71,6 +77,8 @@ namespace WalkieDohi.Data
         public string Name { get; set; }
         public string Ip { get; set; }
         public GroupEntity Group { get; set; }
+
+        public string DisplayName => Group == null ? $"👤 {Name} ({Ip})" : $"👥 {Name}";
 
         public string UniqueKey => Group?.GroupName ?? Ip;
     }

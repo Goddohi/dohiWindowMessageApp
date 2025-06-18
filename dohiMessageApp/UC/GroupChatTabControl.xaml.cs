@@ -349,8 +349,6 @@ namespace WalkieDohi.UC
             AddMessage(display, MessageDirection.Send);
         }
 
-        //추후 설정으로 추가
-        private const int MAX_MESSAGE_COUNT = 300;
 
         /// <summary>
         /// 메세지리스트에 추가를 한다 
@@ -361,10 +359,8 @@ namespace WalkieDohi.UC
         {
             viewModel.ChatMessages.Add(display);
 
-            if (viewModel.ChatMessages.Count >= MAX_MESSAGE_COUNT)
-            {
-                SaveOldMessages();
-            }
+            SaveOldMessages();
+           
 
 
             //스크롤 내려주는 코드 (스크롤튀는 현상 방지를 위해 느리게 실행)
@@ -483,32 +479,36 @@ namespace WalkieDohi.UC
             throw new InvalidOperationException("대상이 없습니다.");
         }
 
+
         private void SaveOldMessages()
         {
             try
             {
-                string dir = GetChatDirectory();
-                Directory.CreateDirectory(dir);
+                string filePath = GetTodayFilePath();
 
-                // 저장 대상: ReLoad 아닌 메시지 중 마지막 저장 시간 이후 메시지, 최대 200개
-                var messagesToSave = viewModel.ChatMessages
+                // 기존 메시지 읽기
+                List<MessageEntity> existing = new List<MessageEntity>();
+                if (File.Exists(filePath))
+                {
+                    var oldJson = File.ReadAllText(filePath);
+                    existing = JsonUtil.Deserialize<List<MessageEntity>>(oldJson);
+                }
+
+                // 새 메시지 추출
+                var newMessages = viewModel.ChatMessages
                     .Where(m => m.Direction != MessageDirection.ReLoad && m.Timestamp > _lastSavedMessageTime)
-                    .Take(MAX_MESSAGE_COUNT)
+                    .OrderBy(m => m.Timestamp)
                     .ToList();
 
-                if (!messagesToSave.Any())
-                    return; // 저장할 메시지 없음
+                if (!newMessages.Any()) return;
 
-                int nextPage = GetNextPageNumber(dir);
-                string filePath = Path.Combine(dir, $"chat_{nextPage:D4}.json");
+                // 누적 저장
+                var append = newMessages.Select(m => m.ToEntity());
+                existing.AddRange(append);
 
-                var entities = messagesToSave.Select(m => m.ToEntity()).ToList();
-                var json = JsonUtil.Serialize(entities, indented: true);
+                File.WriteAllText(filePath, JsonUtil.Serialize(existing, indented: true));
 
-                File.WriteAllText(filePath, json);
-
-                // 저장 시점 갱신
-                _lastSavedMessageTime = messagesToSave.Last().Timestamp;
+                _lastSavedMessageTime = newMessages.Last().Timestamp;
             }
             catch (Exception ex)
             {
@@ -518,46 +518,13 @@ namespace WalkieDohi.UC
 
 
 
-        public void SaveMessagesOnClose()
+        private string GetTodayFilePath()
         {
-            try
-            {
-                string dir = GetChatDirectory();
-                Directory.CreateDirectory(dir);
+            string dir = GetChatDirectory();
+            Directory.CreateDirectory(dir);
 
-                int nextPage = GetNextPageNumber(dir);
-                string filePath = Path.Combine(dir, $"chat_{nextPage:D4}.json");
-
-                var entities = viewModel.ChatMessages
-                    .Where(m => m.Direction != MessageDirection.ReLoad) // ReLoad 제외
-                    .Select(m => m.ToEntity())
-                    .ToList();
-
-                if (!entities.Any())
-                    return; // 저장할 메시지가 없으면 중단
-
-                var json = JsonUtil.Serialize(entities, indented: true);
-                File.WriteAllText(filePath, json);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("채팅 저장 실패: " + ex.Message);
-            }
-        }
-
-
-        private int GetNextPageNumber(string dir)
-        {
-            var files = Directory.GetFiles(dir, "chat_*.json")
-                .Select(f => Path.GetFileNameWithoutExtension(f))
-                .Where(name => name.StartsWith("chat_"))
-                .Select(name =>
-                {
-                    if (int.TryParse(name.Substring(5), out int num)) return num;
-                    return 0;
-                }).ToList();
-
-            return files.Any() ? files.Max() + 1 : 1;
+            string today = DateTime.Now.ToString("yyyyMMdd");
+            return Path.Combine(dir, $"chat_{today}.json");
         }
 
 

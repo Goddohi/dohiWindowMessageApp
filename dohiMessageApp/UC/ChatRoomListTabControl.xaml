@@ -1,0 +1,33 @@
+﻿<UserControl x:Class="WalkieDohi.UC.ChatRoomListTabControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:WalkieDohi.UC"
+             Height="Auto" Width="Auto">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200"/>
+            <!-- 왼쪽: 리스트 -->
+            <ColumnDefinition Width="10"/>
+            <ColumnDefinition Width="*"/>
+            <!-- 오른쪽: 채팅창 -->
+        </Grid.ColumnDefinitions>
+
+        <ListBox x:Name="ChatRoomListBox"
+                 Grid.Column="0"
+                 Margin="10"
+                 DisplayMemberPath="DisplayName"
+                 SelectionChanged="ChatRoomListBox_SelectionChanged"
+                 Loaded="ChatRoomListBox_Loaded"/>
+        <!-- Splitter -->
+        <GridSplitter Grid.Column="1"
+                      Width="5"
+                      Background="#E2E8F0"
+                      HorizontalAlignment="Stretch"
+                      VerticalAlignment="Stretch"
+                      ShowsPreview="True"/>
+        
+        <ContentControl x:Name="ChatContentArea"
+                        Grid.Column="2"
+                        Margin="10"/>
+    </Grid>
+</UserControl>
