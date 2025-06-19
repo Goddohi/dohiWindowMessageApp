@@ -436,6 +436,8 @@ namespace WalkieDohi.UC
         }
 
         #endregion
+
+
         private DateTime _lastSavedMessageTime = DateTime.MinValue;
 
         private void SaveOldMessages()
@@ -474,21 +476,6 @@ namespace WalkieDohi.UC
             }
         }
 
-
-
-        private int GetNextPageNumber(string dir)
-        {
-            var files = Directory.GetFiles(dir, "chat_*.json")
-                .Select(f => Path.GetFileNameWithoutExtension(f))
-                .Where(name => name.StartsWith("chat_"))
-                .Select(name =>
-                {
-                    if (int.TryParse(name.Substring(5), out int num)) return num;
-                    return 0;
-                }).ToList();
-
-            return files.Any() ? files.Max() + 1 : 1;
-        }
         private string GetChatDirectory()
         {
             string baseDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ChatLogs");

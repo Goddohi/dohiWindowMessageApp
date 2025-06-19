@@ -12,6 +12,12 @@ namespace WalkieDohi.Data
     public static class ChatListManager
     {
         private static ObservableCollection<ChatListItem> _chatList = new ObservableCollection<ChatListItem>();
+        public static ObservableCollection<ChatListItem> GetChatList() => _chatList;
+
+
+
+
+        #region 업데이트 리스트 로직
         public static void UpdateChatList(MessageEntity msg)
         {
             if (msg.IsGroupMessage && msg.Group != null)
@@ -24,25 +30,7 @@ namespace WalkieDohi.Data
                 UpdateChatList(name, msg.SenderIp);
             }
         }
-        public static void RemoveChatListItem(string key)
-        {
-            var item = _chatList.FirstOrDefault(c => c.UniqueKey == key);
-            if (item != null)
-                _chatList.Remove(item);
-        }
-        public static void UpdateChatList(string name, string ip)
-        {
-            var existing = _chatList.FirstOrDefault(c => c.Ip == ip);
-            if (existing != null)
-            {
-                _chatList.Remove(existing);
-                _chatList.Insert(0, existing); // 최근 사용을 위로
-            }
-            else
-            {
-                _chatList.Insert(0, new ChatListItem { Name = name, Ip = ip, Group = null });
-            }
-        }
+
         public static void UpdateChatList(GroupEntity group)
         {
             // 그룹 기준으로 동일한 항목 찾기
@@ -68,8 +56,30 @@ namespace WalkieDohi.Data
             }
         }
 
+        public static void UpdateChatList(string name, string ip)
+        {
+            var existing = _chatList.FirstOrDefault(c => c.Ip == ip);
+            if (existing != null)
+            {
+                _chatList.Remove(existing);
+                _chatList.Insert(0, existing); // 최근 사용을 위로
+            }
+            else
+            {
+                _chatList.Insert(0, new ChatListItem { Name = name, Ip = ip, Group = null });
+            }
+        }
 
-        public static ObservableCollection<ChatListItem> GetChatList() => _chatList;
+        #endregion
+
+        public static void RemoveChatListItem(string key)
+        {
+            var item = _chatList.FirstOrDefault(c => c.UniqueKey == key);
+            if (item != null)
+                _chatList.Remove(item);
+        }
+
+
     }
 
     public class ChatListItem
