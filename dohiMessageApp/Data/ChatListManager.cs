@@ -1,6 +1,8 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,7 +15,6 @@ namespace WalkieDohi.Data
     {
         private static ObservableCollection<ChatListItem> _chatList = new ObservableCollection<ChatListItem>();
         public static ObservableCollection<ChatListItem> GetChatList() => _chatList;
-
 
 
 
@@ -54,6 +55,7 @@ namespace WalkieDohi.Data
                     Group = group
                 });
             }
+            SaveChatList();
         }
 
         public static void UpdateChatList(string name, string ip)
@@ -68,6 +70,7 @@ namespace WalkieDohi.Data
             {
                 _chatList.Insert(0, new ChatListItem { Name = name, Ip = ip, Group = null });
             }
+            SaveChatList();
         }
 
         #endregion
@@ -77,7 +80,50 @@ namespace WalkieDohi.Data
             var item = _chatList.FirstOrDefault(c => c.UniqueKey == key);
             if (item != null)
                 _chatList.Remove(item);
+
+            SaveChatList();
         }
+
+        #region 저장/불러오기
+
+        private static readonly string ChatListSavePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ChatList");
+
+        public static void SaveChatList()
+        {
+            try
+            {
+                var dir = Path.GetDirectoryName(ChatListSavePath);
+                if (!Directory.Exists(dir))
+                    Directory.CreateDirectory(dir);
+
+                var json = JsonConvert.SerializeObject(_chatList, Formatting.Indented);
+                File.WriteAllText(ChatListSavePath, json, Encoding.UTF8);
+            }
+            catch (Exception ex)
+            {
+                // 필요시 로그 출력
+            }
+        }
+
+        public static void LoadChatList()
+        {
+            try
+            {
+                if (!File.Exists(ChatListSavePath)) return;
+
+                var json = File.ReadAllText(ChatListSavePath, Encoding.UTF8);
+                var list = JsonConvert.DeserializeObject<ObservableCollection<ChatListItem>>(json);
+
+                _chatList = list ?? new ObservableCollection<ChatListItem>();
+            }
+            catch
+            {
+                _chatList = new ObservableCollection<ChatListItem>();
+            }
+        }
+
+#endregion
+
 
 
     }

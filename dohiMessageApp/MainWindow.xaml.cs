@@ -29,7 +29,7 @@ namespace WalkieDohi
         public MainWindow()
         {
             InitializeComponent();
-
+            ChatListManager.LoadChatList();
             InitTrayIcon();
             LoadUser();
             MainData.Friends = new Util.IO.FriendJsonFileHandler().LoadFriends();
