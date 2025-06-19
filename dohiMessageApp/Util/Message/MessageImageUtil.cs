@@ -38,16 +38,19 @@ namespace WalkieDohi.Util
         {
             if (Clipboard.ContainsImage())
             {
-                BitmapSource image = Clipboard.GetImage();
-                var encoder = new PngBitmapEncoder();
-                encoder.Frames.Add(BitmapFrame.Create(image));
-                using (var stream = new MemoryStream())
+                BitmapSource image = ClipboardExtension.GetImageSafeOnce();//Clipboard.GetImage();
+                if (image != null)
                 {
-                    encoder.Save(stream);
-                    byte[] imageBytes = stream.ToArray();
-                    string base64 = Convert.ToBase64String(imageBytes);
+                    var encoder = new PngBitmapEncoder();
+                    encoder.Frames.Add(BitmapFrame.Create(image));
+                    using (var stream = new MemoryStream())
+                    {
+                        encoder.Save(stream);
+                        byte[] imageBytes = stream.ToArray();
+                        string base64 = Convert.ToBase64String(imageBytes);
 
-                    return base64;
+                        return base64;
+                    }
                 }
             }
             throw new InvalidOperationException("클립보드에 이미지 없음");

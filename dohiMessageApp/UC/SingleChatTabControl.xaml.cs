@@ -156,7 +156,7 @@ namespace WalkieDohi.UC
                 var selected = ChatList.SelectedItem as ChatMessage;
                 if (selected != null)
                 {
-                    Clipboard.SetText(selected.DisplayContent);
+                    ClipboardExtension.CopyTextSafe(selected.DisplayContent);
                 }
             };
             menu.Items.Add(copyItem);
@@ -169,7 +169,7 @@ namespace WalkieDohi.UC
                 var selected = ChatList.SelectedItem as ChatMessage;
                 if (selected != null)
                 {
-                    Clipboard.SetText(selected.DisplayContent);
+                    ClipboardExtension.CopyTextSafe(selected.DisplayContent);
                     e.Handled = true;
                 }
             }
