@@ -102,10 +102,8 @@ namespace WalkieDohi.UC
 
             if (!_chatControls.TryGetValue(key, out var chatControl))
             {
-                // ✅ 채팅 리스트 갱신
                 ChatListManager.UpdateChatList(msg);
-
-                // ✅ 컨트롤 미리 생성해둠
+                
                 var list = ChatListManager.GetChatList();
                 var item = list.FirstOrDefault(c => c.UniqueKey == key);
                 if (item == null) return;
@@ -114,7 +112,6 @@ namespace WalkieDohi.UC
                 _chatControls[key] = chatControl;
             }
 
-            // ✅ 파일 저장 (이미지 or 일반 파일)
             if (msg.CheckMessageTypeFile)
             {
                 MessageUtil.CheckFileDrietory();
@@ -132,6 +129,7 @@ namespace WalkieDohi.UC
                 chatControl.AddReceivedMessage(msg);
             }
         }
+
         private void ChatRoomListBox_Loaded(object sender, RoutedEventArgs e)
         {
             var style = new Style(typeof(ListBoxItem));

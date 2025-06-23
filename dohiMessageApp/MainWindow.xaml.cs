@@ -206,6 +206,14 @@ namespace WalkieDohi
         }
         public void ShowChatRoomFromStart(GroupEntity group)
         {
+
+            bool notExisting = !group.Ips.Contains(NetworkHelper.GetLocalIPv4());
+            if (notExisting)
+            {
+                MessageBox.Show("본인이 포함된 그룹만 가능합니다.");
+                return;
+            }
+
             if (group != null)
                 ChatListManager.UpdateChatList(group);
             else
