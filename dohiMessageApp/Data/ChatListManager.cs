@@ -32,6 +32,7 @@ namespace WalkieDohi.Data
             }
         }
 
+
         public static void UpdateChatList(GroupEntity group)
         {
             // 그룹 기준으로 동일한 항목 찾기
@@ -64,7 +65,7 @@ namespace WalkieDohi.Data
             if (existing != null)
             {
                 _chatList.Remove(existing);
-                _chatList.Insert(0, existing); // 최근 사용을 위로
+                _chatList.Insert(0, existing);
             }
             else
             {

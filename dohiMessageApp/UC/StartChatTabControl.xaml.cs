@@ -98,6 +98,7 @@ namespace WalkieDohi.UC
                 if (Window.GetWindow(this) is MainWindow mainWindow)
                 {
                     mainWindow.ShowChatRoomFromStart(selected);
+                    e.Handled = true; //버블링 현상 제거
                 }
             }
         }
