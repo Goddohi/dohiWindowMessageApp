@@ -83,6 +83,19 @@ namespace WalkieDohi.UC
         {
             if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.V)
             {
+                // 텍스트가 있을경우 경우 리턴
+                // 해당 사유 : 엑셀 복사시 사진도 복사붙여넣기 되는 현상 제거
+                /* 엑셀 복사 window 클립보드 데이터 우선순위
+                 * 1. Bitmap
+                 * 2. HTML Format
+                 * 3. UncodeText
+                 * 4. CSV
+                 * 5. Text
+                 */
+                if (Clipboard.ContainsText())
+                {
+                    return;
+                }
                 try
                 {
                     var base64 = MessageImageUtil.ClipboardPasteImageIfExistsReturnBase64String();
