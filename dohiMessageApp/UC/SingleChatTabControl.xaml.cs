@@ -110,7 +110,6 @@ namespace WalkieDohi.UC
             e.Handled = true; // 기본 Enter 동작 막기
             Send(); // 메시지 전송
 
-
         }
 
         /// <summary>

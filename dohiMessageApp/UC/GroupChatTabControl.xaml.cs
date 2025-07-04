@@ -333,7 +333,6 @@ namespace WalkieDohi.UC
 
                 OnSendFile?.Invoke(this, (fileMessage.FileName, base64));
                 if (MessageImageUtil.isImagecheck(fileMessage.FileName))
-
                 {
                     messageType = MessageType.Image;
                 }

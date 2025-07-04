@@ -54,6 +54,8 @@ namespace WalkieDohi.UC
                         .Where(ip => ip != NetworkHelper.GetLocalIPv4())
                         .Select(ip => new MessengerSender().SendMessageAsync(ip, msg));
                     await System.Threading.Tasks.Task.WhenAll(tasks);
+
+                    ChatListManager.UpdateChatList(item.Group);
                 };
 
                 control.OnSendFile += async (s, fileInfo) =>
@@ -66,6 +68,8 @@ namespace WalkieDohi.UC
                         .Where(ip => ip != NetworkHelper.GetLocalIPv4())
                         .Select(ip => new MessengerSender().SendMessageAsync(ip, msg));
                     await System.Threading.Tasks.Task.WhenAll(tasks);
+
+                    ChatListManager.UpdateChatList(item.Group);
                 };
 
                 return control;
@@ -82,6 +86,8 @@ namespace WalkieDohi.UC
                 {
                     var msg = MessageEntity.OfSendTextMassage(text);
                     await new MessengerSender().SendMessageAsync(item.Ip, msg);
+
+                    ChatListManager.UpdateChatList(item.Name,item.Ip);
                 };
 
                 control.OnSendFile += async (s, fileInfo) =>
@@ -90,6 +96,8 @@ namespace WalkieDohi.UC
                     if (MessageImageUtil.isImagecheck(msg.FileName))
                         msg.Type = MessageType.Image;
                     await new MessengerSender().SendMessageAsync(item.Ip, msg);
+
+                    ChatListManager.UpdateChatList(item.Name, item.Ip);
                 };
 
                 return control;
