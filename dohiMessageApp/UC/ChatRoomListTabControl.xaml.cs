@@ -49,17 +49,17 @@ namespace WalkieDohi.UC
 
                 control.OnSendMessage += async (s, text) =>
                 {
+                    ChatListManager.UpdateChatList(item.Group);
                     var msg = MessageEntity.OfGroupSendTextMassage(item.Group, text);
                     var tasks = item.Group.Ips
                         .Where(ip => ip != NetworkHelper.GetLocalIPv4())
                         .Select(ip => new MessengerSender().SendMessageAsync(ip, msg));
                     await System.Threading.Tasks.Task.WhenAll(tasks);
-
-                    ChatListManager.UpdateChatList(item.Group);
                 };
 
                 control.OnSendFile += async (s, fileInfo) =>
                 {
+                    ChatListManager.UpdateChatList(item.Group);
                     var msg = MessageEntity.OfGroupSendFileMassage(item.Group, fileInfo.Base64Content, fileInfo.FileName);
                     if (MessageImageUtil.isImagecheck(msg.FileName))
                         msg.Type = MessageType.Image;
@@ -69,7 +69,6 @@ namespace WalkieDohi.UC
                         .Select(ip => new MessengerSender().SendMessageAsync(ip, msg));
                     await System.Threading.Tasks.Task.WhenAll(tasks);
 
-                    ChatListManager.UpdateChatList(item.Group);
                 };
 
                 return control;
@@ -84,20 +83,19 @@ namespace WalkieDohi.UC
 
                 control.OnSendMessage += async (s, text) =>
                 {
+                    ChatListManager.UpdateChatList(item.Name, item.Ip);
                     var msg = MessageEntity.OfSendTextMassage(text);
                     await new MessengerSender().SendMessageAsync(item.Ip, msg);
 
-                    ChatListManager.UpdateChatList(item.Name,item.Ip);
                 };
 
                 control.OnSendFile += async (s, fileInfo) =>
                 {
+                    ChatListManager.UpdateChatList(item.Name, item.Ip);
                     var msg = MessageEntity.OfSendFileMassage(fileInfo.Base64Content, fileInfo.FileName);
                     if (MessageImageUtil.isImagecheck(msg.FileName))
                         msg.Type = MessageType.Image;
                     await new MessengerSender().SendMessageAsync(item.Ip, msg);
-
-                    ChatListManager.UpdateChatList(item.Name, item.Ip);
                 };
 
                 return control;
@@ -171,25 +169,13 @@ namespace WalkieDohi.UC
 
                 // 채팅 리스트에서 제거
                 ChatListManager.RemoveChatListItem(key);
+                //채팅로그 삭제
+                ChatListManager.DeleteChatLog(key);
 
                 // UI 갱신
                 ChatRoomListBox.ItemsSource = null;
                 ChatRoomListBox.ItemsSource = ChatListManager.GetChatList();
-                /*
-                // 저장된 채팅 파일 삭제
-                try
-                {
-                    string dir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ChatLogs", key);
-                    if (Directory.Exists(dir))
-                    {
-                        Directory.Delete(dir, true); // 하위 파일 포함 삭제
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("채팅 로그 폴더 삭제 실패: " + ex.Message);
-                }
-                */
+
             }
         }
 
