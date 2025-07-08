@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Interop;
 using WalkieDohi.Entity;
 
@@ -85,6 +86,25 @@ namespace WalkieDohi.Data
             SaveChatList();
         }
 
+
+        public static void DeleteChatLog(string key)
+        {
+            // 저장된 채팅 파일 삭제
+            try
+            {
+                string dir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ChatLogs", key);
+                if (Directory.Exists(dir))
+                {
+                    Directory.Delete(dir, true); // 하위 파일 포함 삭제
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("채팅 로그 폴더 삭제 실패: " + ex.Message);
+            }
+        }
+
+
         #region 저장/불러오기
 
         private static readonly string ChatListSavePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ChatList");
@@ -122,6 +142,8 @@ namespace WalkieDohi.Data
                 _chatList = new ObservableCollection<ChatListItem>();
             }
         }
+
+
 
 #endregion
 
