@@ -485,11 +485,11 @@ namespace WalkieDohi.UC
 
         private string GetChatDirectory()
         {
-            string baseDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ChatLogs");
+            string baseDir = Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "WalkieDohi"), "ChatLogs");
 
             if (TargetGroup != null)
             {
-                var safeGroup = MakeSafeFileName(TargetGroup.GroupName);
+                var safeGroup = MakeSafeFileName(TargetGroup.GroupName); //해당 문제점으로 이름 같으면 다뜸 key가 필요할듯
                 return Path.Combine(baseDir, $"group_{safeGroup}");
             }
            

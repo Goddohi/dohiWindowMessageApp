@@ -13,8 +13,14 @@ namespace WalkieDohi.Util.IO
 {
     class UserJsonFileHandler : UserFileProvider
     {
+        private string filePath => Path.Combine(RoamingDir, fileName);
 
-        private readonly string filePath = "user.json";
+        private readonly string fileName = "user.json";
+
+        private string RoamingDir =>
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "WalkieDohi");
+
+
         public User LoadUser()
         {
             // 이전버전 사용자를 위한 자동 업데이트 로직

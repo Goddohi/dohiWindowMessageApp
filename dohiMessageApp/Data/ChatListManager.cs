@@ -107,7 +107,7 @@ namespace WalkieDohi.Data
 
         #region 저장/불러오기
 
-        private static readonly string ChatListSavePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ChatList");
+        private static readonly string ChatListSavePath = Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "WalkieDohi"), "ChatList");
 
         public static void SaveChatList()
         {

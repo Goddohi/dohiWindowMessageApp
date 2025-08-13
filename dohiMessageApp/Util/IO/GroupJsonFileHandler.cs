@@ -14,7 +14,13 @@ namespace WalkieDohi.Util.IO
 {
     class GroupJsonFileHandler : GroupFileProvider
     {
-        private readonly string filePath = "groups.json";
+        private string filePath => Path.Combine(RoamingDir, fileName);
+
+        private readonly string fileName = "groups.json";
+
+        private string RoamingDir =>
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "WalkieDohi");
+       
         public ObservableCollection<GroupEntity> LoadGroups()
         {
             try
@@ -30,6 +36,22 @@ namespace WalkieDohi.Util.IO
 
             ObservableCollection<GroupEntity> groups = new ObservableCollection<GroupEntity>();
             return groups;
+        }
+
+
+        public void SaveGroups(ObservableCollection<GroupEntity> Groups)
+        {
+            try
+            {
+                var json = JsonConvert.SerializeObject(Groups, Formatting.Indented);
+                File.WriteAllText(filePath, json);
+                MainData.Groups = Groups;
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("그룹파일을 저장하지 못하였습니다.\n" + e.Message);
+            }
+
         }
     }
 }

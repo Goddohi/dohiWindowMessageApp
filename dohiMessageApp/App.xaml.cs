@@ -5,6 +5,8 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows;
 using WalkieDohi.Core.app;
+using WalkieDohi.Data;
+using WalkieDohi.Util.Tcp;
 
 namespace WalkieDohi
 {
@@ -27,8 +29,45 @@ namespace WalkieDohi
                     IntPtr.Zero);
                 Environment.Exit(0);
             }
+           
 
             base.OnStartup(e);
+
+            // 최소화 시작 플래그
+            bool minimized = e.Args.Any(a => string.Equals(a, "--minimized", StringComparison.OrdinalIgnoreCase));
+
+            // 트레이 먼저 준비
+            TrayIconManager.Init(
+                onOpenMainWindow: ShowMainWindow,
+                onExitApp: () => {
+                    TrayIconManager.Dispose();
+                    Shutdown();
+                },
+                tooltip: "WalkieDohi"
+            );
+
+            if (minimized)
+            {
+                return;
+            }
+
+            ShowMainWindow();
         }
+
+        private void ShowMainWindow()
+        {
+            if (MainWindow == null)
+                MainWindow = new MainWindow();
+
+            MainWindow.Show();
+            MainWindow.Activate();
+        }
+
+        protected override void OnExit(ExitEventArgs e)
+        {
+            TrayIconManager.Dispose(); // 유령 아이콘 방지
+            base.OnExit(e);
+        }
+    
     }
 }

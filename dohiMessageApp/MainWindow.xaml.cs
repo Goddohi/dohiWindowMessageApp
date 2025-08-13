@@ -30,7 +30,6 @@ namespace WalkieDohi
         {
             InitializeComponent();
             ChatListManager.LoadChatList();
-            InitTrayIcon();
             LoadUser();
             LoadFriendAndGroup();
 
@@ -79,6 +78,10 @@ namespace WalkieDohi
             try
             {
                 string iconPath = "Assets/WalkieDohi.ico";
+
+
+
+        
                 if (File.Exists(iconPath))
                     trayIcon.Icon = new Icon(iconPath);
             }
@@ -154,8 +157,7 @@ namespace WalkieDohi
 
         private void ExitApplication()
         {
-            trayIcon.Visible = false;
-            trayIcon.Dispose();
+            TrayIconManager.Dispose(); // 유령 아이콘 방지
             Application.Current.Shutdown();
         }
 

@@ -7,6 +7,7 @@ using System.Windows;
 using System.Xml.Linq;
 using WalkieDohi.Entity;
 using WalkieDohi.Util;
+using WalkieDohi.Util.IO;
 
 namespace WalkieDohi.UI
 {
@@ -25,7 +26,6 @@ namespace WalkieDohi.UI
             InitializeComponent();
 
             // 그룹 불러오기
-            //Groups = LoadGroupsFromFile();
             GroupList.ItemsSource = Groups;
 
             DataContext = this;
@@ -35,16 +35,6 @@ namespace WalkieDohi.UI
         {
             // 종료 시 저장
             SaveGroupsToFile();
-        }
-
-        public ObservableCollection<GroupEntity> LoadGroupsFromFile()
-        {
-            if (!File.Exists(GroupJsonPath))
-                return new ObservableCollection<GroupEntity>();
-
-            var json = File.ReadAllText(GroupJsonPath);
-            var groups = JsonConvert.DeserializeObject<ObservableCollection<GroupEntity>>(json);
-            return groups ?? new ObservableCollection<GroupEntity>();
         }
 
         private void CreateGroup_Click(object sender, RoutedEventArgs e)
@@ -127,9 +117,7 @@ namespace WalkieDohi.UI
         /// </summary>
         public void SaveGroupsToFile()
         {
-            var json = JsonConvert.SerializeObject(Groups, Formatting.Indented);
-            File.WriteAllText(GroupJsonPath, json);
-            MainData.Groups = Groups;
+            new Util.IO.GroupJsonFileHandler().SaveGroups(Groups);
         }
 
 #region 그룹원 삭제

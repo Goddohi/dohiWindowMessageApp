@@ -498,7 +498,7 @@ namespace WalkieDohi.UC
 
         private string GetChatDirectory()
         {
-            string baseDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ChatLogs");
+            string baseDir = Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "WalkieDohi"), "ChatLogs");
 
             if (!string.IsNullOrWhiteSpace(TargetIp))
             {

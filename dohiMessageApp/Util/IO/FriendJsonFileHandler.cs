@@ -14,8 +14,14 @@ namespace WalkieDohi.Util.IO
 {
     class FriendJsonFileHandler : FriendFileProvider
     {
-        private readonly string filePath = "friends.json";
 
+        private string filePath =>
+        Path.Combine(RoamingDir, fileName);
+
+        private readonly string fileName= "friends.json";
+
+        private string RoamingDir =>
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "WalkieDohi");
         public void SaveFriends(ObservableCollection<Friend> friends)
         {
             string json = JsonConvert.SerializeObject(friends, Formatting.Indented);
