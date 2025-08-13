@@ -32,8 +32,7 @@ namespace WalkieDohi
             ChatListManager.LoadChatList();
             InitTrayIcon();
             LoadUser();
-            MainData.Friends = new Util.IO.FriendJsonFileHandler().LoadFriends();
-            MainData.Groups = new Util.IO.GroupJsonFileHandler().LoadGroups();
+            LoadFriendAndGroup();
 
             StartReceiver();
             AddStartTab();
@@ -47,7 +46,11 @@ namespace WalkieDohi
             var handle = new WindowInteropHelper(this).Handle;
             HwndSource.FromHwnd(handle)?.AddHook(WndProc);
         }
-
+        private void LoadFriendAndGroup()
+        {
+            MainData.Friends = new Util.IO.FriendJsonFileHandler().LoadFriends();
+            MainData.Groups = new Util.IO.GroupJsonFileHandler().LoadGroups();
+        }
         private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
             if (msg == NativeMethods.WM_SHOWME)
@@ -123,7 +126,8 @@ namespace WalkieDohi
             var tab = new TabItem
             {
                 Header = "➕ 채팅 시작하기",
-                Content = _startTabControl
+                Content = _startTabControl,
+                Name =  "chatStaterTab"
             };
             ChatTabControlHost.Items.Add(tab);
         }
@@ -260,6 +264,20 @@ namespace WalkieDohi
                     ChatTabControlHost.SelectedItem = tab;
                     break;
                 }
+            }
+        }
+
+        private void ChatTabControlHost_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var selectTab = ChatTabControlHost.SelectedItem as TabItem;
+            if(selectTab == null)
+            {
+                return;
+            }
+            
+            if(string.Equals(selectTab.Name,"chatStaterTab"))
+            {
+                LoadFriendAndGroup();
             }
         }
     }

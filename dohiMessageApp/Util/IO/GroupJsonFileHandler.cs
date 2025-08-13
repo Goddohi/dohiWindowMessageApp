@@ -25,11 +25,10 @@ namespace WalkieDohi.Util.IO
                 }
             }catch (Exception e)
             {
-                MessageBox.Show("친구파일을 불러오지 못하였습니다.\n" + e.Message);
+                MessageBox.Show("그룹파일을 불러오지 못하였습니다.\n" + e.Message);
             }
 
             ObservableCollection<GroupEntity> groups = new ObservableCollection<GroupEntity>();
-            File.WriteAllText(filePath, JsonConvert.SerializeObject(groups, Formatting.Indented));
             return groups;
         }
     }

@@ -36,8 +36,6 @@ namespace WalkieDohi.Util.IO
             }
 
             ObservableCollection<Friend> friends = new ObservableCollection<Friend>();
-            friends.Add(new Friend { Name = "로컬 테스트", Ip = "127.0.0.1" });
-            File.WriteAllText(filePath, JsonConvert.SerializeObject(friends, Formatting.Indented));
             return friends;
 
         }

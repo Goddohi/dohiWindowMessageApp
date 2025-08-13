@@ -47,6 +47,7 @@
             Margin="10"
             Style="{StaticResource RoundedTabControlStyle}"
             ItemContainerStyle="{StaticResource RoundedTabItemStyle}"
+            SelectionChanged="ChatTabControlHost_SelectionChanged"
             Padding="5"/>
     </DockPanel>
 </Window>
