@@ -25,10 +25,22 @@
                 </ComboBox>
             </StackPanel>
 
+            <StackPanel>
+                <CheckBox x:Name="AutoStartCheckBox"
+                      Content="윈도우 로그인 시 자동 시작"
+                      Margin="0,0,0,12"
+                      Checked="AutoStartCheckBox_Checked"
+                      Unchecked="AutoStartCheckBox_Unchecked"/>
+                <TextBlock Text="체크하면 현재 사용자 계정에만 적용됩니다."
+                       Foreground="Gray" />
+            </StackPanel>
+
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
                 <Button Content="저장" Width="80" Margin="0,0,10,0" Click="Save_Click"/>
                 <Button Content="닫기" Width="80" Click="Close_Click"/>
             </StackPanel>
+            
+            
         </StackPanel>
     </Grid>
 </Window>

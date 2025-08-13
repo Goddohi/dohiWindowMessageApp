@@ -13,6 +13,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using WalkieDohi.Core.app;
 using WalkieDohi.Entity;
 using WalkieDohi.Util;
 using WalkieDohi.Util.IO;
@@ -34,6 +35,11 @@ namespace WalkieDohi.UI
         {
             PortTextBox.Text  = MainData.currentUser.Preferences.Port.ToString(); 
             SortOptionComboBox.SelectedIndex = MainData.currentUser.Preferences.FriendSortOrder == FriendSortType.ByIp ? 1 : 0;
+
+            var currentAutoStart = AutoStartManager.IsEnabled();
+            _autoStartInitial = currentAutoStart;
+            _autoStartPending = currentAutoStart;   // 현재 상태를 의도에도 복사
+            AutoStartCheckBox.IsChecked = currentAutoStart;
 
         }
 
@@ -61,16 +67,37 @@ namespace WalkieDohi.UI
             MainData.currentUser.Preferences.Port = newPort;
             var selectedSort = (SortOptionComboBox.SelectedItem as ComboBoxItem)?.Content.ToString();
             MainData.currentUser.Preferences.FriendSortOrder = selectedSort == "IP순" ? FriendSortType.ByIp : FriendSortType.ByName;
+            
+            
+            // 자동 시작 변경 적용
+            bool autoStartChanged = _autoStartPending.HasValue && _autoStartPending.Value != _autoStartInitial;
+            if (autoStartChanged)
+            {
+                bool ok = _autoStartPending.Value
+                    ? AutoStartManager.SetEnabled(true, "--minimized")
+                    : AutoStartManager.SetEnabled(false, null);
+
+                if (!ok)
+                {
+                    MessageBox.Show("자동 시작 설정 저장에 실패했습니다.", "오류", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
+                // 적용 성공했으니 초기값 갱신
+                _autoStartInitial = _autoStartPending.Value;
+            }
 
             if (userFileProvider.SaveUser(MainData.currentUser))
             {
-                string Message = "설정이 저장되었습니다.";
+                string msg = "설정이 저장되었습니다.";
                 if (newPort != currentPort)
-                {
-                    Message = "설정이 저장되었습니다.\n - WalkieDohi를 재시작해야 변경한 포트가 적용됩니다 - ";
-                }
-                MessageBox.Show(Message);
+                    msg += "\n - WalkieDohi를 재시작해야 변경한 포트가 적용됩니다 - ";
+                if (autoStartChanged)
+                    msg += $"\n  자동 시작 : {(_autoStartPending.Value ? "사용" : "해제")} ";
+
+                MessageBox.Show(msg);
             }
+
             this.Close();
         }
 
@@ -104,5 +131,24 @@ namespace WalkieDohi.UI
                 return true; // 포트 사용 중
             }
         }
+
+
+
+
+        #region 자동시작
+        private bool _autoStartInitial;     // 첫 상태
+        private bool? _autoStartPending;    // 체크박스로 바꾼 상태
+
+        private void AutoStartCheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+
+            _autoStartPending = true;
+        }
+
+        private void AutoStartCheckBox_Unchecked(object sender, RoutedEventArgs e)
+        {
+            _autoStartPending = false;
+        }
+        #endregion
     }
 }
