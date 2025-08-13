@@ -97,6 +97,7 @@ namespace WalkieDohi.UC
             {
                 if (Window.GetWindow(this) is MainWindow mainWindow)
                 {
+                    selected.MakeRandomKey(); //테스트를 위해서 추가 0814 2025 
                     mainWindow.ShowChatRoomFromStart(selected);
                     e.Handled = true; //버블링 현상 제거
                 }

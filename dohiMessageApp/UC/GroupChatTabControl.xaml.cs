@@ -67,6 +67,10 @@ namespace WalkieDohi.UC
             }).ToList();
 
             GroupMemberList.ItemsSource = members;
+            if(GroupMemberList_viewr != null)
+            {
+                GroupMemberList_viewr.Header = TargetGroup.GroupName + " - 그룹원 보기";
+            }
         }
         #endregion
 

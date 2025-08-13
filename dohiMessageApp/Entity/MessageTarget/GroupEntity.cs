@@ -17,9 +17,11 @@ namespace WalkieDohi.Entity
 
         public string Key { get; set; }
 
-        public void SetRandomKey()
+        public void MakeRandomKey()
         {
-            Key = Guid.NewGuid().ToString();
+            //키가 아예없는 초기에만 생성되록.
+           if(string.IsNullOrWhiteSpace(Key))
+                Key = Guid.NewGuid().ToString();
         }
 
         [JsonIgnore]

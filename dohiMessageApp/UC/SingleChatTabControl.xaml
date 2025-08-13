@@ -110,9 +110,10 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-
+        <TextBlock x:Name="ChatRoomNameDisplay" Text="" Grid.Row="0"/>
         <ListBox x:Name="ChatList" 
                  SelectionMode="Single"
                  VirtualizingPanel.ScrollUnit="Pixel" 
@@ -125,7 +126,7 @@
                  DragEnter="ChatList_DragEnter"
                  Drop="ChatList_Drop"
                  ScrollViewer.VerticalScrollBarVisibility="Auto"
-                 Grid.Row="0" Margin="5">
+                 Grid.Row="1" Margin="5">
             <ListBox.ItemContainerStyle>
                 <Style TargetType="ListBoxItem">
                     <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
@@ -143,12 +144,12 @@
             Width="30" Height="30"
             HorizontalAlignment="Right"
             VerticalAlignment="Bottom"
-            Margin="10,10,30,15"
+            Margin="10,10,30,30"
             Visibility="Collapsed"
             Style="{StaticResource RoundedChatButtonStyle}"
             Click="ScrollToBottomButton_Click"/>
 
-        <Grid Grid.Row="1" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Left">
+        <Grid Grid.Row="2" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Left">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition MinWidth="50" Width="300*"/>
                 <ColumnDefinition Width="80"/>

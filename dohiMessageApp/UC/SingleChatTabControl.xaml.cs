@@ -534,6 +534,8 @@ namespace WalkieDohi.UC
         }
         public void LoadLatestMessages()
         {
+            ChatRoomNameDisplay.Text = MainData.GetFriendNameOrReturnOriginal("미등록 친구", TargetIp);
+
             InitializeMessageFiles(); // 파일 큐 초기화
 
             LoadNextOldMessageFile(); // 최신 1개 로드
