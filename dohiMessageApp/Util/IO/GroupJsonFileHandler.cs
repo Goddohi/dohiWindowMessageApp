@@ -14,13 +14,10 @@ namespace WalkieDohi.Util.IO
 {
     class GroupJsonFileHandler : GroupFileProvider
     {
-        private string filePath => Path.Combine(RoamingDir, fileName);
-
+   
+        private string filePath => DirectoryManager.GetAppDataDirectoryCombineFileName(fileName);
         private readonly string fileName = "groups.json";
 
-        private string RoamingDir =>
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "WalkieDohi");
-       
         public ObservableCollection<GroupEntity> LoadGroups()
         {
             try

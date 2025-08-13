@@ -15,8 +15,7 @@ namespace WalkieDohi.Util.IO
     class FriendJsonFileHandler : FriendFileProvider
     {
 
-        private string filePath =>
-        Path.Combine(RoamingDir, fileName);
+        private string filePath => DirectoryManager.GetAppDataDirectoryCombineFileName(fileName);
 
         private readonly string fileName= "friends.json";
 

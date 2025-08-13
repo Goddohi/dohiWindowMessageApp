@@ -150,6 +150,7 @@
     <Compile Include="Util\ClipBoard\ClipboardExtension.cs" />
     <Compile Include="Util\Converter\BoolToVisibilityConverter.cs" />
     <Compile Include="Util\Converter\StringNullOrEmptyToVisibilityConverter.cs" />
+    <Compile Include="Util\IO\DirectoryManager.cs" />
     <Compile Include="Util\StringUtil.cs" />
     <Compile Include="Util\Converter\InverseBoolToVisibilityConverter.cs" />
     <Compile Include="Util\IO\FriendJsonFileHandler.cs" />

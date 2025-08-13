@@ -13,13 +13,9 @@ namespace WalkieDohi.Util.IO
 {
     class UserJsonFileHandler : UserFileProvider
     {
-        private string filePath => Path.Combine(RoamingDir, fileName);
 
+        private string filePath => DirectoryManager.GetAppDataDirectoryCombineFileName(fileName);
         private readonly string fileName = "user.json";
-
-        private string RoamingDir =>
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "WalkieDohi");
-
 
         public User LoadUser()
         {

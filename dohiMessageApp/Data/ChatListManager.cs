@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Interop;
 using WalkieDohi.Entity;
+using WalkieDohi.Util.IO;
 
 namespace WalkieDohi.Data
 {
@@ -107,7 +108,7 @@ namespace WalkieDohi.Data
 
         #region 저장/불러오기
 
-        private static readonly string ChatListSavePath = Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "WalkieDohi"), "ChatList");
+        private static readonly string ChatListSavePath = DirectoryManager.GetAppDataDirectoryCombineFileName("ChatList.json");
 
         public static void SaveChatList()
         {

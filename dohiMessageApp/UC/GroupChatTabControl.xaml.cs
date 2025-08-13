@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -16,14 +17,14 @@ using System.Windows.Shapes;
 using System.Windows.Threading;
 using WalkieDohi.Core;
 using WalkieDohi.Entity;
+using WalkieDohi.UC.ViewModel;
 using WalkieDohi.UI;
 using WalkieDohi.Util;
-using Path = System.IO.Path;
+using WalkieDohi.Util.IO;
 using DataFormats = System.Windows.DataFormats;
 using DragDropEffects = System.Windows.DragDropEffects;
 using DragEventArgs = System.Windows.DragEventArgs;
-using WalkieDohi.UC.ViewModel;
-using System.Collections.ObjectModel;
+using Path = System.IO.Path;
 
 namespace WalkieDohi.UC
 {
@@ -485,7 +486,7 @@ namespace WalkieDohi.UC
 
         private string GetChatDirectory()
         {
-            string baseDir = Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "WalkieDohi"), "ChatLogs");
+            string baseDir = DirectoryManager.GetAppDataDirectoryCombineFileName("ChatLogs");
 
             if (TargetGroup != null)
             {
