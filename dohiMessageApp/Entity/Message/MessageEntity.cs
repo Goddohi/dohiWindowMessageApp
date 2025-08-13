@@ -27,6 +27,8 @@ namespace WalkieDohi.Entity
         public string SenderIp { get; set; }
         public string Content { get; set; } // 메시지 내용 또는 파일 Base64 문자열
         public string FileName { get; set; } // 파일 이름 (파일일 경우)
+
+        public string ContentPath { get; set; } //파일경로 저장 필요할 경우 사용 (주로 reload에서 이용)
         public bool IsFailed { get; set; } = false;
         public DateTime Timestamp { get; set; } = DateTime.Now;
 
@@ -55,7 +57,7 @@ namespace WalkieDohi.Entity
                 Content = content
             };
         }
-        public static MessageEntity OfFileMassage(string sender, string senderIp, string content, string fileName)
+        public static MessageEntity OfFileMassage(string sender, string senderIp, string content, string fileName, string filepath = "")
         {
             return new MessageEntity
             {
@@ -63,10 +65,11 @@ namespace WalkieDohi.Entity
                 Sender = sender,
                 SenderIp = senderIp,
                 Content = content,
+                ContentPath = filepath,
                 FileName = fileName
             };
         }
-        public static MessageEntity OfSendFileMassage( string content, string fileName)
+        public static MessageEntity OfSendFileMassage( string content, string fileName,string filepath="")
         {
             return new MessageEntity
             {
@@ -74,6 +77,7 @@ namespace WalkieDohi.Entity
                 Sender = MainData.currentUser.Nickname,
                 SenderIp = NetworkHelper.GetLocalIPv4(),
                 Content = content,
+                ContentPath = filepath,
                 FileName = fileName
             };
         }
@@ -101,7 +105,17 @@ namespace WalkieDohi.Entity
                 Content = content
             };
         }
-        public static MessageEntity OfGroupFileMassage(GroupEntity group, string sender, string senderIp, string content, string fileName)
+        /// <summary>
+        /// 파일받기 그룹 - 안씀
+        /// </summary>
+        /// <param name="group"></param>
+        /// <param name="sender"></param>
+        /// <param name="senderIp"></param>
+        /// <param name="content"></param>
+        /// <param name="fileName"></param>
+        /// <param name="filepath"></param>
+        /// <returns></returns>
+        public static MessageEntity OfGroupFileMassage(GroupEntity group, string sender, string senderIp, string content, string fileName, string filepath = "")
         {
             return new MessageEntity
             {
@@ -110,10 +124,20 @@ namespace WalkieDohi.Entity
                 Sender = sender,
                 SenderIp = senderIp,
                 Content = content,
+                ContentPath = filepath,
                 FileName = fileName
             };
         }
-        public static MessageEntity OfGroupSendFileMassage(GroupEntity group,string content, string fileName)
+
+        /// <summary>
+        /// 파일 보내기 (그룹)
+        /// </summary>
+        /// <param name="group"></param>
+        /// <param name="content"></param>
+        /// <param name="fileName"></param>
+        /// <param name="filepath"></param>
+        /// <returns></returns>
+        public static MessageEntity OfGroupSendFileMassage(GroupEntity group,string content, string fileName, string filepath = "")
         {
             return new MessageEntity
             {
@@ -122,6 +146,7 @@ namespace WalkieDohi.Entity
                 Sender = MainData.currentUser.Nickname,
                 SenderIp = NetworkHelper.GetLocalIPv4(),
                 Content = content,
+                ContentPath = filepath,
                 FileName = fileName
             };
         }

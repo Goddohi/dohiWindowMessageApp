@@ -12,11 +12,17 @@ namespace WalkieDohi.Entity
         public string Sender { get; set; }
         public bool IsFailed { get; set; } = false;
         public MessageDirection Direction { get; set; }
+
+        /// <summary>
+        /// 메세지별 보여줄 컨텐츠
+        /// </summary>
         public abstract string DisplayContent { get; }
+        public string ContentPath { get; set; }
+
         public string Ip { get; set; }
         public DateTime Timestamp { get; set; } = DateTime.Now;
 
-        public static ChatMessage CreateFromEntity(MessageEntity msg, MessageDirection direction = MessageDirection.Receive)
+        public static ChatMessage CreateFromEntity(MessageEntity msg, string path, MessageDirection direction = MessageDirection.Receive)
         {
             if (msg == null) return null;
 
@@ -24,24 +30,24 @@ namespace WalkieDohi.Entity
                 return new TextMessage(msg.Sender, msg.Content, direction,msg.Timestamp ,msg.SenderIp,msg.Group);
 
             if (msg.CheckMessageTypeImage)
-                return new ImageMessage(msg.Sender, msg.FileName, msg.Content, direction, msg.Timestamp, msg.SenderIp, msg.Group);
+                return new ImageMessage(msg.Sender, msg.FileName, msg.Content, path, direction, msg.Timestamp, msg.SenderIp, msg.Group);
 
             if (msg.CheckMessageTypeFile)
-                return new FileMessage(msg.Sender, msg.FileName, direction, msg.Timestamp, msg.SenderIp, msg.Group);
+                return new FileMessage(msg.Sender, msg.FileName, path, direction, msg.Timestamp, msg.SenderIp, msg.Group);
 
             return null;
         }
 
-        public static ChatMessage CreateSendMessage(string content, string base64, MessageType type, bool isFailed = false)
+        public static ChatMessage CreateSendMessage(string content, string base64, string path, MessageType type,bool isFailed = false)
         {
             switch (type)
             {
                 case MessageType.Text:
                     return new TextMessage("📤 나", content, MessageDirection.Send, DateTime.Now,NetworkHelper.GetLocalIPv4()) { IsFailed = isFailed };
                 case MessageType.Image:
-                    return new ImageMessage("📤 나", content, base64, MessageDirection.Send, DateTime.Now, NetworkHelper.GetLocalIPv4()) { IsFailed = isFailed };
+                    return new ImageMessage("📤 나", content, base64, path, MessageDirection.Send, DateTime.Now, NetworkHelper.GetLocalIPv4()) { IsFailed = isFailed };
                 case MessageType.File:
-                    return new FileMessage("📤 나", content, MessageDirection.Send, DateTime.Now, NetworkHelper.GetLocalIPv4()) { IsFailed = isFailed };
+                    return new FileMessage("📤 나", content, path, MessageDirection.Send, DateTime.Now, NetworkHelper.GetLocalIPv4()) { IsFailed = isFailed };
                 default:
                     return null;
             }
@@ -90,11 +96,13 @@ namespace WalkieDohi.Entity
         public BitmapImage Image { get; }
         public override string DisplayContent => FileName;
 
-        public ImageMessage(string sender, string fileName, string base64, MessageDirection dir, DateTime timestamp, string ip, GroupEntity group = null)
+
+        public ImageMessage(string sender, string fileName, string base64, string path, MessageDirection dir, DateTime timestamp, string ip, GroupEntity group = null)
         {
             Sender = FormatSender(sender, dir);
             Direction = dir;
             FileName = fileName;
+            ContentPath = path;
             Ip = ip;
             Image = MessageImageUtil.LoadImageFromBase64(base64);
             NotifyIfReceive(sender,ip, fileName, dir, group);
@@ -118,11 +126,12 @@ namespace WalkieDohi.Entity
         public string FileName { get; }
         public override string DisplayContent => FileName;
 
-        public FileMessage(string sender, string fileName, MessageDirection dir, DateTime timestamp, string ip, GroupEntity group = null)
+        public FileMessage(string sender, string fileName, string path, MessageDirection dir, DateTime timestamp, string ip, GroupEntity group = null)
         {
             Sender = FormatSender(sender, dir);
             Direction = dir;
             FileName = fileName;
+            ContentPath = path;
             Ip = ip;
             NotifyIfReceive(sender, ip, fileName, dir, group);
         }

@@ -21,18 +21,21 @@ namespace WalkieDohi.Util
             {
                 entity.Type = MessageType.Text;
                 entity.Content = t.Text;
+                entity.ContentPath = t.ContentPath;
             }
             else if (msg is ImageMessage i)
             {
                 entity.Type = MessageType.Image;
                 entity.FileName = i.FileName;
                 entity.Content = i.Image != null ? Convert.ToBase64String(ImageToBytes(i.Image)) : "";
+                entity.ContentPath = i.ContentPath;
             }
             else if (msg is FileMessage f)
             {
                 entity.Type = MessageType.File;
                 entity.FileName = f.FileName;
                 entity.Content = ""; // 파일은 에바데스
+                entity.ContentPath = f.ContentPath;
             }
 
             return entity;

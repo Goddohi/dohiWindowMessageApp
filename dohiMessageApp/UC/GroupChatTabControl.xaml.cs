@@ -40,7 +40,6 @@ namespace WalkieDohi.UC
 
         public event EventHandler<(string FileName, string Base64Content)> OnSendFile;
 
-        private Dictionary<ChatMessage, string> ChatFilePaths = new Dictionary<ChatMessage, string>();
         private ChatViewModel viewModel;
 
         #region 초기화
@@ -133,36 +132,40 @@ namespace WalkieDohi.UC
         {
             if (ChatList.SelectedItem is ChatMessage selected)
             {
-
-                if (ChatFilePaths.TryGetValue(selected, out string path))
+                if (string.IsNullOrWhiteSpace(selected.ContentPath))
                 {
-                    if (ExtendFile.UnExists(path))
+                    //클립보드이미지는 경로가 없다.
+                    if (selected is ImageMessage imageMsg)
+                    {
+                        if (imageMsg.Image != null)
+                        {
+                            var preview = new ImagePreviewWindow(imageMsg.Image);
+                            //preview.ShowDialog(); //ShowDialog는 이전 UI를 사용할 수 없도록 제한을 합니다.
+                            preview.Show();
+                        }
+                        return;
+                    }
+                }
+                else 
+                {
+                    if (ExtendFile.UnExists(selected.ContentPath))
                     {
                         MessageBox.Show("파일이 존재하지 않습니다.", "오류", MessageBoxButton.OK, MessageBoxImage.Error);
                         return;
                     }
                     if (selected is ImageMessage)
                     {
-                        var preview = new ImagePreviewWindow(path);
+                        var preview = new ImagePreviewWindow(selected.ContentPath);
                         preview.ShowDialog();
                         return;
                     }
                     if (selected is FileMessage)
                     {
-                        System.Diagnostics.Process.Start("explorer.exe", $"/select,\"{path}\"");
+                        System.Diagnostics.Process.Start("explorer.exe", $"/select,\"{selected.ContentPath}\"");
                         return;
                     }
                 }
-                 //클립보드이미지는 경로가 없다.
-                if (selected is ImageMessage imageMsg)
-                {
-                    if (imageMsg.Image != null)
-                    {
-                        var preview = new ImagePreviewWindow(imageMsg.Image);
-                        preview.ShowDialog();
-                    }
-                    return;
-                }
+
                 return;
             }
         }
@@ -265,7 +268,7 @@ namespace WalkieDohi.UC
             if (!string.IsNullOrEmpty(text))
             {
                 OnSendMessage?.Invoke(this, text);
-                var display = ChatMessage.CreateSendMessage( text,"", MessageType.Text);
+                var display = ChatMessage.CreateSendMessage( text,"","", MessageType.Text);
                 AddMessage(display, MessageDirection.Send);
                 InputBox.Clear();
 
@@ -336,9 +339,8 @@ namespace WalkieDohi.UC
                 {
                     messageType = MessageType.Image;
                 }
-                var display = ChatMessage.CreateSendMessage(fileMessage.FileName, fileMessage.Content, messageType);
+                var display = ChatMessage.CreateSendMessage(fileMessage.FileName, fileMessage.Content, filePath, messageType);
                 AddMessage(display, MessageDirection.Send);
-                ChatFilePaths[display] = filePath;
             }
             catch (Exception ex)
             {
@@ -354,9 +356,9 @@ namespace WalkieDohi.UC
         {
             string randomName = MessageImageUtil.GetRandomClipboadImgName();
             var fileMessage = MessageEntity.OfSendFileMassage(base64, randomName);
-
+            string filePath = "";
             OnSendFile?.Invoke(this, (fileMessage.FileName, base64));
-            var display = ChatMessage.CreateSendMessage(fileMessage.FileName, fileMessage.Content, MessageType.Image);
+            var display = ChatMessage.CreateSendMessage(fileMessage.FileName, fileMessage.Content, filePath, MessageType.Image);
 
             AddMessage(display, MessageDirection.Send);
         }
@@ -391,7 +393,8 @@ namespace WalkieDohi.UC
 
         public void AddReceivedMessage(MessageEntity msg)
         {
-            ChatMessage display = ChatMessage.CreateFromEntity(msg);
+            string path = "";
+            ChatMessage display = ChatMessage.CreateFromEntity(msg, path);
             AddMessage(display, MessageDirection.Receive);
         }
 
@@ -403,17 +406,21 @@ namespace WalkieDohi.UC
             {
                 msg.Type = MessageType.Image;
             }
-            
-            ChatMessage display = ChatMessage.CreateFromEntity(msg);
-            AddMessage(display, MessageDirection.Receive);
+            string filePath = "";
+
             if (msg.CheckMessageTypeImage)
             {
-                ChatFilePaths[display] = MessageUtil.GetImagePath(msg.FileName);
+                filePath = MessageUtil.GetImagePath(msg.FileName);
             }
             else
             {
-                ChatFilePaths[display] = MessageUtil.GetFilePath(msg.FileName);
+                filePath = MessageUtil.GetFilePath(msg.FileName);
             }
+
+            ChatMessage display = ChatMessage.CreateFromEntity(msg, filePath);
+
+            AddMessage(display, MessageDirection.Receive);
+
         }
 
 
@@ -454,8 +461,6 @@ namespace WalkieDohi.UC
             // ViewModel 데이터 정리
             viewModel?.ChatMessages?.Clear();
 
-            // 파일 경로 딕셔너리 정리
-            ChatFilePaths?.Clear();
 
             // 이벤트 핸들러 해제
             OnSendMessage = null;
