@@ -480,11 +480,6 @@ namespace WalkieDohi.UC
         }
         #endregion
 
-        private const string ChatLogDir = "ChatLogs";
-
-
-
-
         private DateTime _lastSavedMessageTime = DateTime.MinValue;
 
 
@@ -494,7 +489,7 @@ namespace WalkieDohi.UC
 
             if (TargetGroup != null)
             {
-                var safeGroup = MakeSafeFileName(TargetGroup.GroupName); //해당 문제점으로 이름 같으면 다뜸 key가 필요할듯
+                var safeGroup = DirectoryManager.MakeSafeFileName(TargetGroup.GroupName); //해당 문제점으로 이름 같으면 다뜸 key가 필요할듯
                 return Path.Combine(baseDir, $"group_{safeGroup}");
             }
            
@@ -549,15 +544,6 @@ namespace WalkieDohi.UC
             return Path.Combine(dir, $"chat_{today}.json");
         }
 
-
-        private string MakeSafeFileName(string name)
-        {
-            foreach (char c in Path.GetInvalidFileNameChars())
-            {
-                name = name.Replace(c, '_');
-            }
-            return name;
-        }
 
         private Queue<string> _remainingFiles; // 아직 안 연 파일들 (과거순으로)
         private HashSet<string> _loadedFiles; // 이미 연 파일들

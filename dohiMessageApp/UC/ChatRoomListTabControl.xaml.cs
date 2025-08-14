@@ -8,6 +8,7 @@ using WalkieDohi.Core;
 using WalkieDohi.Data;
 using WalkieDohi.Entity;
 using WalkieDohi.Util;
+using WalkieDohi.Util.IO;
 using WalkieDohi.Util.Tcp;
 
 namespace WalkieDohi.UC
@@ -167,10 +168,17 @@ namespace WalkieDohi.UC
                     _chatControls.Remove(key);
                 }
 
+
                 // 채팅 리스트에서 제거
                 ChatListManager.RemoveChatListItem(key);
+
+                string chatpathKey = string.Copy(key);
+                if (item.Group != null)
+                {
+                    chatpathKey = $"group_{DirectoryManager.MakeSafeFileName(chatpathKey)}"; //해당 문제점으로 이름 같으면 다뜸 key가 필요할듯
+                }
                 //채팅로그 삭제
-                ChatListManager.DeleteChatLog(key);
+                ChatListManager.DeleteChatLog(chatpathKey);
 
                 // UI 갱신
                 ChatRoomListBox.ItemsSource = null;

@@ -93,7 +93,9 @@ namespace WalkieDohi.Data
             // 저장된 채팅 파일 삭제
             try
             {
-                string dir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ChatLogs", key);
+                //string dir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ChatLogs", key);
+
+                string dir = Path.Combine(DirectoryManager.GetAppDataDirectoryCombineFileName("ChatLogs"), key);
                 if (Directory.Exists(dir))
                 {
                     Directory.Delete(dir, true); // 하위 파일 포함 삭제

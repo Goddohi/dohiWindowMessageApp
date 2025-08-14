@@ -18,8 +18,6 @@ namespace WalkieDohi.UI
 
         private GroupEntity _selectedGroup;
 
-        private static readonly string GroupJsonPath =
-    System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "groups.json");
 
         public GroupManagerWindow()
         {

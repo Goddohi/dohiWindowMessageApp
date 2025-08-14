@@ -9,6 +9,8 @@ namespace WalkieDohi.Util.IO
 {
     public static class DirectoryManager
     {
+        //private static string BaseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+
         /// <summary>
         /// AppData\Roaming\WalkieDohi 경로 반환 (없으면 자동 생성)
         /// </summary>
@@ -41,6 +43,15 @@ namespace WalkieDohi.Util.IO
             }
 
             return Path.Combine(folderPath, filename);
+        }
+
+        public static string MakeSafeFileName(string name)
+        {
+            foreach (char c in Path.GetInvalidFileNameChars())
+            {
+                name = name.Replace(c, '_');
+            }
+            return name;
         }
 
     }
