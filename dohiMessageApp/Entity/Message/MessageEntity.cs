@@ -161,7 +161,7 @@ namespace WalkieDohi.Entity
             IsFailed = false;
         }
 
-        [JsonIgnore]
+        [JsonIgnore] //JSON 직렬화/역직렬화 과정에서 해당 속성(필드)을 무시
         public bool IsGroupMessage => Group != null;
         [JsonIgnore]
         public bool IsSingleMessage => Group == null;
