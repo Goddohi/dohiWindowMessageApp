@@ -107,8 +107,8 @@
       <DependentUpon>SnakeGameControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="UC\ViewModel\ChatViewModel.cs" />
-    <Compile Include="UI\GroupManger\FriendSelectWindow.xaml.cs">
-      <DependentUpon>FriendSelectWindow.xaml</DependentUpon>
+    <Compile Include="UI\GroupManger\GroupCreateDialog.xaml.cs">
+      <DependentUpon>GroupCreateDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\GroupManger\GroupMemberDisplay.cs" />
     <Compile Include="Entity\MessageTarget\Friend.cs" />
@@ -118,16 +118,13 @@
     <Compile Include="UC\GroupChatTabControl.xaml.cs">
       <DependentUpon>GroupChatTabControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UC\StartChatTabControl.xaml.cs">
-      <DependentUpon>StartChatTabControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\GroupManger\GroupManagerWindow.xaml.cs">
-      <DependentUpon>GroupManagerWindow.xaml</DependentUpon>
+    <Compile Include="UC\FriendMainListView.xaml.cs">
+      <DependentUpon>FriendMainListView.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\FriendManger\FriendManagerWindow.xaml.cs">
       <DependentUpon>FriendManagerWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\GroupManger\InputDialog.xaml.cs">
+    <Compile Include="UI\InputDialog.xaml.cs">
       <DependentUpon>InputDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\ImagePreviewWindow.xaml.cs">
@@ -154,7 +151,6 @@
     <Compile Include="Util\StringUtil.cs" />
     <Compile Include="Util\Converter\InverseBoolToVisibilityConverter.cs" />
     <Compile Include="Util\IO\FriendJsonFileHandler.cs" />
-    <Compile Include="Util\IO\GroupJsonFileHandler.cs" />
     <Compile Include="Util\IO\UserJsonFileHandler.cs" />
     <Compile Include="Util\IPAddressComparer.cs" />
     <Compile Include="Util\Message\MessageImageUtil.cs" />
@@ -165,7 +161,6 @@
     <Compile Include="Util\Tcp\MessengerSender.cs" />
     <Compile Include="Util\NetworkHelper.cs" />
     <Compile Include="Util\Provider\FriendFileProvider.cs" />
-    <Compile Include="Util\Provider\GroupFileProvider.cs" />
     <Compile Include="Util\Provider\UserFileProvider.cs" />
     <Compile Include="Util\Tcp\PacketReceiver.cs" />
     <Compile Include="Util\Tcp\PacketSender.cs" />
@@ -214,23 +209,19 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UC\StartChatTabControl.xaml">
+    <Page Include="UC\FriendMainListView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\GroupManger\FriendSelectWindow.xaml">
+    <Page Include="UI\GroupManger\GroupCreateDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\GroupManger\GroupManagerWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\FriendManger\FriendManagerWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\GroupManger\InputDialog.xaml">
+    <Page Include="UI\InputDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

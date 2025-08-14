@@ -489,7 +489,7 @@ namespace WalkieDohi.UC
 
             if (TargetGroup != null)
             {
-                var safeGroup = DirectoryManager.MakeSafeFileName(TargetGroup.GroupName); //해당 문제점으로 이름 같으면 다뜸 key가 필요할듯
+                var safeGroup = DirectoryManager.MakeSafeFileName(TargetGroup.Key); //해당 문제점으로 이름 같으면 다뜸 key가 필요할듯
                 return Path.Combine(baseDir, $"group_{safeGroup}");
             }
            

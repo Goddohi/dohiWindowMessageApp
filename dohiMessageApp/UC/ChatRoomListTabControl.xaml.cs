@@ -105,7 +105,7 @@ namespace WalkieDohi.UC
 
         public void HandleIncomingMessage(MessageEntity msg)
         {
-            string key = msg.Group?.GroupName ?? msg.SenderIp;
+            string key = msg.Group?.Key ?? msg.SenderIp;
 
             if (!_chatControls.TryGetValue(key, out var chatControl))
             {
@@ -199,6 +199,26 @@ namespace WalkieDohi.UC
             }
         }
 
+
+
+
+        private void ManageGroups_Click(object sender, RoutedEventArgs e)
+        {
+            var dlg = new WalkieDohi.UI.GroupManger.GroupCreateDialog()
+            {
+                Owner = Window.GetWindow(this)
+            };
+            if (dlg.ShowDialog() == true && dlg.ResultGroup != null)
+            {
+                if (Window.GetWindow(this) is MainWindow mainWindow)
+                {
+                    mainWindow.ShowChatRoomFromStart(dlg.ResultGroup);
+                    e.Handled = true; //버블링 현상 제거
+                }
+
+
+            }
+        }
 
     }
 }

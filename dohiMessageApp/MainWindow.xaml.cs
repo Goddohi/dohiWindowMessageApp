@@ -24,14 +24,14 @@ namespace WalkieDohi
         private PacketReceiver MainReceiver;
         private MessengerSender msgSender = new MessengerSender();
         private ChatRoomListTabControl _chatRoomListTabControl;
-        private StartChatTabControl _startTabControl;
+        private FriendMainListView _startTabControl;
 
         public MainWindow()
         {
             InitializeComponent();
             ChatListManager.LoadChatList();
             LoadUser();
-            LoadFriendAndGroup();
+            LoadFriend();
 
             StartReceiver();
             AddStartTab();
@@ -45,10 +45,9 @@ namespace WalkieDohi
             var handle = new WindowInteropHelper(this).Handle;
             HwndSource.FromHwnd(handle)?.AddHook(WndProc);
         }
-        private void LoadFriendAndGroup()
+        private void LoadFriend()
         {
             MainData.Friends = new Util.IO.FriendJsonFileHandler().LoadFriends();
-            MainData.Groups = new Util.IO.GroupJsonFileHandler().LoadGroups();
         }
         private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
@@ -113,14 +112,13 @@ namespace WalkieDohi
 
         private void AddStartTab()
         {
-            _startTabControl = new StartChatTabControl();
+            _startTabControl = new FriendMainListView();
             _startTabControl.SetFriends(MainData.GetsortedFriends());
             _startTabControl.OnStartChat += friend =>
             {
                 MainData.GetFriendNameOrReturnOriginal(friend);
                 ChatListManager.UpdateChatList(friend.Name, friend.Ip);
             };
-            _startTabControl.SetGroups(MainData.Groups);
             _startTabControl.OnStartGroupChat += group =>
             {
                 ChatListManager.UpdateChatList(group);
@@ -128,9 +126,9 @@ namespace WalkieDohi
 
             var tab = new TabItem
             {
-                Header = "➕ 채팅 시작하기",
+                Header = "친구리스트",
                 Content = _startTabControl,
-                Name =  "chatStaterTab"
+                Name =  "FriendMainList"
             };
             ChatTabControlHost.Items.Add(tab);
         }
@@ -189,13 +187,6 @@ namespace WalkieDohi
             _startTabControl?.SetFriends(MainData.GetsortedFriends());
         }
 
-        private void ManageGroups_Click(object sender, RoutedEventArgs e)
-        {
-            var popup = new UI.GroupManagerWindow { Owner = this };
-            popup.ShowDialog();
-            _startTabControl?.SetGroups(MainData.Groups);
-        }
-
         private void OpenSettings_Click(object sender, RoutedEventArgs e)
         {
             var settingWindow = new UI.SettingWindow { Owner = this };
@@ -227,7 +218,7 @@ namespace WalkieDohi
 
             ActivateChatRoomTab();
 
-            _chatRoomListTabControl?.SelectChatByKey(group.GroupName);
+            _chatRoomListTabControl?.SelectChatByKey(group.Key);
         }
 
 
@@ -254,7 +245,7 @@ namespace WalkieDohi
             }
             ChatListManager.UpdateChatList(group);
             ActivateChatRoomTab();
-            _chatRoomListTabControl?.SelectChatByKey(group.GroupName);
+            _chatRoomListTabControl?.SelectChatByKey(group.Key);
         }
 
         private void ActivateChatRoomTab()
