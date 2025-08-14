@@ -12,12 +12,12 @@
             <!-- 오른쪽: 채팅창 -->
         </Grid.ColumnDefinitions>
 
-        <Grid Grid.Column="0" Margin="10">
+        <Grid Grid.Column="0" Margin="3">
 
             <StackPanel>
 
 
-                <Grid Margin="0,0,0,5">
+                <Grid Margin="0,0,0,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <!-- 그룹을 검색하세요 -->
@@ -31,12 +31,12 @@
                             Style="{StaticResource RoundedSettingButtonStyle}"
                             Click="ManageGroups_Click"
                             Height="30"
-                            Margin="10,0,0,0"/>
+                            Margin="5,0"/>
                 </Grid>
 
                 <ListBox x:Name="ChatRoomListBox"
                  Grid.Column="0"
-                 Margin="10"
+                 Margin="5"
                  DisplayMemberPath="DisplayName"
                  SelectionChanged="ChatRoomListBox_SelectionChanged"
                  Loaded="ChatRoomListBox_Loaded"/>

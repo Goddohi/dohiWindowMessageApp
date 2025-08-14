@@ -40,10 +40,8 @@ namespace WalkieDohi.Data
             // 그룹 기준으로 동일한 항목 찾기
             var existing = _chatList.FirstOrDefault(c =>
                 c.Group != null &&
-                c.Group.GroupName == group.GroupName && //그룹이름 기준을 곧 제거예정 개인화 예정 
-                c.Group.Key == group.Key &&
-                c.Group.Ips.Distinct().OrderBy(ip => ip).SequenceEqual(group.Ips.Distinct().OrderBy(ip => ip) )
-            );
+                c.Group.Key == group.Key 
+                );
 
             if (existing != null)
             {
@@ -88,6 +86,20 @@ namespace WalkieDohi.Data
             SaveChatList();
         }
 
+        public static void ChangeNameChatListItem(string key,string GroupName)
+        {
+            var item = _chatList.FirstOrDefault(c => c.UniqueKey == key);
+            if (item != null)
+            {
+                if(item.Group != null)
+                {
+                    item.Group.GroupName = GroupName;
+                    item.Name = GroupName;
+                }
+            }
+
+            SaveChatList();
+        }
 
         public static void DeleteChatLog(string key)
         {

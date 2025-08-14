@@ -4,12 +4,15 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using WalkieDohi.Core;
 using WalkieDohi.Data;
 using WalkieDohi.Entity;
 using WalkieDohi.Util;
 using WalkieDohi.Util.IO;
+using System.Windows.Input;
 using WalkieDohi.Util.Tcp;
+using WalkieDohi.UI;
 
 namespace WalkieDohi.UC
 {
@@ -137,23 +140,79 @@ namespace WalkieDohi.UC
             }
         }
 
+        private MenuItem _miGroupRename;
         private void ChatRoomListBox_Loaded(object sender, RoutedEventArgs e)
         {
             var style = new Style(typeof(ListBoxItem));
             var contextMenu = new ContextMenu();
             var leaveItem = new MenuItem { Header = "채팅방 나가기" };
             leaveItem.Click += LeaveChatRoom_Click;
+
             contextMenu.Items.Add(leaveItem);
+
+            var logClearItem = new MenuItem { Header = "채팅내용 지우기" };
+            logClearItem.Click += ClearChatRoom_Click;
+
+            contextMenu.Items.Add(logClearItem);
+
+            _miGroupRename = new MenuItem { Header = "그룹 이름변경" };
+            _miGroupRename.Click += GroupNameChange_Click;
+            contextMenu.Items.Add(_miGroupRename); // 항상 추가해두고 가시성만 토글
+
+            // 우클릭 시 선택 보정(권장)
+            ChatRoomListBox.PreviewMouseRightButtonDown += ChatRoomListBox_PreviewMouseRightButtonDown;
+            // 메뉴 뜨기 직전에 가시성 토글
+            ChatRoomListBox.ContextMenuOpening += ChatRoomListBox_ContextMenuOpening;
 
             style.Setters.Add(new Setter(ListBoxItem.ContextMenuProperty, contextMenu));
             ChatRoomListBox.ItemContainerStyle = style;
         }
 
+        private void GroupNameChange_Click(object sender, RoutedEventArgs e)
+        {
+            if (ChatRoomListBox.SelectedItem is ChatListItem item)
+            {
+                string key = item.UniqueKey;
+
+                var title = "그룹채팅방 이름 변경";
+                var ask = $"어떤 이름으로 변경하시겠습니까?";
+                var popup = new InputDialog(title, item.Group.GroupName, ask);
+
+                popup.ShowDialog();
+                if (string.IsNullOrWhiteSpace(popup.ResponseText)==false)
+                {
+
+                    // 채팅 컨트롤 제거 전 리소스 정리
+                    if (_chatControls.TryGetValue(key, out var control))
+                    {
+
+                        (control as IDisposable)?.Dispose();
+
+                        if (ChatContentArea.Content == control)
+                            ChatContentArea.Content = null;
+
+                        _chatControls.Remove(key);
+                    }
+
+                    ChatListManager.ChangeNameChatListItem(key, popup.ResponseText);
+                    // UI 갱신
+                    ChatRoomListBox.ItemsSource = null;
+                    ChatRoomListBox.ItemsSource = ChatListManager.GetChatList();
+                }
+            }
+        }
 
         private void LeaveChatRoom_Click(object sender, RoutedEventArgs e)
         {
             if (ChatRoomListBox.SelectedItem is ChatListItem item)
             {
+                var title = "채팅방 나가기";
+                var ask = $"이 {item.DisplayName} 채팅방에서 나가시겠습니까?";
+                    
+
+                var confirm = MessageBox.Show(ask, title, MessageBoxButton.YesNo, MessageBoxImage.Question);
+                if (confirm != MessageBoxResult.Yes) return;
+
                 string key = item.UniqueKey;
 
                 // 채팅 컨트롤 제거 전 리소스 정리
@@ -187,6 +246,78 @@ namespace WalkieDohi.UC
             }
         }
 
+
+        private void ClearChatRoom_Click(object sender, RoutedEventArgs e)
+        {
+            if (ChatRoomListBox.SelectedItem is ChatListItem item)
+            {
+                var title = "채팅내용 지우기 ";
+                var ask = $"이 {item.DisplayName} 채팅방의 채팅내용을 지우시겠습니까?";
+
+
+                var confirm = MessageBox.Show(ask, title, MessageBoxButton.YesNo, MessageBoxImage.Question);
+                if (confirm != MessageBoxResult.Yes) return;
+
+                string key = item.UniqueKey;
+
+                // 채팅 컨트롤 제거 전 리소스 정리
+                if (_chatControls.TryGetValue(key, out var control))
+                {
+
+                    (control as IDisposable)?.Dispose();
+
+                    if (ChatContentArea.Content == control)
+                        ChatContentArea.Content = null;
+
+                    _chatControls.Remove(key);
+                }
+                string chatpathKey = string.Copy(key);
+                if (item.Group != null)
+                {
+                    chatpathKey = $"group_{DirectoryManager.MakeSafeFileName(chatpathKey)}"; 
+                }
+                //채팅로그 삭제
+                ChatListManager.DeleteChatLog(chatpathKey);
+
+                // UI 갱신
+                ChatRoomListBox.ItemsSource = null;
+                ChatRoomListBox.ItemsSource = ChatListManager.GetChatList();
+
+            }
+        }
+
+
+
+        private void ChatRoomListBox_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            var dep = e.OriginalSource as DependencyObject;
+            var lbi = FindParent<ListBoxItem>(dep);
+            if (lbi != null) lbi.IsSelected = true;
+        }
+
+        private static T FindParent<T>(DependencyObject child) where T : DependencyObject
+        {
+            while (child != null)
+            {
+                if (child is T t) return t;
+                child = VisualTreeHelper.GetParent(child);
+            }
+            return null;
+        }
+        private void ChatRoomListBox_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+        {
+            var item = ChatRoomListBox.SelectedItem as ChatListItem;
+            if (item == null)
+            {
+                e.Handled = true; // 선택된 게 없으면 메뉴 띄우지 않음
+                return;
+            }
+
+            // 그룹 채팅이면 보이기, 1:1이면 숨기기
+            _miGroupRename.Visibility = (item.Group != null)
+                ? Visibility.Visible
+                : Visibility.Collapsed;
+        }
 
 
         public void SelectChatByKey(string key)
