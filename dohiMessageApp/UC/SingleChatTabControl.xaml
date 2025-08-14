@@ -109,11 +109,12 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <TextBlock x:Name="ChatRoomNameDisplay" Text="" Grid.Row="0"/>
+        <TextBlock x:Name="ChatRoomNameDisplay" Text="" Grid.Row="0" Margin="5" FontWeight="Bold"/>
+        
         <ListBox x:Name="ChatList" 
                  SelectionMode="Single"
                  VirtualizingPanel.ScrollUnit="Pixel" 

@@ -122,8 +122,8 @@
         </Grid.RowDefinitions>
 
         <!-- 그룹원 목록 Expander -->
-        <Expander Header="그룹원 보기" Grid.Row="0" Margin="5" IsExpanded="False" x:Name="GroupMemberList_viewr">
-            <ListBox x:Name="GroupMemberList" Height="100" DisplayMemberPath="DisplayText"/>
+        <Expander Header="그룹원 보기" Grid.Row="0" Margin="5" IsExpanded="False" x:Name="GroupMemberList_viewr"  FontWeight="Bold" >
+            <ListBox x:Name="GroupMemberList" Height="100" DisplayMemberPath="DisplayText"  FontWeight="Normal"/>
         </Expander>
 
         <!-- 채팅 메시지 리스트 -->
