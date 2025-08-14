@@ -13,7 +13,7 @@ namespace WalkieDohi.Entity
     public class GroupEntity :DohiEntityBase
     {
         public string GroupName {  get; set; }
-        public string[] Ips { get; set; } = Array.Empty<string>();
+        public List<string> Ips { get; set; } = new List<string>();// Array.Empty<string>();
 
         public string Key { get; set; }
 
@@ -21,10 +21,17 @@ namespace WalkieDohi.Entity
         {
             //키가 아예없는 초기에만 생성되록.
            if(string.IsNullOrWhiteSpace(Key))
-                Key = Guid.NewGuid().ToString();
+                Key = Guid.NewGuid().ToString("N");
+            /*
+                "N": 32자리, 구분자 없음 → d85b1407333f4b6a8a3a1f6f0c2e9d2f
+                "D": 하이픈 포함 기본형 → d85b1407-333f-4b6a-8a3a-1f6f0c2e9d2f
+                "B": 중괄호 포함 → {d85b1407-333f-4b6a-8a3a-1f6f0c2e9d2f}
+                "P": 괄호 포함 → (d85b1407-333f-4b6a-8a3a-1f6f0c2e9d2f)
+                "X": 특수 16진 포맷(드물게 사용) 
+             */
         }
 
-        [JsonIgnore]
+        [JsonIgnore] //JSON 직렬화/역직렬화 과정에서 해당 속성(필드)을 무시
         public string TooltipText
         {
             get

@@ -161,12 +161,18 @@ namespace WalkieDohi.Entity
             IsFailed = false;
         }
 
+        [JsonIgnore]
         public bool IsGroupMessage => Group != null;
-
+        [JsonIgnore]
         public bool IsSingleMessage => Group == null;
 
+        [JsonIgnore]
         public bool CheckMessageTypeFile  => this.Type == MessageType.File;
+        
+        [JsonIgnore]
         public bool CheckMessageTypeText  => this.Type == MessageType.Text;
+
+        [JsonIgnore]
         public bool CheckMessageTypeImage => this.Type == MessageType.Image;
     }
 
