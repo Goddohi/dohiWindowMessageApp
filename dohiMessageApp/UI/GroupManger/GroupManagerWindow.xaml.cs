@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -47,8 +48,8 @@ namespace WalkieDohi.UI
             var newGroup = new GroupEntity
             {
                 GroupName = name,
-                Ips = new[] { NetworkHelper.GetLocalIPv4() }
-            };
+                Ips = new List<string> { NetworkHelper.GetLocalIPv4() }
+        };
             Groups.Add(newGroup);
             GroupNameBox.Clear();
             SaveGroupsToFile(); // 변경 사항 저장
@@ -102,13 +103,12 @@ namespace WalkieDohi.UI
                 var selected = selectWindow.SelectedFriend;
                 if (selected != null && !_selectedGroup.Ips.Contains(selected.Ip))
                 {
-                    _selectedGroup.Ips = _selectedGroup.Ips.Append(selected.Ip).ToArray();
+                    _selectedGroup.Ips = _selectedGroup.Ips.Append(selected.Ip).ToList();
                     RefreshMemberDisplay();
                     SaveGroupsToFile(); // 변경 사항 저장
                 }
             }
         }
-
 
         /// <summary>
         /// Json으로 바로 적용
@@ -135,7 +135,7 @@ namespace WalkieDohi.UI
             }
             if (MessageBox.Show($"{selected.DisplayText}을 삭제할까요?", "삭제 확인", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
             {
-                _selectedGroup.Ips = _selectedGroup.Ips.Where(ip => ip != selected.Ip).ToArray();
+                _selectedGroup.Ips = _selectedGroup.Ips.Where(ip => ip != selected.Ip).ToList();
                 RefreshMemberDisplay();
                 SaveGroupsToFile();
             }
@@ -148,7 +148,7 @@ namespace WalkieDohi.UI
             if (selected.Ip == NetworkHelper.GetLocalIPv4()) return;
             if (MessageBox.Show($"{selected.DisplayText}을 삭제할까요?", "삭제 확인", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
             {
-                _selectedGroup.Ips = _selectedGroup.Ips.Where(ip => ip != selected.Ip).ToArray();
+                _selectedGroup.Ips = _selectedGroup.Ips.Where(ip => ip != selected.Ip).ToList();
                 RefreshMemberDisplay();
                 SaveGroupsToFile();
             }
