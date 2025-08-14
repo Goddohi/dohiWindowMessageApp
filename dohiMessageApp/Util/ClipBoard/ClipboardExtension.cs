@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media.Imaging;
+using WalkieDohi.Entity;
 
 namespace WalkieDohi.Util
 {
@@ -25,6 +27,58 @@ namespace WalkieDohi.Util
                 }
             });
         }
+
+        public static void CopyImageSafe(BitmapImage image)
+        {
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                try
+                {
+                    Clipboard.SetImage(image);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("복사 실패: " + ex.Message);
+                }
+            });
+        }
+
+        public static void ChatCopy(ChatMessage chat)
+        {
+            switch (chat)
+            {
+                case TextMessage t:
+                    if (!string.IsNullOrEmpty(t.DisplayContent))
+                        CopyTextSafe(t.DisplayContent);
+                    break;
+
+                case ImageMessage im:
+                    // 1) 이미지 자체 복사 (가장 일반적인 기대 동작)
+                    if (im.Image != null)
+                    {
+                        CopyImageSafe(im.Image);
+                    }
+                    else
+                    {
+                        CopyTextSafe(im.DisplayContent);
+                    }
+                    break;
+
+                case FileMessage fm:
+                     if (!string.IsNullOrEmpty(fm.DisplayContent))
+                        CopyTextSafe(fm.DisplayContent);
+                    break;
+
+                default:
+                    // 알 수 없는 타입이면 보여지는 문자열이라도 복사
+                    if (!string.IsNullOrEmpty(chat.DisplayContent))
+                        CopyTextSafe(chat.DisplayContent);
+                    break;
+            }
+
+
+        }
+
 
         public static BitmapSource GetImageSafeOnce()
         {

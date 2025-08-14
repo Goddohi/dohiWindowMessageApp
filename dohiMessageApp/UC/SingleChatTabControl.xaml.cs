@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -172,7 +173,7 @@ namespace WalkieDohi.UC
                 var selected = ChatList.SelectedItem as ChatMessage;
                 if (selected != null)
                 {
-                    ClipboardExtension.CopyTextSafe(selected.DisplayContent);
+                    ClipboardExtension.ChatCopy(selected);
                 }
             };
             menu.Items.Add(copyItem);
@@ -185,11 +186,14 @@ namespace WalkieDohi.UC
                 var selected = ChatList.SelectedItem as ChatMessage;
                 if (selected != null)
                 {
-                    ClipboardExtension.CopyTextSafe(selected.DisplayContent);
+                    ClipboardExtension.ChatCopy(selected);
                     e.Handled = true;
                 }
             }
         }
+
+
+
         private void ChatList_ScrollChanged(object sender, MouseWheelEventArgs e)
         {
             var scrollViewer = GetScrollViewer(ChatList);

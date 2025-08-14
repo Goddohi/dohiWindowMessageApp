@@ -155,10 +155,10 @@
         <Button Grid.Row="1"
             x:Name="ScrollToBottomButton"
             Content="▼"
-            Width="30" Height="30"
+            Width="25" Height="25"
             HorizontalAlignment="Right"
             VerticalAlignment="Bottom"
-            Margin="10,10,30,30"
+            Margin="10,10,30,20"
             Visibility="Collapsed"
             Style="{StaticResource RoundedChatButtonStyle}"
             Click="ScrollToBottomButton_Click"/>
