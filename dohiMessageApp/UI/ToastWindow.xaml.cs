@@ -48,7 +48,7 @@ namespace WalkieDohi.UI
                 TitleText.Text = $"📨 {sender}님이 보냄";
             else
             {
-                var groupChatName = string.IsNullOrWhiteSpace(ChatListManager.GetNameChatListByKey(Group.Key)) ? ChatListManager.GetNameChatListByKey(Group.Key) : Group.GroupName;
+                var groupChatName = string.IsNullOrWhiteSpace(ChatListManager.GetNameChatListByKey(Group.Key)) ? Group.GroupName : ChatListManager.GetNameChatListByKey(Group.Key) ;
                 TitleText.Text = $"📨 [ {groupChatName} ] {sender}님이 보냄";
             }
             
