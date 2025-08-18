@@ -77,6 +77,7 @@ namespace WalkieDohi.Data
 
         #endregion
 
+        #region 리스트 삭제 로직
         public static void RemoveChatListItem(string key)
         {
             var item = _chatList.FirstOrDefault(c => c.UniqueKey == key);
@@ -85,7 +86,9 @@ namespace WalkieDohi.Data
 
             SaveChatList();
         }
+        #endregion
 
+        #region 리스트 이름 변경 로직 (시험삼아 그룹만)
         public static void ChangeNameChatListItem(string key,string GroupName)
         {
             var item = _chatList.FirstOrDefault(c => c.UniqueKey == key);
@@ -100,7 +103,9 @@ namespace WalkieDohi.Data
 
             SaveChatList();
         }
+        #endregion
 
+        #region 채팅 내역만 삭제 로직 
         public static void DeleteChatLog(string key)
         {
             // 저장된 채팅 파일 삭제
@@ -119,7 +124,7 @@ namespace WalkieDohi.Data
                 MessageBox.Show("채팅 로그 폴더 삭제 실패: " + ex.Message);
             }
         }
-
+        #endregion
 
         #region 저장/불러오기
 
@@ -161,8 +166,27 @@ namespace WalkieDohi.Data
 
 
 
-#endregion
+        #endregion
+    
+        
+        #region 채팅방이름 불러오는 로직  (개인화로인한 추가)
+        public static string GetNameChatListByKey(string key)
+        {
+            
+            var item = _chatList.FirstOrDefault(c => c.UniqueKey == key);
+            if (item != null)
+            {
+                if (item.Group == null)
+                    return item.Name;
 
+                if (item.Group != null)
+                    return item.Group.GroupName;
+
+            }
+
+            return "";
+        }
+        #endregion
 
 
     }

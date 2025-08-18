@@ -44,7 +44,13 @@ namespace WalkieDohi.UI
             Group = group;
             Ip = ip;
             InitializeComponent();
-            TitleText.Text = (group == null) ? $"📨 {sender}님이 보냄" :  $"📨 [ {Group.GroupName} ] {sender}님이 보냄";
+            if (group == null)
+                TitleText.Text = $"📨 {sender}님이 보냄";
+            else
+            {
+                var groupChatName = string.IsNullOrWhiteSpace(ChatListManager.GetNameChatListByKey(Group.Key)) ? ChatListManager.GetNameChatListByKey(Group.Key) : Group.GroupName;
+                TitleText.Text = $"📨 [ {groupChatName} ] {sender}님이 보냄";
+            }
             
             MessageText.Text = message;
             
