@@ -17,25 +17,17 @@
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0" Text="{Binding Sender}" FontWeight="Bold"/>
 
-                <Grid Grid.Column="1">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
 
+
+                <StackPanel Grid.Column="1" Orientation="Vertical">
                     <!-- 메시지 내용 -->
                     <TextBlock Grid.Column="0"
-                   Text="{Binding Text}"
-                   TextWrapping="Wrap"
-                   VerticalAlignment="Top" />
+                               Text="{Binding Text}"
+                               TextWrapping="Wrap"
+                               VerticalAlignment="Top" />
 
-                    <!-- 시간: 오른쪽 고정 -->
-                    <TextBlock Grid.Column="1"
-                   Text="{Binding Timestamp, StringFormat='{}{0:MM-dd HH:mm}'}"
-                   VerticalAlignment="Top"
-                   HorizontalAlignment="Right"
-                   Margin="10,0,0,0"/>
-                </Grid>
+                    <TextBlock Text="{Binding Timestamp, StringFormat='{}{0:MM-dd HH:mm}'}" Foreground="Gray" FontSize="12"/>
+                </StackPanel>
             </Grid>
         </DataTemplate>
 
@@ -52,26 +44,18 @@
                 <!-- Sender -->
                 <TextBlock Grid.Column="0" Text="{Binding Sender}" FontWeight="Bold"/>
 
-                <!-- 내부 메시지 + 시간 정렬 -->
-                <Grid Grid.Column="1">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
+                <!-- 이미지 -->
 
-                    <!-- 이미지 -->
+                <StackPanel Grid.Column="1" Orientation="Vertical">
                     <Image Grid.Column="0"
-                   MaxWidth="500"
-                   MaxHeight="300"
-                   Stretch="Uniform"
-                   Source="{Binding Image}" />
+                           MaxWidth="500"
+                           MaxHeight="300"
+                           Stretch="Uniform"
+                           Source="{Binding Image}" />
 
                     <!-- 시간 -->
-                    <TextBlock Grid.Column="1"
-                       Text="{Binding Timestamp, StringFormat='{}{0:MM-dd HH:mm}'}"
-                       VerticalAlignment="Bottom"
-                       Margin="10,0,0,0"/>
-                </Grid>
+                    <TextBlock Text="{Binding Timestamp, StringFormat='{}{0:MM-dd HH:mm}'}" Foreground="Gray" FontSize="12"/>
+                </StackPanel>
             </Grid>
         </DataTemplate>
 
@@ -89,24 +73,16 @@
                 <TextBlock Grid.Column="0" Text="{Binding Sender}" FontWeight="Bold"/>
 
                 <!-- 내부 파일 + 시간 정렬 -->
-                <Grid Grid.Column="1">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-
+                <StackPanel Grid.Column="1" Orientation="Vertical">
                     <!-- 파일 내용 -->
-                    <StackPanel Grid.Column="0" Orientation="Horizontal">
+                    <StackPanel Orientation="Horizontal">
                         <TextBlock Text="[파일] " Foreground="Blue" FontWeight="Bold"/>
                         <TextBlock Text="{Binding FileName}" Foreground="Blue" ToolTip="클릭하여 파일 위치 보기"/>
                     </StackPanel>
 
                     <!-- 시간 -->
-                    <TextBlock Grid.Column="1"
-                       Text="{Binding Timestamp, StringFormat='{}{0:MM-dd HH:mm}'}"
-                       VerticalAlignment="Center"
-                       Margin="10,0,0,0"/>
-                </Grid>
+                    <TextBlock Text="{Binding Timestamp, StringFormat='{}{0:MM-dd HH:mm}'}" Foreground="Gray" FontSize="12"/>
+                </StackPanel>
             </Grid>
         </DataTemplate>
     </UserControl.Resources>
