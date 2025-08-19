@@ -60,7 +60,12 @@ namespace WalkieDohi
                 MainWindow = new MainWindow();
 
             MainWindow.Show();
+           // 작업줄 최소화 상태라면 복원
+            if (MainWindow.WindowState == WindowState.Minimized)
+                MainWindow.WindowState = WindowState.Normal;
+
             MainWindow.Activate();
+            MainWindow.Focus();
         }
 
         protected override void OnExit(ExitEventArgs e)
