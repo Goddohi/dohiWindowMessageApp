@@ -57,6 +57,7 @@ namespace WalkieDohi.Entity
             }
         }
 
+
         public bool isDirectionSend()
         {
             return MessageDirection.Send.Equals(Direction);
@@ -64,6 +65,13 @@ namespace WalkieDohi.Entity
         public bool isDirectionReceive()
         {
             return MessageDirection.Receive.Equals(Direction);
+        }
+
+        protected string FormatSender(string sender, MessageDirection dir)
+        {
+            if (this.IsReload)
+                return sender;
+            return dir == MessageDirection.Send ? "📤 나" : sender;
         }
     }
 
@@ -74,12 +82,12 @@ namespace WalkieDohi.Entity
 
         public TextMessage(string sender, string text, MessageDirection dir, DateTime timestamp,string ip,GroupEntity group = null, bool isReload = false)
         {
+            IsReload = isReload;
             Sender = FormatSender(sender, dir);
             Direction = dir;
             Text = text;
             Timestamp = timestamp;
             Ip = ip;
-            IsReload = isReload;
             NotifyIfReceive(sender, ip, text, dir, group);
         }
 
@@ -90,13 +98,6 @@ namespace WalkieDohi.Entity
 
             if (dir == MessageDirection.Receive)
                 new ToastWindow(sender, ip, text, group).Show();
-        }
-
-        private string FormatSender(string sender, MessageDirection dir)
-        {
-            if (this.IsReload)
-                return sender;
-            return dir == MessageDirection.Send ? "📤 나" : sender;
         }
     }
 
@@ -109,13 +110,13 @@ namespace WalkieDohi.Entity
 
         public ImageMessage(string sender, string fileName, string base64, string path, MessageDirection dir, DateTime timestamp, string ip, GroupEntity group = null, bool isReload = false)
         {
+            IsReload = isReload;
             Sender = FormatSender(sender, dir);
             Direction = dir;
             FileName = fileName;
             ContentPath = path;
             Ip = ip;
             Image = MessageImageUtil.LoadImageFromBase64(base64);
-            IsReload = isReload;
             NotifyIfReceive(sender,ip, fileName, dir, group);
         }
 
@@ -127,12 +128,7 @@ namespace WalkieDohi.Entity
                 new ToastWindow(sender, ip, content, group).Show();
         }
 
-        private string FormatSender(string sender, MessageDirection dir)
-        {
-            if (this.IsReload)
-                return sender;
-            return dir == MessageDirection.Send ? "📤 나" : sender;
-        }
+
 
     }
 
@@ -143,12 +139,13 @@ namespace WalkieDohi.Entity
 
         public FileMessage(string sender, string fileName, string path, MessageDirection dir, DateTime timestamp, string ip, GroupEntity group = null, bool isReload = false)
         {
+            IsReload = isReload;
+
             Sender = FormatSender(sender, dir);
             Direction = dir;
             FileName = fileName;
             ContentPath = path;
             Ip = ip;
-            IsReload = isReload;
             NotifyIfReceive(sender, ip, fileName, dir, group);
         }
 
@@ -158,13 +155,6 @@ namespace WalkieDohi.Entity
                 return;
             if (dir == MessageDirection.Receive)
                 new ToastWindow(sender, ip, content, group).Show();
-        }
-
-        private string FormatSender(string sender, MessageDirection dir)
-        {
-            if (this.IsReload)
-                return sender;
-            return dir == MessageDirection.Receive ? $"📥{sender}" : sender;
         }
     }
 }
