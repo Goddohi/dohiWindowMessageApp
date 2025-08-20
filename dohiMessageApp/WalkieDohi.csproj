@@ -164,6 +164,7 @@
     <Compile Include="Util\Provider\UserFileProvider.cs" />
     <Compile Include="Util\Tcp\PacketReceiver.cs" />
     <Compile Include="Util\Tcp\PacketSender.cs" />
+    <Compile Include="Util\TemplateSelectors\DirectionToAlignmentConverter.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

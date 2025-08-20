@@ -10,15 +10,21 @@ namespace WalkieDohi.Util
 
             // IP 기준으로 방향 추론
             MessageDirection direction;
-        
+
             if (msg.SenderIp == NetworkHelper.GetLocalIPv4())
             {
                 direction = MessageDirection.Send;
             }
             else
-            { 
-                direction = MessageDirection.Receive; 
-                /* 기존 사용자 보호 정책 추가할 것 */
+            {
+                direction = MessageDirection.Receive;
+                /* 기존 사용자 보호 정책 추가 */
+                if (string.IsNullOrWhiteSpace(msg.SenderIp))
+                {
+                    if (string.Equals(msg.Sender, "📤 나"))
+                        direction = MessageDirection.Send;
+
+                }
             }
 
 
