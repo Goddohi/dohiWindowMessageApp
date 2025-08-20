@@ -14,6 +14,7 @@ namespace WalkieDohi.Util
             {
                 Sender = msg.Sender,
                 IsFailed = msg.IsFailed,
+                SenderIp = msg.Ip,
                 Timestamp = msg.Timestamp     
             };
 

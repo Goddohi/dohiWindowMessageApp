@@ -4,40 +4,37 @@ namespace WalkieDohi.Util
 {
     public static class MessageEntityExtensions
     {
-        public static ChatMessage ToChatMessage(this MessageEntity msg)
+        public static ChatMessage ToChatMessage(this MessageEntity msg,bool IsReload = false)
         {
             if (msg == null) return null;
 
             // IP 기준으로 방향 추론
             MessageDirection direction;
-
-            if (msg.SenderIp == null) //이전내역받기는 ip안불러옴
-            { 
-                direction = MessageDirection.ReLoad; 
-            }
-            else if (msg.SenderIp == NetworkHelper.GetLocalIPv4())
+        
+            if (msg.SenderIp == NetworkHelper.GetLocalIPv4())
             {
                 direction = MessageDirection.Send;
             }
             else
             { 
                 direction = MessageDirection.Receive; 
+                /* 기존 사용자 보호 정책 추가할 것 */
             }
 
 
             if (msg.CheckMessageTypeText)
             {
-                return new TextMessage(msg.Sender, msg.Content, direction, msg.Timestamp , msg.SenderIp, msg.Group);
+                return new TextMessage(msg.Sender, msg.Content, direction, msg.Timestamp , msg.SenderIp, msg.Group,IsReload);
             }
 
             if (msg.CheckMessageTypeImage)
             {
-                return new ImageMessage(msg.Sender, msg.FileName, msg.Content, msg.ContentPath, direction, msg.Timestamp, msg.SenderIp, msg.Group);
+                return new ImageMessage(msg.Sender, msg.FileName, msg.Content, msg.ContentPath, direction, msg.Timestamp, msg.SenderIp, msg.Group, IsReload);
             }
 
             if (msg.CheckMessageTypeFile)
             {
-                return new FileMessage(msg.Sender, msg.FileName,msg.ContentPath, direction, msg.Timestamp, msg.SenderIp, msg.Group);
+                return new FileMessage(msg.Sender, msg.FileName,msg.ContentPath, direction, msg.Timestamp, msg.SenderIp, msg.Group, IsReload);
             }
 
             return null;

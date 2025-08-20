@@ -480,7 +480,7 @@ namespace WalkieDohi.UC
 
                 // 새 메시지 추출
                 var newMessages = viewModel.ChatMessages
-                    .Where(m => m.Direction != MessageDirection.ReLoad && m.Timestamp > _lastSavedMessageTime)
+                    .Where(m => !m.IsReload && m.Timestamp > _lastSavedMessageTime)
                     .OrderBy(m => m.Timestamp)
                     .ToList();
 
@@ -570,7 +570,7 @@ namespace WalkieDohi.UC
                 var entities = JsonUtil.Deserialize<List<MessageEntity>>(json);
 
                 var messages = entities
-                    .Select(e => e.ToChatMessage())
+                    .Select(e => e.ToChatMessage(true))
                     .Where(m => m != null)
                     .ToList();
 

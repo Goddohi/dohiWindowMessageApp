@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.IO;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
@@ -12,6 +13,9 @@ namespace WalkieDohi.Entity
         public string Sender { get; set; }
         public bool IsFailed { get; set; } = false;
         public MessageDirection Direction { get; set; }
+
+        [JsonIgnore]
+        public bool IsReload { get; set; } = false;
 
         /// <summary>
         /// 메세지별 보여줄 컨텐츠
@@ -68,24 +72,30 @@ namespace WalkieDohi.Entity
         public string Text { get; }
         public override string DisplayContent => Text;
 
-        public TextMessage(string sender, string text, MessageDirection dir, DateTime timestamp,string ip, GroupEntity group = null)
+        public TextMessage(string sender, string text, MessageDirection dir, DateTime timestamp,string ip,GroupEntity group = null, bool isReload = false)
         {
             Sender = FormatSender(sender, dir);
             Direction = dir;
             Text = text;
             Timestamp = timestamp;
             Ip = ip;
+            IsReload = isReload;
             NotifyIfReceive(sender, ip, text, dir, group);
         }
 
         private void NotifyIfReceive(string sender, string ip, string text, MessageDirection dir, GroupEntity group)
         {
+            if (this.IsReload)
+                return;
+
             if (dir == MessageDirection.Receive)
                 new ToastWindow(sender, ip, text, group).Show();
         }
 
         private string FormatSender(string sender, MessageDirection dir)
         {
+            if (this.IsReload)
+                return sender;
             return dir == MessageDirection.Send ? "📤 나" : sender;
         }
     }
@@ -97,7 +107,7 @@ namespace WalkieDohi.Entity
         public override string DisplayContent => FileName;
 
 
-        public ImageMessage(string sender, string fileName, string base64, string path, MessageDirection dir, DateTime timestamp, string ip, GroupEntity group = null)
+        public ImageMessage(string sender, string fileName, string base64, string path, MessageDirection dir, DateTime timestamp, string ip, GroupEntity group = null, bool isReload = false)
         {
             Sender = FormatSender(sender, dir);
             Direction = dir;
@@ -105,17 +115,22 @@ namespace WalkieDohi.Entity
             ContentPath = path;
             Ip = ip;
             Image = MessageImageUtil.LoadImageFromBase64(base64);
+            IsReload = isReload;
             NotifyIfReceive(sender,ip, fileName, dir, group);
         }
 
         private void NotifyIfReceive(string sender,string ip, string content, MessageDirection dir, GroupEntity group)
         {
+            if (this.IsReload)
+                return;
             if (dir == MessageDirection.Receive)
                 new ToastWindow(sender, ip, content, group).Show();
         }
 
         private string FormatSender(string sender, MessageDirection dir)
         {
+            if (this.IsReload)
+                return sender;
             return dir == MessageDirection.Send ? "📤 나" : sender;
         }
 
@@ -126,24 +141,29 @@ namespace WalkieDohi.Entity
         public string FileName { get; }
         public override string DisplayContent => FileName;
 
-        public FileMessage(string sender, string fileName, string path, MessageDirection dir, DateTime timestamp, string ip, GroupEntity group = null)
+        public FileMessage(string sender, string fileName, string path, MessageDirection dir, DateTime timestamp, string ip, GroupEntity group = null, bool isReload = false)
         {
             Sender = FormatSender(sender, dir);
             Direction = dir;
             FileName = fileName;
             ContentPath = path;
             Ip = ip;
+            IsReload = isReload;
             NotifyIfReceive(sender, ip, fileName, dir, group);
         }
 
         private void NotifyIfReceive(string sender,string ip, string content, MessageDirection dir, GroupEntity group)
         {
+            if (this.IsReload)
+                return;
             if (dir == MessageDirection.Receive)
                 new ToastWindow(sender, ip, content, group).Show();
         }
 
         private string FormatSender(string sender, MessageDirection dir)
         {
+            if (this.IsReload)
+                return sender;
             return dir == MessageDirection.Receive ? $"📥{sender}" : sender;
         }
     }
