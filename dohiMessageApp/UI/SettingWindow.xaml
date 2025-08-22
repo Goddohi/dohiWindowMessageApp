@@ -4,6 +4,7 @@
         Title="설정"
         Height="400" Width="400"
         Loaded="Window_Loaded"
+        KeyDown="Window_KeyDown"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize">
 

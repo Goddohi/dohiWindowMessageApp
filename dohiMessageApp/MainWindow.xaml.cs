@@ -259,22 +259,27 @@ namespace WalkieDohi
                 }
             }
         }
-
-        private void ChatTabControlHost_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void Window_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
-            //굳이 사용안해도 로직상으로 구멍이 없어서 불필요한 자원 사용하지 않기위해서 숨김처리
-            /*
-            var selectTab = ChatTabControlHost.SelectedItem as TabItem;
-            if(selectTab == null)
+            if (e.Key == Key.Escape)
             {
-                return;
+                var selectTab = ChatTabControlHost.SelectedItem as TabItem;
+                if (selectTab == null)
+                {
+                    return;
+                }
+
+                if (string.Equals(selectTab.Name, "FriendMainList"))
+                {
+                    this.Close();
+                }
+                else
+                {
+                    ChatTabControlHost.SelectedIndex = 0;
+                }
+                
             }
-            
-            if(string.Equals(selectTab.Name,"chatStaterTab"))
-            {
-                LoadFriendAndGroup();
-            }
-            */
         }
+
     }
 }

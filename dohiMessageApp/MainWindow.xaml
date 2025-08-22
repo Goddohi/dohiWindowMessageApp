@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WalkieDohi"
         xmlns:uc="clr-namespace:WalkieDohi.UC"
-        mc:Ignorable="d"
+        mc:Ignorable="d" KeyDown="Window_KeyDown"
         Title="WalkieDohi" Height="600" Width="900">
     <DockPanel>
         <!-- 상단 사용자 영역 -->
@@ -47,7 +47,6 @@
             Margin="10"
             Style="{StaticResource RoundedTabControlStyle}"
             ItemContainerStyle="{StaticResource RoundedTabItemStyle}"
-            SelectionChanged="ChatTabControlHost_SelectionChanged"
             Padding="5"/>
     </DockPanel>
 </Window>

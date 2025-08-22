@@ -38,6 +38,11 @@ namespace WalkieDohi.UI
             viewModel.Friends = new ObservableCollection<Friend>(MainData.GetsortedFriends()); // 복사본
 
         }
+        private void Window_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Escape)
+                this.Close();
+        }
 
 
         #region 클리어 로직
