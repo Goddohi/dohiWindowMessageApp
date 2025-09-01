@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="WalkieDohi.UC.ChatRoomListTabControl"
+﻿<UserControl x:Class="WalkieDohi.ChattingRooms.UserControls.ChatRoomListTabControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:WalkieDohi.UC"

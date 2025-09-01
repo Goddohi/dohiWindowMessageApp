@@ -8,7 +8,6 @@ using System.Drawing;
 using System.Windows.Interop;
 using WalkieDohi.ChattingRooms.Entity;
 using WalkieDohi.Util;
-using WalkieDohi.UC;
 using WalkieDohi.Util.Tcp;
 using WalkieDohi.Core.app;
 using MessageBox = System.Windows.MessageBox;
@@ -17,6 +16,8 @@ using System.Windows.Input;
 using WalkieDohi.Groups.Entity;
 using WalkieDohi.Friends.Views;
 using WalkieDohi.ChattingRooms.Data;
+using WalkieDohi.ChattingRooms.UserControls;
+using WalkieDohi.Friends.UserControls;
 
 namespace WalkieDohi
 {

@@ -21,7 +21,6 @@ using System.Windows.Threading;
 using WalkieDohi.Core;
 using WalkieDohi.ChattingRooms.Entity;
 using WalkieDohi.Packet.Messages.Entity;
-using WalkieDohi.UI;
 using WalkieDohi.Util;
 using Clipboard = System.Windows.Clipboard;
 using ContextMenu = System.Windows.Controls.ContextMenu;
@@ -34,8 +33,9 @@ using MessageBox = System.Windows.MessageBox;
 using Path = System.IO.Path;
 using UserControl = System.Windows.Controls.UserControl;
 using WalkieDohi.ChattingRooms.ViewModels;
+using WalkieDohi.ChattingRooms.Views;
 
-namespace WalkieDohi.ChattingRooms.Views
+namespace WalkieDohi.ChattingRooms.UserControls
 {
     /// <summary>
     /// ChatTabControl.xaml에 대한 상호 작용 논리

@@ -20,7 +20,6 @@ using WalkieDohi.ChattingRooms.Entity;
 using WalkieDohi.Friends.Entity;
 using WalkieDohi.Groups.Entity;
 using WalkieDohi.Packet.Messages.Entity;
-using WalkieDohi.UI;
 using WalkieDohi.Util;
 using WalkieDohi.Util.IO;
 using DataFormats = System.Windows.DataFormats;
@@ -28,8 +27,9 @@ using DragDropEffects = System.Windows.DragDropEffects;
 using DragEventArgs = System.Windows.DragEventArgs;
 using Path = System.IO.Path;
 using WalkieDohi.ChattingRooms.ViewModels;
+using WalkieDohi.ChattingRooms.Views;
 
-namespace WalkieDohi.ChattingRooms.Views
+namespace WalkieDohi.ChattingRooms.UserControls
 {
     /// <summary>
     /// GroupChatTabControl.xaml에 대한 상호 작용 논리

@@ -6,7 +6,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
-namespace WalkieDohi.UI
+namespace WalkieDohi.ChattingRooms.Views
 {
     public partial class ImagePreviewWindow : Window
     {

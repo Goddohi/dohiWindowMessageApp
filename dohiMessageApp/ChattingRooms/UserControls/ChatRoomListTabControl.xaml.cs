@@ -7,17 +7,15 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using WalkieDohi.Core;
 using WalkieDohi.ChattingRooms.Data;
-using WalkieDohi.ChattingRooms.Entity;
 using WalkieDohi.Util;
 using WalkieDohi.Util.IO;
 using System.Windows.Input;
 using WalkieDohi.Util.Tcp;
-using WalkieDohi.UI;
 using WalkieDohi.Groups.Views;
 using WalkieDohi.Packet.Messages.Entity;
-using WalkieDohi.ChattingRooms.Views;
+using WalkieDohi.Commons.Views;
 
-namespace WalkieDohi.UC
+namespace WalkieDohi.ChattingRooms.UserControls
 {
     public partial class ChatRoomListTabControl : UserControl
     {

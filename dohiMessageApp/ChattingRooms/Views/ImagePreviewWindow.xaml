@@ -1,4 +1,4 @@
-﻿<Window x:Class="WalkieDohi.UI.ImagePreviewWindow"
+﻿<Window x:Class="WalkieDohi.ChattingRooms.Views.ImagePreviewWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="이미지 미리보기" Height="600" Width="800"

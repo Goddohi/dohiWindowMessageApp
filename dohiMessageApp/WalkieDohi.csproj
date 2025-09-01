@@ -88,7 +88,7 @@
     <Compile Include="ChattingRooms\Data\ChatListManager.cs" />
     <Compile Include="ChattingRooms\Entity\ChatMessage.cs" />
     <Compile Include="Packets\Entity\PacketEntity.cs" />
-    <Compile Include="UC\ChatRoomListTabControl.xaml.cs">
+    <Compile Include="ChattingRooms\UserControls\ChatRoomListTabControl.xaml.cs">
       <DependentUpon>ChatRoomListTabControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Games\UserControls\BrickGameControl.xaml.cs">
@@ -110,23 +110,23 @@
     <Compile Include="Groups\Views\GroupCreateDialog.xaml.cs">
       <DependentUpon>GroupCreateDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Firends\Entity\Friend.cs" />
+    <Compile Include="Friends\Entity\Friend.cs" />
     <Compile Include="Groups\Entity\GroupEntity.cs" />
     <Compile Include="Users\Entity\User.cs" />
     <Compile Include="MainData.cs" />
-    <Compile Include="ChattingRooms\Views\GroupChatTabControl.xaml.cs">
+    <Compile Include="ChattingRooms\UserControls\GroupChatTabControl.xaml.cs">
       <DependentUpon>GroupChatTabControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UC\FriendMainListView.xaml.cs">
+    <Compile Include="Friends\UserControls\FriendMainListView.xaml.cs">
       <DependentUpon>FriendMainListView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Firends\Views\FriendManagerWindow.xaml.cs">
+    <Compile Include="Friends\Views\FriendManagerWindow.xaml.cs">
       <DependentUpon>FriendManagerWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\InputDialog.xaml.cs">
+    <Compile Include="Commons\Views\InputDialog.xaml.cs">
       <DependentUpon>InputDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\ImagePreviewWindow.xaml.cs">
+    <Compile Include="ChattingRooms\Views\ImagePreviewWindow.xaml.cs">
       <DependentUpon>ImagePreviewWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Games\Views\MiniGameWindow.xaml.cs">
@@ -135,19 +135,17 @@
     <Compile Include="Users\Views\SettingWindow.xaml.cs">
       <DependentUpon>SettingWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\ToastWindow.xaml.cs">
+    <Compile Include="ChattingRooms\Views\ToastWindow.xaml.cs">
       <DependentUpon>ToastWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Firends\ViewModels\FriendManagerWindowViewModel.cs" />
-    <Compile Include="ChattingRooms\Views\SingleChatTabControl.xaml.cs">
+    <Compile Include="Friends\ViewModels\FriendManagerWindowViewModel.cs" />
+    <Compile Include="ChattingRooms\UserControls\SingleChatTabControl.xaml.cs">
       <DependentUpon>SingleChatTabControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Util\ClipBoard\ClipboardExtension.cs" />
-    <Compile Include="Util\Converter\BoolToVisibilityConverter.cs" />
     <Compile Include="Util\Converter\StringNullOrEmptyToVisibilityConverter.cs" />
     <Compile Include="Util\IO\DirectoryManager.cs" />
     <Compile Include="Util\StringUtil.cs" />
-    <Compile Include="Util\Converter\InverseBoolToVisibilityConverter.cs" />
     <Compile Include="Util\IO\FriendJsonFileHandler.cs" />
     <Compile Include="Util\IO\UserJsonFileHandler.cs" />
     <Compile Include="Util\IPAddressComparer.cs" />
@@ -180,7 +178,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UC\ChatRoomListTabControl.xaml">
+    <Page Include="ChattingRooms\UserControls\ChatRoomListTabControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -204,11 +202,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="ChattingRooms\Views\GroupChatTabControl.xaml">
+    <Page Include="ChattingRooms\UserControls\GroupChatTabControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UC\FriendMainListView.xaml">
+    <Page Include="Friends\UserControls\FriendMainListView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -216,15 +214,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Firends\Views\FriendManagerWindow.xaml">
+    <Page Include="Friends\Views\FriendManagerWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\InputDialog.xaml">
+    <Page Include="Commons\Views\InputDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\ImagePreviewWindow.xaml">
+    <Page Include="ChattingRooms\Views\ImagePreviewWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -236,11 +234,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\ToastWindow.xaml">
+    <Page Include="ChattingRooms\Views\ToastWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="ChattingRooms\Views\SingleChatTabControl.xaml">
+    <Page Include="ChattingRooms\UserControls\SingleChatTabControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

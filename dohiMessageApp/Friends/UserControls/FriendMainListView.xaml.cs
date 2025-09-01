@@ -9,9 +9,8 @@ using WalkieDohi.ChattingRooms.Entity;
 using WalkieDohi.Friends.Entity;
 using WalkieDohi.Friends.Views;
 using WalkieDohi.Groups.Entity;
-using WalkieDohi.UI;
 
-namespace WalkieDohi.UC
+namespace WalkieDohi.Friends.UserControls
 {
     public partial class FriendMainListView : UserControl
     {

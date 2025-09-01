@@ -1,7 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Input;
 
-namespace WalkieDohi.UI
+namespace WalkieDohi.Commons.Views
 {
     public partial class InputDialog : Window
     {

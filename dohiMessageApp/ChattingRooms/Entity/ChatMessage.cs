@@ -3,9 +3,9 @@ using System;
 using System.IO;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
+using WalkieDohi.ChattingRooms.Views;
 using WalkieDohi.Groups.Entity;
 using WalkieDohi.Packet.Messages.Entity;
-using WalkieDohi.UI;
 using WalkieDohi.Util;
 
 namespace WalkieDohi.ChattingRooms.Entity
