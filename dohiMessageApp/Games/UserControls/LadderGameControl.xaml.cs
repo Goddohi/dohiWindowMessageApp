@@ -7,7 +7,7 @@ using System.Windows.Media;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 
-namespace WalkieDohi.UC.Games
+namespace WalkieDohi.Games.UserControls
 {
     public partial class LadderGameControl : UserControl
     {

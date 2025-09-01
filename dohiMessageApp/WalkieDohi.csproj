@@ -91,19 +91,19 @@
     <Compile Include="UC\ChatRoomListTabControl.xaml.cs">
       <DependentUpon>ChatRoomListTabControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UC\Games\BrickGameControl.xaml.cs">
+    <Compile Include="Games\UserControls\BrickGameControl.xaml.cs">
       <DependentUpon>BrickGameControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UC\Games\LadderGameControl.xaml.cs">
+    <Compile Include="Games\UserControls\LadderGameControl.xaml.cs">
       <DependentUpon>LadderGameControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UC\Games\NumberGuessGameControl.xaml.cs">
+    <Compile Include="Games\UserControls\NumberGuessGameControl.xaml.cs">
       <DependentUpon>NumberGuessGameControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UC\Games\ShootingGameControl.xaml.cs">
+    <Compile Include="Games\UserControls\ShootingGameControl.xaml.cs">
       <DependentUpon>ShootingGameControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UC\Games\SnakeGameControl.xaml.cs">
+    <Compile Include="Games\UserControls\SnakeGameControl.xaml.cs">
       <DependentUpon>SnakeGameControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="UC\ViewModel\ChatViewModel.cs" />
@@ -113,7 +113,7 @@
     <Compile Include="UI\GroupManger\GroupMemberDisplay.cs" />
     <Compile Include="Entity\MessageTarget\Friend.cs" />
     <Compile Include="Entity\MessageTarget\GroupEntity.cs" />
-    <Compile Include="Entity\User.cs" />
+    <Compile Include="Users\Entity\User.cs" />
     <Compile Include="MainData.cs" />
     <Compile Include="UC\GroupChatTabControl.xaml.cs">
       <DependentUpon>GroupChatTabControl.xaml</DependentUpon>
@@ -130,10 +130,10 @@
     <Compile Include="UI\ImagePreviewWindow.xaml.cs">
       <DependentUpon>ImagePreviewWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\MiniGame\MiniGameWindow.xaml.cs">
+    <Compile Include="Games\Views\MiniGameWindow.xaml.cs">
       <DependentUpon>MiniGameWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\SettingWindow.xaml.cs">
+    <Compile Include="Users\Views\SettingWindow.xaml.cs">
       <DependentUpon>SettingWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\ToastWindow.xaml.cs">
@@ -186,23 +186,23 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UC\Games\BrickGameControl.xaml">
+    <Page Include="Games\UserControls\BrickGameControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UC\Games\LadderGameControl.xaml">
+    <Page Include="Games\UserControls\LadderGameControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UC\Games\NumberGuessGameControl.xaml">
+    <Page Include="Games\UserControls\NumberGuessGameControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UC\Games\ShootingGameControl.xaml">
+    <Page Include="Games\UserControls\ShootingGameControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UC\Games\SnakeGameControl.xaml">
+    <Page Include="Games\UserControls\SnakeGameControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -230,11 +230,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\MiniGame\MiniGameWindow.xaml">
+    <Page Include="Games\Views\MiniGameWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\SettingWindow.xaml">
+    <Page Include="Users\Views\SettingWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -275,9 +275,7 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="UC\MainTab\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <None Include="개발계획도.md" />
   </ItemGroup>

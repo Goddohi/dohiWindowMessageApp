@@ -7,7 +7,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
-namespace WalkieDohi.UC.Games
+namespace WalkieDohi.Games.UserControls
 {
     public partial class SnakeGameControl : UserControl
     {

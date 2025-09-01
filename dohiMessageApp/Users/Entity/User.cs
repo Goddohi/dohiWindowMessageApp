@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using WalkieDohi.Core;
 
-namespace WalkieDohi.Entity
+namespace WalkieDohi.Users.Entity
 {
     public class User : DohiEntityBase
     {

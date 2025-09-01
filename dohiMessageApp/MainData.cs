@@ -7,27 +7,13 @@ using System.Threading.Tasks;
 using System.Collections.ObjectModel;
 using System.Net;
 using WalkieDohi.Util;
+using WalkieDohi.Users.Entity;
 
 namespace WalkieDohi
 {
     public static class MainData
     {
         public static int GetPort() { return MainData.currentUser.getPreferencesPort(); }
-        private static ObservableCollection<GroupEntity> groups = new ObservableCollection<GroupEntity>();
-
-        public static ObservableCollection<GroupEntity> Groups
-        {
-            get { return groups; }
-            set
-            {
-                if (groups != value)
-                {
-                    groups = value;
-                }
-            }
-
-        }
-
 
         private static ObservableCollection<Friend> friends = new ObservableCollection<Friend>();
 
@@ -43,9 +29,7 @@ namespace WalkieDohi
             
         }
 
-
         public static User currentUser = new User();
-
 
         /// <summary>
         /// IP 주소에 해당하는 친구의 이름으로 수정하여 반환합니다.
@@ -59,6 +43,7 @@ namespace WalkieDohi
             friend.Name = MainData.Friends.FirstOrDefault(f => f.Ip == friend.Ip)?.Name ?? friend.Name;
             return friend;
         }
+
         /// <summary>
         /// IP 주소에 해당하는 친구의 이름으로 수정하여 반환합니다.
         /// 친구 목록에서 IP가 일치하는 첫 번째 친구의 이름을 찾습니다.
@@ -80,11 +65,6 @@ namespace WalkieDohi
                 ? new ObservableCollection<Friend>(MainData.Friends.OrderBy(f => IPAddress.Parse(f.Ip), new IPAddressComparer()))
                 : new ObservableCollection<Friend>(MainData.Friends.OrderBy(f => f.Name));
         }
-
-
-
-
-
 
     }
 }

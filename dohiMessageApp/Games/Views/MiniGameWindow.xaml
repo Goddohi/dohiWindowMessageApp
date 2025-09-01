@@ -1,7 +1,7 @@
-﻿<Window x:Class="WalkieDohi.UI.MiniGameWindow"
+﻿<Window x:Class="WalkieDohi.Games.Views.MiniGameWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:games="clr-namespace:WalkieDohi.UC.Games"
+        xmlns:games="clr-namespace:WalkieDohi.Games.UserControls"
         Title="미니게임 센터"
         Height="550" Width="600"
         WindowStartupLocation="CenterOwner">

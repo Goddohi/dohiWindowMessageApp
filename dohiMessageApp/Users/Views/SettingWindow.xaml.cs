@@ -15,11 +15,12 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using WalkieDohi.Core.app;
 using WalkieDohi.Entity;
+using WalkieDohi.Users.Entity;
 using WalkieDohi.Util;
 using WalkieDohi.Util.IO;
 using WalkieDohi.Util.Provider;
 
-namespace WalkieDohi.UI
+namespace WalkieDohi.Users.Views
 {
     /// <summary>
     /// SettingWindow.xaml에 대한 상호 작용 논리
@@ -47,7 +48,7 @@ namespace WalkieDohi.UI
         {
             if (PortTextBox.Text.Equals("GAME"))
             {
-                var gameWindow = new MiniGameWindow();
+                var gameWindow = new Games.Views.MiniGameWindow();
                 gameWindow.Owner = this;
                 gameWindow.ShowDialog();
                 return;
@@ -111,7 +112,7 @@ namespace WalkieDohi.UI
             clickCount++;
             if (clickCount >= 5)
             {
-                var gameWindow = new MiniGameWindow();
+                var gameWindow = new Games.Views.MiniGameWindow();
                 gameWindow.Owner = this;
                 gameWindow.ShowDialog();
                 clickCount = 0;

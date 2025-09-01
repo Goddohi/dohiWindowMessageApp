@@ -189,7 +189,7 @@ namespace WalkieDohi
 
         private void OpenSettings_Click(object sender, RoutedEventArgs e)
         {
-            var settingWindow = new UI.SettingWindow { Owner = this };
+            var settingWindow = new Users.Views.SettingWindow { Owner = this };
             settingWindow.ShowDialog();
             _startTabControl?.SetFriends(MainData.GetsortedFriends());
         }

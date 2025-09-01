@@ -2,7 +2,7 @@
 using System.Windows;
 using System.Windows.Controls;
 
-namespace WalkieDohi.UC.Games
+namespace WalkieDohi.Games.UserControls
 {
     public partial class NumberGuessGameControl : UserControl
     {
