@@ -142,7 +142,6 @@
     <Compile Include="UC\SingleChatTabControl.xaml.cs">
       <DependentUpon>SingleChatTabControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Groups\ViewModels\GroupManagerViewModel.cs" />
     <Compile Include="Util\ClipBoard\ClipboardExtension.cs" />
     <Compile Include="Util\Converter\BoolToVisibilityConverter.cs" />
     <Compile Include="Util\Converter\StringNullOrEmptyToVisibilityConverter.cs" />
