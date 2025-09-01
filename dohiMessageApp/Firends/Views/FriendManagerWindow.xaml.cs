@@ -1,4 +1,4 @@
-﻿using WalkieDohi.Entity;
+﻿using WalkieDohi.ChattingRooms.Entity;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;

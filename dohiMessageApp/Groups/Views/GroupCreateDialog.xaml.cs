@@ -4,7 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using WalkieDohi.Entity;
+using WalkieDohi.ChattingRooms.Entity;
 using WalkieDohi.Friends.Entity;
 using WalkieDohi.Groups.Entity;
 using WalkieDohi.Util;

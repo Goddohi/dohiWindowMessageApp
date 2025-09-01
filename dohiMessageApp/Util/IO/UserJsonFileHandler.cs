@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using WalkieDohi.Entity;
+using WalkieDohi.ChattingRooms.Entity;
 using WalkieDohi.Users.Entity;
 using WalkieDohi.Util.Provider;
 

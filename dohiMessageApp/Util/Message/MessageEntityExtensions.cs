@@ -1,4 +1,5 @@
-﻿using WalkieDohi.Entity;
+﻿using WalkieDohi.ChattingRooms.Entity;
+using WalkieDohi.Packet.Messages.Entity;
 
 namespace WalkieDohi.Util
 {

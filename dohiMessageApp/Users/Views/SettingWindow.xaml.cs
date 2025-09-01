@@ -14,7 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using WalkieDohi.Core.app;
-using WalkieDohi.Entity;
+using WalkieDohi.ChattingRooms.Entity;
 using WalkieDohi.Users.Entity;
 using WalkieDohi.Util;
 using WalkieDohi.Util.IO;

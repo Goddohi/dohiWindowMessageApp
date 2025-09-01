@@ -8,11 +8,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Interop;
-using WalkieDohi.Entity;
+using WalkieDohi.ChattingRooms.Entity;
 using WalkieDohi.Groups.Entity;
+using WalkieDohi.Packet.Messages.Entity;
 using WalkieDohi.Util.IO;
 
-namespace WalkieDohi.Data
+namespace WalkieDohi.ChattingRooms.Data
 {
     public static class ChatListManager
     {

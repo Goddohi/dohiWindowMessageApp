@@ -4,10 +4,11 @@ using System.IO;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
 using WalkieDohi.Groups.Entity;
+using WalkieDohi.Packet.Messages.Entity;
 using WalkieDohi.UI;
 using WalkieDohi.Util;
 
-namespace WalkieDohi.Entity
+namespace WalkieDohi.ChattingRooms.Entity
 {
     public abstract class ChatMessage
     {

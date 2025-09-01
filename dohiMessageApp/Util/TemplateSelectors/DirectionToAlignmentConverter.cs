@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
-using WalkieDohi.Entity;
+using WalkieDohi.Packet.Messages.Entity;
 
 namespace WalkieDohi.Util.TemplateSelectors
 {

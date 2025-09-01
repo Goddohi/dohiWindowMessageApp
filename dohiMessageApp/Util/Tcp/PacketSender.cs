@@ -6,7 +6,8 @@ using System.Net.Sockets;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using WalkieDohi.Entity;
+using WalkieDohi.ChattingRooms.Entity;
+using WalkieDohi.Packet.Entity;
 
 namespace WalkieDohi.Util.Tcp
 {

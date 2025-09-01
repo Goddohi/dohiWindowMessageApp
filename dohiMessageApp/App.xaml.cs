@@ -5,7 +5,6 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows;
 using WalkieDohi.Core.app;
-using WalkieDohi.Data;
 using WalkieDohi.Util.Tcp;
 
 namespace WalkieDohi

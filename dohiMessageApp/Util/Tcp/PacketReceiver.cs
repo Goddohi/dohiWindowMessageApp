@@ -5,7 +5,9 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using WalkieDohi.Entity;
+using WalkieDohi.ChattingRooms.Entity;
+using WalkieDohi.Packet.Entity;
+using WalkieDohi.Packet.Messages.Entity;
 
 namespace WalkieDohi.Util.Tcp
 {

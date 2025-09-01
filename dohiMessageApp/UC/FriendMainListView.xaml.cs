@@ -5,7 +5,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using WalkieDohi.Entity;
+using WalkieDohi.ChattingRooms.Entity;
 using WalkieDohi.Friends.Entity;
 using WalkieDohi.Friends.Views;
 using WalkieDohi.Groups.Entity;

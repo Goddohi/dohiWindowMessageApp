@@ -11,7 +11,7 @@ using WalkieDohi.Core;
 using WalkieDohi.Util;
 using WalkieDohi.Groups.Entity;
 
-namespace WalkieDohi.Entity
+namespace WalkieDohi.Packet.Messages.Entity
 {
     /// <summary>
     /// 메세지 수신 송신용 TCP로 전송되는 양식으로 가능한 필드 변경자체(추가는 해도 되나 기존 내용은 삭제자제)

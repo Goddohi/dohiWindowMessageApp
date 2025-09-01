@@ -1,4 +1,4 @@
-﻿using WalkieDohi.Entity;
+﻿using WalkieDohi.ChattingRooms.Entity;
 using System;
 using System.Collections.Generic;
 using System.Linq;

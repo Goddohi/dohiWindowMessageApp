@@ -13,8 +13,8 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Threading;
-using WalkieDohi.Data;
-using WalkieDohi.Entity;
+using WalkieDohi.ChattingRooms.Data;
+using WalkieDohi.ChattingRooms.Entity;
 using WalkieDohi.Groups.Entity;
 
 namespace WalkieDohi.UI

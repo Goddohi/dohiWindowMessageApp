@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media.Imaging;
-using WalkieDohi.Entity;
+using WalkieDohi.ChattingRooms.Entity;
 
 namespace WalkieDohi.Util
 {

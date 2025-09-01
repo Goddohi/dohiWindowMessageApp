@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WalkieDohi.Entity;
+using WalkieDohi.ChattingRooms.Entity;
+using WalkieDohi.Packet.Messages.Entity;
 
 namespace WalkieDohi.Core
 {

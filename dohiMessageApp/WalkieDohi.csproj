@@ -85,9 +85,9 @@
     <Compile Include="Core\DohiViewModelBase.cs" />
     <Compile Include="Core\ExtendFile.cs" />
     <Compile Include="Core\TabBasicinterface.cs" />
-    <Compile Include="Data\ChatListManager.cs" />
-    <Compile Include="Entity\Message\ChatMessage.cs" />
-    <Compile Include="Entity\PacketEntity.cs" />
+    <Compile Include="ChattingRooms\Data\ChatListManager.cs" />
+    <Compile Include="ChattingRooms\Entity\ChatMessage.cs" />
+    <Compile Include="Packets\Entity\PacketEntity.cs" />
     <Compile Include="UC\ChatRoomListTabControl.xaml.cs">
       <DependentUpon>ChatRoomListTabControl.xaml</DependentUpon>
     </Compile>
@@ -106,7 +106,7 @@
     <Compile Include="Games\UserControls\SnakeGameControl.xaml.cs">
       <DependentUpon>SnakeGameControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UC\ViewModel\ChatViewModel.cs" />
+    <Compile Include="ChattingRooms\ViewModels\ChatViewModel.cs" />
     <Compile Include="Groups\Views\GroupCreateDialog.xaml.cs">
       <DependentUpon>GroupCreateDialog.xaml</DependentUpon>
     </Compile>
@@ -114,7 +114,7 @@
     <Compile Include="Groups\Entity\GroupEntity.cs" />
     <Compile Include="Users\Entity\User.cs" />
     <Compile Include="MainData.cs" />
-    <Compile Include="UC\GroupChatTabControl.xaml.cs">
+    <Compile Include="ChattingRooms\Views\GroupChatTabControl.xaml.cs">
       <DependentUpon>GroupChatTabControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="UC\FriendMainListView.xaml.cs">
@@ -139,7 +139,7 @@
       <DependentUpon>ToastWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Firends\ViewModels\FriendManagerWindowViewModel.cs" />
-    <Compile Include="UC\SingleChatTabControl.xaml.cs">
+    <Compile Include="ChattingRooms\Views\SingleChatTabControl.xaml.cs">
       <DependentUpon>SingleChatTabControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Util\ClipBoard\ClipboardExtension.cs" />
@@ -171,12 +171,12 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Entity\Message\MessageEntity.cs" />
+    <Compile Include="Packets\Messages\Entity\MessageEntity.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="Styles\BasicWalkieDohiStyle.xaml">
+    <Page Include="AppResources\Styles\BasicWalkieDohiStyle.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -204,7 +204,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UC\GroupChatTabControl.xaml">
+    <Page Include="ChattingRooms\Views\GroupChatTabControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -240,7 +240,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UC\SingleChatTabControl.xaml">
+    <Page Include="ChattingRooms\Views\SingleChatTabControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -1,7 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Windows.Media.Imaging;
-using WalkieDohi.Entity;
+using WalkieDohi.ChattingRooms.Entity;
+using WalkieDohi.Packet.Messages.Entity;
 using WalkieDohi.Util;
 
 namespace WalkieDohi.Util

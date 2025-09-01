@@ -7,7 +7,7 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="Styles/BasicWalkieDohiStyle.xaml"/>
+                <ResourceDictionary Source="AppResources/Styles/BasicWalkieDohiStyle.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             
             <util:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
