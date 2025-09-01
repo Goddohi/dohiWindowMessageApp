@@ -13,6 +13,7 @@ using WalkieDohi.Util.IO;
 using System.Windows.Input;
 using WalkieDohi.Util.Tcp;
 using WalkieDohi.UI;
+using WalkieDohi.Groups.Views;
 
 namespace WalkieDohi.UC
 {
@@ -335,7 +336,7 @@ namespace WalkieDohi.UC
 
         private void ManageGroups_Click(object sender, RoutedEventArgs e)
         {
-            var dlg = new WalkieDohi.UI.GroupManger.GroupCreateDialog()
+            var dlg = new GroupCreateDialog()
             {
                 Owner = Window.GetWindow(this)
             };

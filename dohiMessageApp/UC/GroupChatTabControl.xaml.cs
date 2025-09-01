@@ -17,6 +17,8 @@ using System.Windows.Shapes;
 using System.Windows.Threading;
 using WalkieDohi.Core;
 using WalkieDohi.Entity;
+using WalkieDohi.Friends.Entity;
+using WalkieDohi.Groups.Entity;
 using WalkieDohi.UC.ViewModel;
 using WalkieDohi.UI;
 using WalkieDohi.Util;

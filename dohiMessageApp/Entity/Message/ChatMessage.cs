@@ -3,6 +3,7 @@ using System;
 using System.IO;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
+using WalkieDohi.Groups.Entity;
 using WalkieDohi.UI;
 using WalkieDohi.Util;
 

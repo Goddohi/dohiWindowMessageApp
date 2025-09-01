@@ -5,9 +5,11 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using WalkieDohi.Entity;
+using WalkieDohi.Friends.Entity;
+using WalkieDohi.Groups.Entity;
 using WalkieDohi.Util;
 
-namespace WalkieDohi.UI.GroupManger
+namespace WalkieDohi.Groups.Views
 {
     public partial class GroupCreateDialog : Window
     {

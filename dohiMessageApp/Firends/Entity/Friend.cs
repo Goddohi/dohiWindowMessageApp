@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
-namespace WalkieDohi.Entity
+namespace WalkieDohi.Friends.Entity
 
 {
     public class Friend : DohiEntityBase

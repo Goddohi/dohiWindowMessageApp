@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Interop;
 using WalkieDohi.Entity;
+using WalkieDohi.Groups.Entity;
 using WalkieDohi.Util.IO;
 
 namespace WalkieDohi.Data

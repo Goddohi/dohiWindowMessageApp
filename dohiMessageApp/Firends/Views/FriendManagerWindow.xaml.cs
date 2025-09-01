@@ -16,12 +16,13 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using WalkieDohi;
-using WalkieDohi.UI.ViewModel;
 using System.Collections.ObjectModel;
 using WalkieDohi.Util.IO;
 using WalkieDohi.Util.Provider;
+using WalkieDohi.Friends.Entity;
+using WalkieDohi.Friends.ViewModels;
 
-namespace WalkieDohi.UI
+namespace WalkieDohi.Friends.Views
 {
     /// <summary>
     /// FriendManagerWindow.xaml에 대한 상호 작용 논리

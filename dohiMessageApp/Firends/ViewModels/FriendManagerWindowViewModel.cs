@@ -7,8 +7,9 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WalkieDohi.Friends.Entity;
 
-namespace WalkieDohi.UI.ViewModel
+namespace WalkieDohi.Friends.ViewModels
 {
     public class FriendManagerWindowViewModel : DohiViewModelBase
     {

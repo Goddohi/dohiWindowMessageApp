@@ -8,6 +8,7 @@ using System.Collections.ObjectModel;
 using System.Net;
 using WalkieDohi.Util;
 using WalkieDohi.Users.Entity;
+using WalkieDohi.Friends.Entity;
 
 namespace WalkieDohi
 {

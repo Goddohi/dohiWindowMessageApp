@@ -15,6 +15,8 @@ using WalkieDohi.Core.app;
 using MessageBox = System.Windows.MessageBox;
 using Application = System.Windows.Application;
 using System.Windows.Input;
+using WalkieDohi.Groups.Entity;
+using WalkieDohi.Friends.Views;
 
 namespace WalkieDohi
 {
@@ -182,7 +184,7 @@ namespace WalkieDohi
 
         private void ManageFriends_Click(object sender, RoutedEventArgs e)
         {
-            var popup = new UI.FriendManagerWindow { Owner = this };
+            var popup = new FriendManagerWindow { Owner = this };
             popup.ShowDialog();
             _startTabControl?.SetFriends(MainData.GetsortedFriends());
         }

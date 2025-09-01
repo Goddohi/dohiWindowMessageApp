@@ -9,6 +9,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using WalkieDohi.Core;
 using WalkieDohi.Util;
+using WalkieDohi.Groups.Entity;
 
 namespace WalkieDohi.Entity
 {

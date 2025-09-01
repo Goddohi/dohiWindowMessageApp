@@ -8,7 +8,7 @@ using System.Windows.Input;
 using WalkieDohi.Core;
 using WalkieDohi.Util;
 
-namespace WalkieDohi.Entity
+namespace WalkieDohi.Groups.Entity
 {
     public class GroupEntity :DohiEntityBase
     {
@@ -47,5 +47,10 @@ namespace WalkieDohi.Entity
                 return string.Join("\n", names);
             }
         }
+    }
+    public class GroupMemberDisplay
+    {
+        public string Ip { get; set; }
+        public string Name { get; set; }  // FriendList에서 조회해서 붙임
     }
 }

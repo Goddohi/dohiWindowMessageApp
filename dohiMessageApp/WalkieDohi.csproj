@@ -107,12 +107,11 @@
       <DependentUpon>SnakeGameControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="UC\ViewModel\ChatViewModel.cs" />
-    <Compile Include="UI\GroupManger\GroupCreateDialog.xaml.cs">
+    <Compile Include="Groups\Views\GroupCreateDialog.xaml.cs">
       <DependentUpon>GroupCreateDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\GroupManger\GroupMemberDisplay.cs" />
-    <Compile Include="Entity\MessageTarget\Friend.cs" />
-    <Compile Include="Entity\MessageTarget\GroupEntity.cs" />
+    <Compile Include="Firends\Entity\Friend.cs" />
+    <Compile Include="Groups\Entity\GroupEntity.cs" />
     <Compile Include="Users\Entity\User.cs" />
     <Compile Include="MainData.cs" />
     <Compile Include="UC\GroupChatTabControl.xaml.cs">
@@ -121,7 +120,7 @@
     <Compile Include="UC\FriendMainListView.xaml.cs">
       <DependentUpon>FriendMainListView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\FriendManger\FriendManagerWindow.xaml.cs">
+    <Compile Include="Firends\Views\FriendManagerWindow.xaml.cs">
       <DependentUpon>FriendManagerWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\InputDialog.xaml.cs">
@@ -139,11 +138,11 @@
     <Compile Include="UI\ToastWindow.xaml.cs">
       <DependentUpon>ToastWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\ViewModel\FriendManagerWindowViewModel.cs" />
+    <Compile Include="Firends\ViewModels\FriendManagerWindowViewModel.cs" />
     <Compile Include="UC\SingleChatTabControl.xaml.cs">
       <DependentUpon>SingleChatTabControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\ViewModel\GroupManagerViewModel.cs" />
+    <Compile Include="Groups\ViewModels\GroupManagerViewModel.cs" />
     <Compile Include="Util\ClipBoard\ClipboardExtension.cs" />
     <Compile Include="Util\Converter\BoolToVisibilityConverter.cs" />
     <Compile Include="Util\Converter\StringNullOrEmptyToVisibilityConverter.cs" />
@@ -214,11 +213,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\GroupManger\GroupCreateDialog.xaml">
+    <Page Include="Groups\Views\GroupCreateDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\FriendManger\FriendManagerWindow.xaml">
+    <Page Include="Firends\Views\FriendManagerWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -15,6 +15,7 @@ using System.Windows.Shapes;
 using System.Windows.Threading;
 using WalkieDohi.Data;
 using WalkieDohi.Entity;
+using WalkieDohi.Groups.Entity;
 
 namespace WalkieDohi.UI
 {

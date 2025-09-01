@@ -7,8 +7,10 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using WalkieDohi.Entity;
+using WalkieDohi.Friends.Entity;
+using WalkieDohi.Groups.Entity;
 
-namespace WalkieDohi.UI.ViewModel
+namespace WalkieDohi.Groups.ViewModels
 {
     public class GroupManagerViewModel : INotifyPropertyChanged
     {
