@@ -50,9 +50,18 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Assets\WalkieDohi.ico</ApplicationIcon>
+    <ApplicationIcon>
+    </ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.Web.WebView2.Core, Version=1.0.2210.55, Culture=neutral, PublicKeyToken=2a8ab48044d2601e, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>AppResources\Plugins\Microsoft.Web.WebView2.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Web.WebView2.Wpf, Version=1.0.2210.55, Culture=neutral, PublicKeyToken=2a8ab48044d2601e, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>AppResources\Plugins\Microsoft.Web.WebView2.Wpf.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -78,6 +87,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="ChattingRooms\Views\PDFPreviewWindow.xaml.cs">
+      <DependentUpon>PDFPreviewWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Core\app\AutoStartManager.cs" />
     <Compile Include="Core\app\NativeMethods.cs" />
     <Compile Include="Core\app\TrayIconManager.cs" />
@@ -161,6 +173,10 @@
     <Compile Include="Util\Tcp\PacketReceiver.cs" />
     <Compile Include="Util\Tcp\PacketSender.cs" />
     <Compile Include="Util\TemplateSelectors\DirectionToAlignmentConverter.cs" />
+    <Page Include="ChattingRooms\Views\PDFPreviewWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -276,12 +292,16 @@
     <None Include="개발계획도.md" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Assets\WalkieDohi.ico">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Resource Include="Assets\WalkieDohi.png">
+    <Resource Include="AppResources\Assets\WalkieDohi.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
+    <Resource Include="AppResources\Assets\WalkieDohi.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Content Include="AppResources\Libs\Newtonsoft.Json.dll" />
+    <Content Include="AppResources\Plugins\Microsoft.Web.WebView2.Core.dll" />
+    <Content Include="AppResources\Plugins\Microsoft.Web.WebView2.Wpf.dll" />
+    <Content Include="AppResources\NativeDlls\WebView2Loader.dll" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.7.2">

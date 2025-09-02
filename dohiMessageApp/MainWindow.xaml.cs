@@ -79,10 +79,7 @@ namespace WalkieDohi
 
             try
             {
-                string iconPath = "Assets/WalkieDohi.ico";
-
-
-
+                string iconPath = "AppResources/Assets/WalkieDohi.ico";
         
                 if (File.Exists(iconPath))
                     trayIcon.Icon = new Icon(iconPath);

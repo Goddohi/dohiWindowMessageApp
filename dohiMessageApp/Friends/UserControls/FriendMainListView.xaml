@@ -1,7 +1,6 @@
 ﻿<UserControl x:Class="WalkieDohi.Friends.UserControls.FriendMainListView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:WalkieDohi.UC"
              xmlns:util="clr-namespace:WalkieDohi.Util"
              Height="Auto" Width="Auto">
     <UserControl.Resources>

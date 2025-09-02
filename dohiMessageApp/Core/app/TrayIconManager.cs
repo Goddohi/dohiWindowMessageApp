@@ -92,7 +92,7 @@ namespace WalkieDohi.Core.app
             {
                 // 2) exe와 같은 폴더의 아이콘 파일을 절대경로로 로드 (상대경로 금지)
                 var exeDir = Path.GetDirectoryName(Application.ExecutablePath);
-                var icoPath = Path.Combine(exeDir ?? "", "Assets", "WalkieDohi.ico");
+                var icoPath = Path.Combine(exeDir ?? "", "AppResources", "Assets", "WalkieDohi.ico");
                 if (File.Exists(icoPath)) return new Icon(icoPath);
             }
             catch { /* fallback */ }
@@ -113,7 +113,7 @@ namespace WalkieDohi.Core.app
             // 네임스페이스/폴더에 따라 달라집니다. 일치하는 .ico 리소스 찾아보기
             foreach (var name in asm.GetManifestResourceNames())
             {
-                // 예: "WalkieDohi.Assets.WalkieDohi.ico"
+                // 예: "WalkieDohi.AppResources.Assets.WalkieDohi.ico"
                 if (name.EndsWith(".ico", StringComparison.OrdinalIgnoreCase) &&
                     name.IndexOf("WalkieDohi", StringComparison.OrdinalIgnoreCase) >= 0)
                     return name;

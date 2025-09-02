@@ -151,8 +151,19 @@ namespace WalkieDohi.ChattingRooms.UserControls
                     }
                     if (selected is FileMessage)
                     {
-                        System.Diagnostics.Process.Start("explorer.exe", $"/select,\"{selected.ContentPath}\"");
-                        return;
+                        string ext = Path.GetExtension(selected.ContentPath).ToLower();
+
+                        if (ext == ".pdf")
+                        {
+                            var preview = new PDFPreviewWindow(selected.ContentPath);
+                            preview.ShowDialog();
+                            return;
+                        }
+                        else
+                        {
+                            System.Diagnostics.Process.Start("explorer.exe", $"/select,\"{selected.ContentPath}\"");
+                            return;
+                        }
                     }
                 }
                 return;
