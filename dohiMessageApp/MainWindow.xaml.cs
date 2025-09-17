@@ -67,7 +67,7 @@ namespace WalkieDohi
             MainData.currentUser = new Util.IO.UserJsonFileHandler().LoadUser();
             NicknameBox.Text = MainData.currentUser.Nickname;
         }
-
+        /*  App.xaml.cs -> TrayIconManager.cs 호출 방식으로  이관
         private void InitTrayIcon()
         {
             trayIcon = new NotifyIcon
@@ -94,7 +94,7 @@ namespace WalkieDohi
             trayIcon.ContextMenuStrip.Items.Add("열기", null, (s, e) => ShowMainWindow());
             trayIcon.ContextMenuStrip.Items.Add("종료", null, (s, e) => ExitApplication());
         }
-
+        */
         private void StartReceiver()
         {
             MainReceiver = new PacketReceiver(MainData.GetPort());
