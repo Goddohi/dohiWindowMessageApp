@@ -15,6 +15,8 @@ using Microsoft.Web.WebView2.Core;
 using Microsoft.Win32;
 using System.IO;
 using Path = System.IO.Path;
+using WalkieDohi.Core;
+using System.Threading;
 
 namespace WalkieDohi.ChattingRooms.Views
 {
@@ -26,16 +28,38 @@ namespace WalkieDohi.ChattingRooms.Views
         public PDFPreviewWindow()
         {
             InitializeComponent();
+
+            this.Title = "PDF 뷰어";
             onLoadedPDF();
+
+            if (_fail)
+            {
+                throw new InvalidOperationException("PDF 뷰어 초기화 실패");
+            }
         }
         public PDFPreviewWindow(string filePath)
         {
             InitializeComponent();
+            this.Title = filePath + " PDF 뷰어";
             StartupFilePath = filePath;
-            onLoadedPDF();
+            
+             onLoadedPDF();
+
+            if (_fail)
+            {
+                throw new InvalidOperationException("PDF 뷰어 초기화 실패");
+            }
+            
         }
         private string StartupFilePath { get; set; }
 
+
+        /// ---------------------------------------------------------------------
+        /// <summary>
+        /// desc         : 에러 
+        /// </summary>
+        /// ---------------------------------------------------------------------
+        private bool _fail = false;
 
         /// ---------------------------------------------------------------------
         /// <summary>
@@ -43,7 +67,6 @@ namespace WalkieDohi.ChattingRooms.Views
         /// </summary>
         /// ---------------------------------------------------------------------
         private double zoom = 1.0;
-
 
         /// ---------------------------------------------------------------------
         /// <summary>
@@ -66,6 +89,7 @@ namespace WalkieDohi.ChattingRooms.Views
         /// ---------------------------------------------------------------------
         private async void onLoadedPDF()
         {
+            _fail = false;
             /// ---------------------------------------------------------------------
             /// 비트 체크
             /// ---------------------------------------------------------------------
@@ -106,7 +130,7 @@ namespace WalkieDohi.ChattingRooms.Views
             }
             catch (System.DllNotFoundException dllnotfoundexception)
             {
-                Status("dll 문제 발생", dllnotfoundexception.Message);
+                ExceptionAndOpenFileExplorer("dll 문제 발생", dllnotfoundexception.Message);
 
                 return;
             }
@@ -150,7 +174,7 @@ namespace WalkieDohi.ChattingRooms.Views
             }
             catch (Exception excep)
             {
-                Status("WebView2 어셈블리 확인 실패", excep.Message);
+                ExceptionAndOpenFileExplorer("WebView2 어셈블리 확인 실패", excep.Message);
             }
 
         }
@@ -169,17 +193,17 @@ namespace WalkieDohi.ChattingRooms.Views
                 var loader = Path.Combine(dir ?? "", "Webview2Loader.dll"); // 파일 확인
 
                 if (File.Exists(loader)) Status("Loader dll 발견", loader);
-                else Status("Loader dll 없음(빌드 산출물에 복사 필요)", loader);
+                else ExceptionAndOpenFileExplorer("Loader dll 없음(빌드 산출물에 복사 필요)", loader);
             }
             catch (Exception excep)
             {
-                Status("Loader 확인 실패", excep.Message);
+                ExceptionAndOpenFileExplorer("Loader 확인 실패", excep.Message);
 
                 /* 
                     * 메인 DLL 참조 확인
                     * D:\HISSolutions\HIS\Deploy\Client\Core\Microsoft.Web.WebView2.Core.dll
                     * D:\HISSolutions\HIS\Deploy\Client\Core\Microsoft.Web.WebView2.Wpf.dll
-                    */
+                */
             }
 
 
@@ -204,7 +228,7 @@ namespace WalkieDohi.ChattingRooms.Views
             {
                 if (excep.Message.Contains("WebView2Loader.dll"))
                 {
-                    Status("API 버전 확인 실패", "빌드했을 때, 실행 파일(.exe)이 있는 위치에 WebView2Loader.dll 파일이 있는지 확인해주세요.\n" + excep.Message);
+                    ExceptionAndOpenFileExplorer("API 버전 확인 실패_WebView2Loader.dll문제", "빌드했을 때, 실행 파일(.exe)이 있는 위치에 WebView2Loader.dll 파일이 있는지 확인해주세요.\n" + excep.Message);
 
                     /*
                         * DLL 위치 확인
@@ -212,7 +236,7 @@ namespace WalkieDohi.ChattingRooms.Views
                         * D:\HISSolutions\HIS\Deploy\Client\WebView2Loader.dll 에도 있어야 함.
                     */
                 }
-                else Status("API 버전 확인 실패", excep.Message);
+                else ExceptionAndOpenFileExplorer("API 버전 확인 실패", excep.Message);
             }
         }
 
@@ -234,7 +258,7 @@ namespace WalkieDohi.ChattingRooms.Views
             }
             catch (Exception excep)
             {
-                Status("레지스트리 확인(HKLM Clients) 실패", excep.Message);
+                ExceptionAndOpenFileExplorer("레지스트리 확인(HKLM Clients) 실패", excep.Message);
             }
 
 
@@ -247,7 +271,7 @@ namespace WalkieDohi.ChattingRooms.Views
             }
             catch (Exception excep)
             {
-                Status("레지스트리 확인(HKCU Clients) 실패", excep.Message);
+                ExceptionAndOpenFileExplorer("레지스트리 확인(HKCU Clients) 실패", excep.Message);
             }
         }
 
@@ -362,7 +386,6 @@ namespace WalkieDohi.ChattingRooms.Views
 
             catch (Exception excep)
             {
-
                 Status("pdf 파일 불러오는 도중 오류", excep.Message);
             }
 
@@ -397,6 +420,56 @@ namespace WalkieDohi.ChattingRooms.Views
         private void Status(string sujectText, string messageText)
         {
             // 디버그 용 
+        }
+
+        /// ---------------------------------------------------------------------
+        /// <summary>
+        /// name         : ExceptionAndCloseWindow
+        /// desc         : 사용자에게 해당 창을 PDF뷰어대신 파일탐색기로 전환하여 사용자 불편함을 제공하지 않기 위함
+        /// update date  : 최종 수정 일자, 수정자, 수정개요 
+        /// </summary>
+        /// ---------------------------------------------------------------------
+        private void ExceptionAndOpenFileExplorer(string sujectText, string messageText)
+        {
+            // 디버그 용 
+            Status(sujectText, messageText);
+            if(_fail){
+                return;
+            }
+            OpenFileExplorer();
+            _fail = true;
+        }
+
+        /// ---------------------------------------------------------------------
+        /// <summary>
+        /// name         : OpenFileExplorer
+        /// desc         : 해당 파일의 경로에 파일 탐색기를 열어줍니다.
+        /// update date  : 최종 수정 일자, 수정자, 수정개요 
+        /// </summary>
+        /// ---------------------------------------------------------------------
+        private void OpenFileExplorer()
+        {
+            // 디버그 용 
+            if (ExtendFile.UnExists(StartupFilePath))
+            {
+                MessageBox.Show("파일이 존재하지 않습니다.", "오류", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+            System.Diagnostics.Process.Start("explorer.exe", $"/select,\"{StartupFilePath}\"");
+            return;
+        }
+
+        private CancellationTokenSource _cts = new CancellationTokenSource();
+        public void ForceCleanup()
+        {
+            // 여기서 모든 비관리/비동기 리소스 정리
+            try { _cts.Cancel(); } catch { }
+            Web?.Dispose();
+        }
+        protected override void OnClosed(EventArgs e)
+        {
+            base.OnClosed(e);
+            ForceCleanup();
         }
     }
 }

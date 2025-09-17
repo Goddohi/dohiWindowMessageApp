@@ -155,9 +155,20 @@ namespace WalkieDohi.ChattingRooms.UserControls
 
                         if (ext == ".pdf")
                         {
-                            var preview = new PDFPreviewWindow(selected.ContentPath);
-                            preview.ShowDialog();
-                            return;
+                            PDFPreviewWindow preview = null;
+                            try
+                            {
+                                preview = new PDFPreviewWindow(selected.ContentPath);  // 초기화 하기전에 close를 하면 Show에서 에러나므로 금지 
+                                //preview.ShowDialog(); //모달 창 -> 부모를 블락 닫을땐 DialogResult를 사용
+                                preview.Show(); //모델리스 창  -> 부모 사용가능 닫을때  this.Close(); 해도됌
+                                return;
+                            }
+                            catch (Exception) //예외시 자동으로 파일 탐색기 호출함
+                            {
+                                preview?.ForceCleanup();   // 직접 구현한 외부 DLL close 메모리 관리
+                                preview = null;
+                                return;
+                            }
                         }
                         else
                         {

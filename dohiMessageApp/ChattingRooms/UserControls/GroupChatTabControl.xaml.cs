@@ -164,7 +164,9 @@ namespace WalkieDohi.ChattingRooms.UserControls
                     if (selected is ImageMessage)
                     {
                         var preview = new ImagePreviewWindow(selected.ContentPath);
-                        preview.ShowDialog();
+                        // preview.Topmost = true; // 이건 그냥 필기용으로 주석   항상위로 띄워주는데 외부앱도 최상단으로.
+                        //preview.ShowDialog(); //ShowDialog는 이전 UI를 사용할 수 없도록 제한을 합니다.
+                        preview.Show();
                         return;
                     }
                     if (selected is FileMessage)
@@ -173,9 +175,20 @@ namespace WalkieDohi.ChattingRooms.UserControls
 
                         if (ext == ".pdf")
                         {
-                            var preview = new PDFPreviewWindow(selected.ContentPath);
-                            preview.ShowDialog();
-                            return;
+                            PDFPreviewWindow preview = null;
+                            try
+                             {
+                                preview = new PDFPreviewWindow(selected.ContentPath);  // 초기화 하기전에 close를 
+                                //preview.ShowDialog(); //모달 창 -> 부모를 블락 닫을땐 DialogResult를 사용
+                                preview.Show(); //모델리스 창  -> 부모 사용가능 닫을때  this.Close(); 해도됌
+                                return;
+                            }
+                            catch (Exception)
+                            {
+                                preview?.ForceCleanup();   // 직접 구현한 외부 DLL close 메모리 관리
+                                preview = null;
+                                return;
+                            }
                         }
                         else
                         {
