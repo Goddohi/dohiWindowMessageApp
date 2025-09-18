@@ -44,7 +44,6 @@ namespace WalkieDohi.ChattingRooms.Views
             StartupFilePath = filePath;
             
              onLoadedPDF();
-
             if (_fail)
             {
                 throw new InvalidOperationException("PDF 뷰어 초기화 실패");
@@ -95,31 +94,54 @@ namespace WalkieDohi.ChattingRooms.Views
             /// ---------------------------------------------------------------------
             PrintAssemblybitness();
 
+            if (_fail)
+            {
+                return;
+            }
             /// ---------------------------------------------------------------------
             /// 프로세스 체크
             /// ---------------------------------------------------------------------
             PrintAssemblyInfo();
 
+            if (_fail)
+            {
+                return;
+            }
             /// ---------------------------------------------------------------------
             /// dll Loader 체크
             /// ---------------------------------------------------------------------
             CheckedWebView2LoaderPresence();
 
+            if (_fail)
+            {
+                return;
+            }
             /// ---------------------------------------------------------------------
             /// API 버전 체크
             /// ---------------------------------------------------------------------
             PrintRuntimVersionFromAPI();
 
+            if (_fail)
+            {
+                return;
+            }
             /// ---------------------------------------------------------------------
             /// 레지스트리 체크 
             /// ---------------------------------------------------------------------
             PrintRuntimePressenceFromRegistry();
 
+            if (_fail)
+            {
+                return;
+            }
             /// ---------------------------------------------------------------------
             /// 파일 시스템 확인
             /// ---------------------------------------------------------------------
             PrintRuntimePresenceFromFileSystem();
-
+            if (_fail)
+            {
+                return;
+            }
 
             try
             {
@@ -291,6 +313,10 @@ namespace WalkieDohi.ChattingRooms.Views
 
                 var usrPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Microsoft", "EdgeWebView", "Application");
                 Status("파일 시스템(FS User) 확인", (Directory.Exists(usrPath) ? "있음" : "없음"));
+                //둘다없을경우
+                if(!(Directory.Exists(usrPath) || Directory.Exists(sysPath) )){
+                    ExceptionAndOpenFileExplorer("파일시스템 둘다없음", "파일시스템 둘다없음");
+                }
             }
             catch (Exception excep)
             {
@@ -420,6 +446,8 @@ namespace WalkieDohi.ChattingRooms.Views
         private void Status(string sujectText, string messageText)
         {
             // 디버그 용 
+
+            //MessageBox.Show(sujectText+"----" +messageText, "오류", MessageBoxButton.OK, MessageBoxImage.Error);
         }
 
         /// ---------------------------------------------------------------------

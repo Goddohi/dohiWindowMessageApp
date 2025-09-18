@@ -350,7 +350,7 @@ namespace WalkieDohi.ChattingRooms.UserControls
             if (!File.Exists(filePath)) return;
 
             FileInfo fileInfo = new FileInfo(filePath);
-            const long MaxFileSize = 20 * 1024 * 1024;
+            const long MaxFileSize = 200 * 1024 * 1024;
 
 
             if (fileInfo.Length > MaxFileSize)

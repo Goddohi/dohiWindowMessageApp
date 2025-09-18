@@ -239,17 +239,21 @@ namespace WalkieDohi.ChattingRooms.UserControls
             }
             ScrollToBottomButton.Visibility = Visibility.Collapsed;
         }
-
+        /// <summary>
+        /// 드래그할때 일어나는 이벤트 관리
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
 
         private void ChatList_DragEnter(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
-                e.Effects = DragDropEffects.Copy;
+                e.Effects = DragDropEffects.Copy; //파일 드래그일때 copy발동후에 ChatList_Drop를 타게됨
             }
             else
             {
-                e.Effects = DragDropEffects.None;
+                e.Effects = DragDropEffects.None; //이벤트 없음처리
             }
         }
 
