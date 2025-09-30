@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WalkieDohi.Packet.Messages.Entity;
 
 namespace WalkieDohi.Packet.Entity
 {
@@ -26,6 +27,16 @@ namespace WalkieDohi.Packet.Entity
             return JsonConvert.DeserializeObject<T>(packet.Data);
         }
 
+        public void SendFailPacket()
+        {
+            if (this.Type == PacketType.Message)
+            {
+                MessageEntity message = ToObject<MessageEntity>(this);
+                message.ResultSetFail();
+                this.Data = JsonConvert.SerializeObject(message);
+            }
+
+        }
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
@@ -33,7 +44,7 @@ namespace WalkieDohi.Packet.Entity
     {
         Message
     }
-
+    
 
 
 

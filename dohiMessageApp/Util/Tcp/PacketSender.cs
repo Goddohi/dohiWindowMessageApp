@@ -35,6 +35,7 @@ namespace WalkieDohi.Util.Tcp
             catch (Exception ex)
             {
                 Console.WriteLine($"[패킷 전송 실패] {ex.Message}");
+                packet.SendFailPacket();
             }
         }
     }
