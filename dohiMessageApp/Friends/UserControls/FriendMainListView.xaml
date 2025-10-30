@@ -63,7 +63,10 @@
                      Margin="0,10,0,0"
                      DisplayMemberPath="DisplayName"
                      MouseDoubleClick="FriendListBox_MouseDoubleClick"
-                     VerticalAlignment="Stretch"/>
+                     MouseRightButtonUp="FriendListBox_MouseRightButtonUp"
+                     VerticalAlignment="Stretch"
+                     ScrollViewer.VerticalScrollBarVisibility="Auto"
+                     ScrollViewer.HorizontalScrollBarVisibility="Disabled"/>
         </Grid>
 
     </Grid>

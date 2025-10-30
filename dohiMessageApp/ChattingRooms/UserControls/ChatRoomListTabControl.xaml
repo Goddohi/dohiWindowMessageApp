@@ -6,15 +6,18 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="200"/>
             <!-- 왼쪽: 리스트 -->
-            <ColumnDefinition Width="10"/>
+            <ColumnDefinition Width="14"/>
             <ColumnDefinition Width="*"/>
             <!-- 오른쪽: 채팅창 -->
         </Grid.ColumnDefinitions>
 
         <Grid Grid.Column="0" Margin="3">
 
-            <StackPanel>
-
+            <Grid Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/> <!-- 상단 다른 UI -->
+                    <RowDefinition Height="*"/>    <!-- ListBox가 차지 -->
+                </Grid.RowDefinitions>
 
                 <Grid Margin="0,0,0,0">
                     <Grid.ColumnDefinitions>
@@ -25,7 +28,7 @@
                     </Grid.ColumnDefinitions>
 
                     <Button x:Name="ManageGroupsButton"
-                            Grid.Column="0"
+                            Grid.Row="0"
                             Content="그룹채팅방 생성"
                             Style="{StaticResource RoundedSettingButtonStyle}"
                             Click="ManageGroups_Click"
@@ -34,12 +37,16 @@
                 </Grid>
 
                 <ListBox x:Name="ChatRoomListBox"
-                 Grid.Column="0"
+                 
+                         Grid.Row="1"
                  Margin="5"
                  DisplayMemberPath="DisplayName"
                  SelectionChanged="ChatRoomListBox_SelectionChanged"
-                 Loaded="ChatRoomListBox_Loaded"/>
-            </StackPanel>
+                 Loaded="ChatRoomListBox_Loaded"
+                 VerticalAlignment="Stretch"
+                 ScrollViewer.VerticalScrollBarVisibility="Auto"
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"/>
+            </Grid>
 
 
         </Grid>

@@ -59,15 +59,51 @@ namespace WalkieDohi.Friends.UserControls
 
         private void FriendListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
+            var listBox = sender as ListBox;
+            var item = listBox?.SelectedItem as Friend;
+            if (item != null)
+            {
+                OpenChat();
+            }
+        }
+
+        private void OpenChat()
+        {
             if (FriendListBox.SelectedItem is Friend selected)
             {
+                if(selected == null) return;
+               
+
                 if (Window.GetWindow(this) is MainWindow mainWindow)
                 {
-                    mainWindow.ShowChatRoomFromStart(selected.Name,selected.Ip);
+                    mainWindow.ShowChatRoomFromStart(selected.Name, selected.Ip);
                 }
             }
         }
 
+        private void FriendListBox_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            var listBox = sender as ListBox;
+            var item = listBox?.SelectedItem as Friend;
 
+            if (item != null)
+            {
+                // 예시: 우클릭 시 메뉴 표시
+                ContextMenu menu = new ContextMenu();
+
+
+                var openItem = new MenuItem { Header = "채팅 열기" };
+                openItem.Click += (s, ev) => OpenChat();
+
+
+                //var removeItem = new MenuItem { Header = "친구 삭제" };
+               // removeItem.Click += (s, ev) => RemoveFriend(item);
+
+                menu.Items.Add(openItem);
+                //menu.Items.Add(removeItem);
+
+                menu.IsOpen = true;
+            }
+        }
     }
 }
