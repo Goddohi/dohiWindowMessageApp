@@ -1,0 +1,119 @@
+﻿<UserControl x:Class="WalkieDohi.ChattingRooms.UserControls.DoodlePadControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WalkieDohi.ChattingRooms.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800"
+                          x:Name="root">
+    <UserControl.Resources>
+        <!-- 아래에서 위로 올라오는 애니메이션 -->
+        <Storyboard x:Key="ShowStoryboard">
+            <DoubleAnimation Storyboard.TargetName="SlidePanel"
+                             Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)"
+                             From="300" To="0" Duration="0:0:0.15" />
+            <DoubleAnimation Storyboard.TargetName="Overlay"
+                             Storyboard.TargetProperty="Opacity"
+                             From="0" To="0.5" Duration="0:0:0.15" />
+        </Storyboard>
+
+        <!-- 위에서 아래로 내려가며 사라지는 애니메이션 -->
+        <Storyboard x:Key="HideStoryboard">
+            <DoubleAnimation Storyboard.TargetName="SlidePanel"
+                             Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)"
+                             From="0" To="300" Duration="0:0:0.15" />
+            <DoubleAnimation Storyboard.TargetName="Overlay"
+                             Storyboard.TargetProperty="Opacity"
+                             From="0.5" To="0" Duration="0:0:0.15" />
+        </Storyboard>
+    </UserControl.Resources>
+
+    <!-- 전체 영역 : 투명 + 어두운 오버레이 -->
+    <Grid>
+        <!-- 반투명 배경(채팅방 어둡게) -->
+        <Border x:Name="Overlay"
+                Background="#80000000"
+                Opacity="0" />
+
+        <!-- 아래에서 슬라이드 되는 패널 -->
+        <Grid x:Name="SlidePanel"
+              VerticalAlignment="Bottom"
+              Margin="0,0,0,0">
+            <Grid.RenderTransform>
+                <TranslateTransform Y="300"/>
+            </Grid.RenderTransform>
+
+            <Border CornerRadius="16"
+                    BorderBrush="#FF444444"
+                    BorderThickness="1"
+                    Background="White"
+                    Margin="16"
+                    Padding="16"
+                    Effect="{DynamicResource DropShadowEffect}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- 상단 헤더 -->
+                    <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="0,0,0,8">
+                        <TextBlock Text="낙서하기"
+                                   FontSize="16"
+                                   FontWeight="Bold"
+                                   VerticalAlignment="Center" />
+                        <TextBlock Text="  |  손가락이나 펜으로 자유롭게 그려주세요."
+                                   FontSize="12"
+                                   Foreground="Gray"
+                                   VerticalAlignment="Center"/>
+                        <Button Content="X"
+                                Width="22"
+                                Height="22"
+                                HorizontalAlignment="Right"
+                                Margin="8,0,0,0"
+                                Click="BtnClose_Click"/>
+                    </StackPanel>
+
+                    <!-- InkCanvas -->
+                    <Border Grid.Row="1"
+                            CornerRadius="8"
+                            BorderBrush="#FFD0D0D0"
+                            BorderThickness="1"
+                            Background="#FFFDFDFD"
+                            Padding="8">
+                        <InkCanvas x:Name="inkSig"
+                                   Background="White"
+                                   Height="120"
+                                   HorizontalAlignment="Stretch"
+                                   EditingMode="Ink"
+                                   UseLayoutRounding="True"
+                                   SnapsToDevicePixels="True" />
+                    </Border>
+
+                    <!-- 버튼 영역 -->
+                    <StackPanel Grid.Row="2"
+                                Orientation="Horizontal"
+                                HorizontalAlignment="Right"
+                                Margin="0,12,0,0">
+                        <Button Content="지우기"
+                                Height="28"
+                                MinWidth="70"
+                                Margin="0,0,8,0"
+                                Click="BtnSignClear_Click"/>
+                        <Button Content="취소"
+                                Height="28"
+                                MinWidth="70"
+                                Margin="0,0,8,0"
+                                Click="BtnCancel_Click"/>
+                        <Button Content="낙서 완료"
+                                Height="28"
+                                MinWidth="90"
+                                Click="BtnSave_Click"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

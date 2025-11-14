@@ -614,7 +614,19 @@ namespace WalkieDohi.ChattingRooms.UserControls
                 MessageBox.Show("이전 메시지 로딩 실패: " + ex.Message);
             }
         }
+        private void BtnDoodle_Click(object sender, RoutedEventArgs e)
+        {
+            // 낙서 버튼 누르면 아래에서 슥 올라오게
+            DoodlePad.Show();
+        }
 
+        private void DoodlePad_DoodleCompleted(object sender, string base64)
+        {
+            if (string.IsNullOrEmpty(base64))
+                return;
+
+            SendClipboardImageMessage(base64);   // 그대로 쏘면 끝
+        }
 
     }
 

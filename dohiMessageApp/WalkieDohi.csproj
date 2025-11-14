@@ -86,6 +86,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="ChattingRooms\UserControls\DoodlePadControl.xaml.cs">
+      <DependentUpon>DoodlePadControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ChattingRooms\Views\PDFPreviewWindow.xaml.cs">
       <DependentUpon>PDFPreviewWindow.xaml</DependentUpon>
     </Compile>
@@ -172,6 +175,10 @@
     <Compile Include="Util\Tcp\PacketReceiver.cs" />
     <Compile Include="Util\Tcp\PacketSender.cs" />
     <Compile Include="Util\TemplateSelectors\DirectionToAlignmentConverter.cs" />
+    <Page Include="ChattingRooms\UserControls\DoodlePadControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="ChattingRooms\Views\PDFPreviewWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
