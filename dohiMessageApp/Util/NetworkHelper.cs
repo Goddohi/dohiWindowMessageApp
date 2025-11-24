@@ -25,5 +25,30 @@ namespace WalkieDohi.Util
             return string.IsNullOrEmpty(localIp) ? "127.0.0.1" : localIp;
         }
 
+
+        public static string GetOutboundIPv4ForTarget(string remoteIpString)
+        {
+            try
+            {
+                var remoteIp = IPAddress.Parse(remoteIpString);
+
+                using (var socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, 0))
+                {
+                    socket.Connect(new IPEndPoint(remoteIp, MainData.GetPort()));
+
+                    var localEndPoint = socket.LocalEndPoint as IPEndPoint;
+                    if (localEndPoint != null)
+                        return localEndPoint.Address.ToString();
+                }
+            }
+            catch
+            {
+                // 실패 시 fallback
+                return GetLocalIPv4();
+            }
+
+            return GetLocalIPv4();
+        }
+
     }
 }

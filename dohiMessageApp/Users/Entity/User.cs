@@ -10,6 +10,11 @@ namespace WalkieDohi.Users.Entity
     public class User : DohiEntityBase
     {
         public string Nickname { get; set; } = "사용자";
+
+
+        // 설치/유저 단위 고유 식별자
+        public string UserUuid { get; private set; }
+
         public UserPreferences Preferences { get; set; } = new UserPreferences();
 
         /// <summary>
@@ -17,15 +22,28 @@ namespace WalkieDohi.Users.Entity
         /// </summary>
         /// <returns></returns>
         public static User GetDefaultUser()
-        {
-            return new User();
+        { 
+            User user = new User();
+            user.UserUuid = Guid.NewGuid().ToString();
+            return user;
         }
-        #region    비교메서드
 
+        public static Boolean UserChecked(User user)
+        {
+            if (user == null) { return false; }
+            
+            // 새로 만들 때 비어 있으면 한 번만 생성 기본사용자들을 위함 2025.11.24기준
+            if (string.IsNullOrEmpty(user.UserUuid))
+            {
+                user.UserUuid = Guid.NewGuid().ToString();
+            }
+            if (user.Preferences == null)
+            {
+                user.Preferences = User.GetDefaultUser().Preferences; 
+            }
 
-        #endregion 비교메서드
-
-
+            return true;
+        }
 
         #region    Getter Setter
         public int getPreferencesPort()
@@ -34,14 +52,6 @@ namespace WalkieDohi.Users.Entity
         }
 
         #endregion Getter Setter
-
-
-
-
-        #region   조회메서드
-
-
-        #endregion 조회메서드
 
 
     }

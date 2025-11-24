@@ -159,6 +159,7 @@
     <Compile Include="Util\ClipBoard\ClipboardExtension.cs" />
     <Compile Include="Util\Converter\StringNullOrEmptyToVisibilityConverter.cs" />
     <Compile Include="Util\IO\DirectoryManager.cs" />
+    <Compile Include="Util\Logging\Logging.cs" />
     <Compile Include="Util\StringUtil.cs" />
     <Compile Include="Util\IO\FriendJsonFileHandler.cs" />
     <Compile Include="Util\IO\UserJsonFileHandler.cs" />

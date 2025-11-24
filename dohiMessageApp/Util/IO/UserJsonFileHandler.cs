@@ -29,7 +29,7 @@ namespace WalkieDohi.Util.IO
         public bool SaveUser(User user)
         {
             //임시
-            if(user == null) { return false; }
+            if (User.UserChecked(user)) { return false; }
             try
             {
                 File.WriteAllText(filePath, JsonConvert.SerializeObject(user, Formatting.Indented));

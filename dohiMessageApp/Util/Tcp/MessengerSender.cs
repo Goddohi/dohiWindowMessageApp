@@ -17,7 +17,8 @@ namespace WalkieDohi.Util
 
         public async Task SendMessageAsync(string ip, MessageEntity message)
         {
-            var packet = PacketEntity.FromObject(PacketType.Message, message);
+
+            var packet = PacketEntity.FromObject(PacketType.Message, message,ip);
             try
             {
                 await _packetSender.SendPacketAsync(ip, MainData.GetPort(), packet);
