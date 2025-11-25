@@ -6,15 +6,59 @@
         xmlns:local="clr-namespace:WalkieDohi"
         mc:Ignorable="d" KeyDown="Window_KeyDown"
         Title="WalkieDohi" Height="600" Width="900">
-    <DockPanel>
-        <!-- 상단 사용자 영역 -->
-        <StackPanel DockPanel.Dock="Top"
+    <Window.Resources>
+        <DropShadowEffect x:Key="DropShadowEffectSmall"
+                          Color="Black"
+                          BlurRadius="10"
+                          ShadowDepth="2"
+                          Opacity="0.4" />
+
+        <Storyboard x:Key="ShowToolsPanelStoryboard">
+            <DoubleAnimation Storyboard.TargetName="ToolsPanel"
+                             Storyboard.TargetProperty="Opacity"
+                             From="0" To="1"
+                             Duration="0:0:0.18" />
+
+            <DoubleAnimation Storyboard.TargetName="ToolsPanelTranslate"
+                             Storyboard.TargetProperty="Y"
+                             From="-20" To="0"
+                             Duration="0:0:0.18">
+                <DoubleAnimation.EasingFunction>
+                    <CubicEase EasingMode="EaseOut" />
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
+
+        <!-- 닫기 애니메이션 -->
+        <Storyboard x:Key="HideToolsPanelStoryboard">
+            <DoubleAnimation Storyboard.TargetName="ToolsPanel"
+                             Storyboard.TargetProperty="Opacity"
+                             From="1" To="0"
+                             Duration="0:0:0.15" />
+
+            <DoubleAnimation Storyboard.TargetName="ToolsPanelTranslate"
+                             Storyboard.TargetProperty="Y"
+                             From="0" To="-20"
+                             Duration="0:0:0.15">
+                <DoubleAnimation.EasingFunction>
+                    <CubicEase EasingMode="EaseIn" />
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
+    </Window.Resources>
+    <Grid
+      Background="Transparent"
+      MouseDown="RootGrid_MouseDown">
+        
+        <DockPanel>
+            <!-- 상단 사용자 영역 -->
+            <StackPanel DockPanel.Dock="Top"
                     Orientation="Horizontal"
                     Margin="10"
                     VerticalAlignment="Top">
 
-            <!-- 닉네임 입력 -->
-            <TextBox x:Name="NicknameBox"
+                <!-- 닉네임 입력 -->
+                <TextBox x:Name="NicknameBox"
                      Width="150"
                      Height="30"
                      Margin="0,0,10,0"
@@ -22,8 +66,8 @@
                      FontSize="14"
                      Padding="5"/>
 
-            <!-- 닉네임 저장 버튼 -->
-            <Button x:Name="SaveUserButton"
+                <!-- 닉네임 저장 버튼 -->
+                <Button x:Name="SaveUserButton"
                     Content="닉네임 저장"
                     Style="{StaticResource RoundedSettingButtonStyle}"
                     Click="SaveUserButton_Click"
@@ -31,7 +75,7 @@
                     Height="30"/>
 
 
-            <Button x:Name="ManageGroupsButton1"
+                <Button x:Name="SettingButton"
                     HorizontalAlignment="Right"
                     Content="설정"
                     Margin="0,0,10,0"
@@ -39,13 +83,67 @@
                     Click="OpenSettings_Click"
                     Height="30"/>
 
-        </StackPanel>
 
-        <!-- 채팅 탭 영역 -->
-        <TabControl x:Name="ChatTabControlHost"
+
+            </StackPanel>
+
+            <!-- 채팅 탭 영역 -->
+            <TabControl x:Name="ChatTabControlHost"
             Margin="10"
             Style="{StaticResource RoundedTabControlStyle}"
             ItemContainerStyle="{StaticResource RoundedTabItemStyle}"
             Padding="5"/>
-    </DockPanel>
+        </DockPanel>
+
+
+        <Button x:Name="MenuButton"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Top"
+                    Content="유용한도구"
+                    Margin="0,10,10,0"
+                    Style="{StaticResource RoundedSettingButtonStyle}"
+                    Click="MenuButton_Click"
+                    Height="30"/>
+        
+        <!-- 실제로 좌라라락!~~~ 나오는 메뉴창 -->
+        <Border x:Name="ToolsPanel"
+                Width="220"
+                Background="#FFF5F7F7"
+                CornerRadius="10"
+                Padding="10"
+                Opacity="0"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Top"
+                Margin="0,50,10,0"
+                Effect="{DynamicResource DropShadowEffectSmall}"
+                RenderTransformOrigin="0.5,0"
+                IsHitTestVisible="False">
+            
+            <Border.RenderTransform>
+                <TranslateTransform x:Name="ToolsPanelTranslate" Y="-20" />
+            </Border.RenderTransform>
+
+            <StackPanel>
+                <TextBlock Text="유용한 도구"
+                           FontWeight="Bold"
+                           Foreground="Black"
+                           FontSize="14"
+                           Margin="0,0,0,5" />
+                <Separator Margin="0,0,0,5"/>
+
+                <!-- 예시 항목들 -->
+                <Button Content="미니 게임"
+                        Style="{StaticResource RoundedSettingButtonStyle}"
+                        Margin="0,0,0,5"
+                        Height="26"
+                        Click="GameButton_Click"/>
+                <Button Content="개발Git주소"
+                        ToolTip="와서 조언해주시면 감사합니다."
+                        Style="{StaticResource RoundedSettingButtonStyle}"
+                        Margin="0,0,0,5"
+                        Height="26"
+                        Click="GitButton_Click"/>
+            </StackPanel>
+        </Border>
+    </Grid>
 </Window>

@@ -18,6 +18,8 @@ using WalkieDohi.Friends.Views;
 using WalkieDohi.ChattingRooms.Data;
 using WalkieDohi.ChattingRooms.UserControls;
 using WalkieDohi.Friends.UserControls;
+using System.Windows.Media.Animation;
+using System.Windows.Media;
 
 namespace WalkieDohi
 {
@@ -281,5 +283,80 @@ namespace WalkieDohi
             }
         }
 
+        private bool _isToolsPanelOpen = false;
+
+        private void MenuButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_isToolsPanelOpen)
+            {
+                // 닫기
+                var sb = (Storyboard)FindResource("HideToolsPanelStoryboard");
+                sb.Begin();
+                ToolsPanel.IsHitTestVisible = false;
+            }
+            else
+            {
+                // 열기
+                ToolsPanel.IsHitTestVisible = true;
+                var sb = (Storyboard)FindResource("ShowToolsPanelStoryboard");
+                sb.Begin();
+            }
+
+            _isToolsPanelOpen = !_isToolsPanelOpen;
+        }
+
+
+        private void GameButton_Click(object sender, RoutedEventArgs e)
+        {
+            var gameWindow = new Games.Views.MiniGameWindow();
+            gameWindow.Owner = this;
+            gameWindow.Show();
+
+        }
+
+        private void GitButton_Click(object sender, RoutedEventArgs e)
+        {
+            string url = "https://github.com/Goddohi/dohiWindowMessageApp";
+
+            try
+            {
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = url,
+                    UseShellExecute = true  // 기본 브라우저로 열기 위한 옵션
+                });
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("URL을 열 수 없습니다.\n" + ex.Message,
+                                "오류", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void RootGrid_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (!_isToolsPanelOpen)
+                return;
+
+            var clicked = e.OriginalSource as DependencyObject;
+
+            // 클릭한 요소가 메뉴 버튼이나 패널 내부인지 검사
+            while (clicked != null)
+            {
+                if (clicked == MenuButton || clicked == ToolsPanel)
+                {
+                    // 메뉴 안 / 버튼 클릭이면 닫지 않음
+                    return;
+                }
+
+                clicked = VisualTreeHelper.GetParent(clicked);
+            }
+
+            // 여기까지 왔다는 건 메뉴 밖을 클릭한 경우 → 닫기
+            var sb = (Storyboard)FindResource("HideToolsPanelStoryboard");
+            sb.Begin();
+            ToolsPanel.IsHitTestVisible = false;
+            _isToolsPanelOpen = false;
+        }
     }
 }
