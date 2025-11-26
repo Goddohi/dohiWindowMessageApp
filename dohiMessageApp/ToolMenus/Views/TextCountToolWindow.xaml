@@ -18,11 +18,34 @@
         </Grid.RowDefinitions>
 
         <!-- 제목 -->
-        <TextBlock Grid.Row="0"
-                   Text="텍스트 입력"
+        <StackPanel Grid.Row="0"
+            Orientation="Horizontal">
+            <TextBlock Text="텍스트 입력"
                    FontWeight="Bold"
                    FontSize="15"
                    Margin="0,0,0,6"/>
+
+            <!-- 윈도우/리눅스 모드 선택 -->
+            <CheckBox x:Name="LinuxModeCheckBox"
+              Content="리눅스(LF) 기준으로 계산"
+              ToolTip="윈도우는 줄바꿈 2byte, 리눅스는 1byte"
+              Margin="10,0,0,0"
+              VerticalAlignment="Center"
+              Checked="LinuxModeCheckBox_Changed"
+              Unchecked="LinuxModeCheckBox_Changed"/>
+
+            <!-- 인코딩/단위 선택 드롭박스 -->
+            <ComboBox x:Name="EncodingComboBox"
+              Width="150"
+              Margin="10,0,0,0"
+              VerticalAlignment="Center"
+              SelectionChanged="EncodingComboBox_SelectionChanged">
+                <ComboBoxItem Tag="ANSI" IsSelected="True">ANSI 바이트</ComboBoxItem>
+                <ComboBoxItem Tag="UTF8" >UTF-8 바이트</ComboBoxItem>
+                <ComboBoxItem Tag="CP949">CP949 바이트</ComboBoxItem>
+                <ComboBoxItem Tag="UTF16">UTF-16 코드 유닛</ComboBoxItem>
+            </ComboBox>
+        </StackPanel>
 
         <!-- 입력 박스 -->
         <TextBox x:Name="InputTextBox"
@@ -56,6 +79,11 @@
             <TextBlock x:Name="WordCountText"
                        FontWeight="Bold"
                        FontSize="13"/>
+            <!-- 선택된 인코딩 기준 바이트/코드 표시 -->
+            <TextBlock x:Name="ByteInfoText"
+                       FontWeight="Bold"
+                       Margin="0,0,0,2"
+                       FontSize="13"/>
         </StackPanel>
 
         <!-- 버튼 -->
@@ -69,14 +97,7 @@
             Style="{StaticResource RoundedSettingButtonStyle}"
             Click="ClearButton_Click"/>
 
-            <!-- 윈도우/리눅스 모드 선택 -->
-            <CheckBox x:Name="LinuxModeCheckBox"
-              Content="리눅스(LF) 기준으로 계산"
-              ToolTip="윈도우는 줄바꿈 2byte, 리눅스는 1byte"
-              Margin="10,0,0,0"
-              VerticalAlignment="Center"
-              Checked="LinuxModeCheckBox_Changed"
-              Unchecked="LinuxModeCheckBox_Changed"/>
+
         </StackPanel>
 
     </Grid>
