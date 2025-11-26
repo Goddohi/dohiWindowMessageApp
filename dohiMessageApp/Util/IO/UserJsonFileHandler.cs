@@ -14,14 +14,29 @@ namespace WalkieDohi.Util.IO
 {
     class UserJsonFileHandler : UserFileProvider
     {
+        private string DohifilePath =>
+            DirectoryManager.GetAppDataDirectoryCombineFileName("user.dohi");
 
-        private string filePath => DirectoryManager.GetAppDataDirectoryCombineFileName(fileName);
-        private readonly string fileName = "user.json";
+        
+        private string JsonFilePath =>
+            DirectoryManager.GetAppDataDirectoryCombineFileName("user.json");
+
+        private User ActualUserFilePath
+        {
+            get
+            {
+                if (File.Exists(DohifilePath))
+                    return JsonConvert.DeserializeObject<User>(File.ReadAllText(DohifilePath));
+                if (File.Exists(JsonFilePath))
+                    return JsonConvert.DeserializeObject<User>(File.ReadAllText(JsonFilePath));
+                return User.GetDefaultUser();
+            }
+        }
 
         public User LoadUser()
         {
             // 이전버전 사용자를 위한 자동 업데이트 로직
-            User user = File.Exists(filePath) ? JsonConvert.DeserializeObject<User>(File.ReadAllText(filePath)) :  User.GetDefaultUser();
+            User user = ActualUserFilePath;
             SaveUser(user);
             return user;
         }
@@ -29,10 +44,10 @@ namespace WalkieDohi.Util.IO
         public bool SaveUser(User user)
         {
             //임시
-            if (User.UserChecked(user)) { return false; }
+            if (User.UserChecked(user) == false) { return false; }
             try
             {
-                File.WriteAllText(filePath, JsonConvert.SerializeObject(user, Formatting.Indented));
+                File.WriteAllText(DohifilePath, JsonConvert.SerializeObject(user, Formatting.Indented));
                 MainData.currentUser = user;
                 return true;
             }

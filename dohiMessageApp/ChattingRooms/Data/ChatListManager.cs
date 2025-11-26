@@ -132,16 +132,35 @@ namespace WalkieDohi.ChattingRooms.Data
 
         private static readonly string ChatListSavePath = DirectoryManager.GetAppDataDirectoryCombineFileName("ChatList.json");
 
+        private static string DohifilePath =>
+            DirectoryManager.GetAppDataDirectoryCombineFileName("ChatList.dohi");
+
+
+        private static string JsonFilePath =>
+            DirectoryManager.GetAppDataDirectoryCombineFileName("ChatList.json");
+        private static string ActualFilePath
+        {
+            get
+            {
+                if (File.Exists(DohifilePath))
+                    return DohifilePath;
+                if (File.Exists(JsonFilePath))
+                    return JsonFilePath;
+                return JsonFilePath;
+            }
+        }
+
+
         public static void SaveChatList()
         {
             try
             {
-                var dir = Path.GetDirectoryName(ChatListSavePath);
+                var dir = Path.GetDirectoryName(DohifilePath);
                 if (!Directory.Exists(dir))
                     Directory.CreateDirectory(dir);
 
                 var json = JsonConvert.SerializeObject(_chatList, Formatting.Indented);
-                File.WriteAllText(ChatListSavePath, json, Encoding.UTF8);
+                File.WriteAllText(DohifilePath, json, Encoding.UTF8);
             }
             catch (Exception ex)
             {
@@ -153,9 +172,9 @@ namespace WalkieDohi.ChattingRooms.Data
         {
             try
             {
-                if (!File.Exists(ChatListSavePath)) return;
+                if (!File.Exists(ActualFilePath)) return;
 
-                var json = File.ReadAllText(ChatListSavePath, Encoding.UTF8);
+                var json = File.ReadAllText(ActualFilePath, Encoding.UTF8);
                 var list = JsonConvert.DeserializeObject<ObservableCollection<ChatListItem>>(json);
 
                 _chatList = list ?? new ObservableCollection<ChatListItem>();

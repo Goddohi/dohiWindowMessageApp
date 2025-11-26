@@ -28,6 +28,7 @@ using DragEventArgs = System.Windows.DragEventArgs;
 using Path = System.IO.Path;
 using WalkieDohi.ChattingRooms.ViewModels;
 using WalkieDohi.ChattingRooms.Views;
+using System.Text.RegularExpressions;
 
 namespace WalkieDohi.ChattingRooms.UserControls
 {
@@ -569,7 +570,7 @@ namespace WalkieDohi.ChattingRooms.UserControls
             Directory.CreateDirectory(dir);
 
             string today = DateTime.Now.ToString("yyyyMMdd");
-            return Path.Combine(dir, $"chat_{today}.json");
+            return Path.Combine(dir, $"chat_{today}.dohi");
         }
 
 
@@ -581,7 +582,8 @@ namespace WalkieDohi.ChattingRooms.UserControls
             string dir = GetChatDirectory();
             if (!Directory.Exists(dir)) return;
 
-            var files = Directory.GetFiles(dir, "chat_*.json")
+            var files = Directory.EnumerateFiles(dir)
+                .Where(f => Regex.IsMatch(Path.GetFileName(f), @"^chat_.*\.(json|dohi)$"))
                 .OrderByDescending(f => f) // 최신 → 과거 순
                 .ToList();
 
