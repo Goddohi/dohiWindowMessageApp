@@ -358,5 +358,12 @@ namespace WalkieDohi
             ToolsPanel.IsHitTestVisible = false;
             _isToolsPanelOpen = false;
         }
+
+        private void TextCountToolButton_Click(object sender, RoutedEventArgs e)
+        {
+            var textToolWindow = new ToolMenus.Views.TextCountToolWindow();
+            textToolWindow.Owner = this;
+            textToolWindow.Show();
+        }
     }
 }

@@ -1,0 +1,83 @@
+﻿<Window x:Class="WalkieDohi.ToolMenus.Views.TextCountToolWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WalkieDohi.ToolMenus.Views"
+        mc:Ignorable="d"
+        Title="글자 수 세기" Height="450" Width="650"
+        WindowStartupLocation="CenterOwner"
+        Background="#FFF5F7F7">
+
+    <Grid Margin="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- 제목 -->
+        <TextBlock Grid.Row="0"
+                   Text="텍스트 입력"
+                   FontWeight="Bold"
+                   FontSize="15"
+                   Margin="0,0,0,6"/>
+
+        <!-- 입력 박스 -->
+        <TextBox x:Name="InputTextBox"
+                 Grid.Row="1"
+                 AcceptsReturn="True"
+                 VerticalScrollBarVisibility="Auto"
+                 TextWrapping="Wrap"
+                 FontSize="13"
+                 Background="White"
+                 BorderBrush="#FFD0E4E4"
+                 TextChanged="InputTextBox_TextChanged"/>
+
+        <!-- 글자수/바이트/줄/단어 -->
+        <StackPanel Grid.Row="2"
+                    Margin="0,8,0,8"
+                    >
+
+            <!-- 글자수 -->
+            <TextBlock x:Name="CharCountText"
+                       FontWeight="Bold"
+                       Margin="0,0,0,2"
+                       FontSize="13"/>
+
+            <!-- 줄 수 -->
+            <TextBlock x:Name="LineCountText"
+                       FontWeight="Bold"
+                       Margin="0,0,0,2"
+                       FontSize="13"/>
+
+            <!-- 단어 수 -->
+            <TextBlock x:Name="WordCountText"
+                       FontWeight="Bold"
+                       FontSize="13"/>
+        </StackPanel>
+
+        <!-- 버튼 -->
+        <!-- 버튼 영역 -->
+        <StackPanel Grid.Row="3"
+            Orientation="Horizontal">
+
+            <Button Content="초기화"
+            Width="85"
+            Height="28"
+            Style="{StaticResource RoundedSettingButtonStyle}"
+            Click="ClearButton_Click"/>
+
+            <!-- 윈도우/리눅스 모드 선택 -->
+            <CheckBox x:Name="LinuxModeCheckBox"
+              Content="리눅스(LF) 기준으로 계산"
+              ToolTip="윈도우는 줄바꿈 2byte, 리눅스는 1byte"
+              Margin="10,0,0,0"
+              VerticalAlignment="Center"
+              Checked="LinuxModeCheckBox_Changed"
+              Unchecked="LinuxModeCheckBox_Changed"/>
+        </StackPanel>
+
+    </Grid>
+</Window>

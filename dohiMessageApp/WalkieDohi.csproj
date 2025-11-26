@@ -126,6 +126,9 @@
     </Compile>
     <Compile Include="Friends\Entity\Friend.cs" />
     <Compile Include="Groups\Entity\GroupEntity.cs" />
+    <Compile Include="ToolMenus\Views\TextCountToolWindow.xaml.cs">
+      <DependentUpon>TextCountToolWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Users\Entity\User.cs" />
     <Compile Include="MainData.cs" />
     <Compile Include="ChattingRooms\UserControls\GroupChatTabControl.xaml.cs">
@@ -250,6 +253,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Games\Views\MiniGameWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ToolMenus\Views\TextCountToolWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

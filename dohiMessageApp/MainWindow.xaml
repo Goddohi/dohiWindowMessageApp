@@ -137,6 +137,12 @@
                         Margin="0,0,0,5"
                         Height="26"
                         Click="GameButton_Click"/>
+                <Button Content="글자수계산기"
+                        ToolTip="필요하실때가 있더라고요... 이력서 적는거에만 쓰지마세여..."
+                        Style="{StaticResource RoundedSettingButtonStyle}"
+                        Margin="0,0,0,5"
+                        Height="26"
+                        Click="TextCountToolButton_Click"/>
                 <Button Content="개발Git주소"
                         ToolTip="와서 조언해주시면 감사합니다."
                         Style="{StaticResource RoundedSettingButtonStyle}"
