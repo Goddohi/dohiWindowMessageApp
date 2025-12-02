@@ -188,16 +188,28 @@ namespace WalkieDohi.ToolMenus.Views
             {
                 var ws = wb.Worksheets.Add("Sheet1");
 
+                // 헤더
                 for (int c = 0; c < _table.Columns.Count; c++)
                 {
                     ws.Cell(1, c + 1).Value = _table.Columns[c].ColumnName;
                 }
 
+                // 데이터
                 for (int r = 0; r < _table.Rows.Count; r++)
                 {
                     for (int c = 0; c < _table.Columns.Count; c++)
                     {
-                        ws.Cell(r + 2, c + 1).Value = (XLCellValue)_table.Rows[r][c];
+                        object value = _table.Rows[r][c];
+
+                        if (value == null || value == DBNull.Value)
+                        {
+                            ws.Cell(r + 2, c + 1).Value = string.Empty;
+                        }
+                        else
+                        {
+                            // 문자열로 넣기 (string → XLCellValue 변환은 지원)
+                            ws.Cell(r + 2, c + 1).Value = value.ToString();
+                        }
                     }
                 }
 
@@ -207,7 +219,6 @@ namespace WalkieDohi.ToolMenus.Views
 
             MessageBox.Show("저장 완료!");
         }
-
         private void BtnRefresh_Click(object sender, RoutedEventArgs e)
         {
             // 1) 파일 목록 초기화
