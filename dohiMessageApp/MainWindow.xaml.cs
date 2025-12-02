@@ -365,5 +365,12 @@ namespace WalkieDohi
             textToolWindow.Owner = this;
             textToolWindow.Show();
         }
+
+        private void ExcelCellCollectorButton_Click(object sender, RoutedEventArgs e)
+        {
+            var ToolWindow = new ToolMenus.Views.ExcelCellCollectorWindow();
+            ToolWindow.Owner = this;
+            ToolWindow.Show();
+        }
     }
 }

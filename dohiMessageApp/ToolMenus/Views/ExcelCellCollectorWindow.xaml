@@ -1,0 +1,64 @@
+﻿<Window x:Class="WalkieDohi.ToolMenus.Views.ExcelCellCollectorWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WalkieDohi.ToolMenus.Views"
+        mc:Ignorable="d"
+         Title="엑셀 셀 수집기"
+        Width="1000" Height="700">
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="150"/>
+            <RowDefinition Height="150"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- 버튼 -->
+        <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="0,0,0,10">
+            <Button Content="파일 추가" Width="100" Margin="0,0,10,0"
+                    Click="BtnAddFiles_Click"/>
+
+            <Button Content="셀 정의 추가" Width="120" Margin="0,0,10,0"
+                    Click="BtnAddCellDef_Click"/>
+
+            <Button Content="셀 정의 삭제" Width="120" Margin="0,0,10,0"
+                    Click="BtnDeleteCellDef_Click"/>
+
+            <Button Content="새로고침" Width="100" Margin="0,0,10,0"
+                    Click="BtnRefresh_Click"/>
+
+            <Button Content="엑셀로 내보내기" Width="150"
+                    Click="BtnExportExcel_Click"/>
+        </StackPanel>
+
+        <!-- 파일 목록 -->
+        <GroupBox Grid.Row="1" Header="파일 목록">
+            <ListBox x:Name="lstFiles"/>
+        </GroupBox>
+
+        <!-- 셀 정의 목록 -->
+        <GroupBox Grid.Row="2" Header="셀 정의 (창끄면 사라져요)">
+            <DataGrid x:Name="dgCellDefs"
+                      AutoGenerateColumns="False"
+                      CanUserAddRows="True"
+                      CanUserDeleteRows="True">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="헤더" Binding="{Binding Header}" Width="*"/>
+                    <DataGridTextColumn Header="시트명(빈값이면 맨처음시트)" Binding="{Binding SheetName}" Width="*"/>
+                    <DataGridTextColumn Header="셀 주소" Binding="{Binding CellAddress}" Width="*"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </GroupBox>
+
+        <!-- 결과 -->
+        <GroupBox Grid.Row="3" Header="결과">
+            <DataGrid x:Name="dgResult"
+                      AutoGenerateColumns="True"
+                      IsReadOnly="True"/>
+        </GroupBox>
+
+    </Grid>
+</Window>

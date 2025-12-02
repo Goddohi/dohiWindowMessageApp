@@ -143,6 +143,12 @@
                         Margin="0,0,0,5"
                         Height="26"
                         Click="TextCountToolButton_Click"/>
+                <Button Content="엑셀크롤링도구"
+                        ToolTip="많은 엑셀중에 특정셀만 모으고싶을때... VB스크립트 귀찮을때 쓰기좋아요..(디자인은 투박해야 좋더라고요 이건)"
+                        Style="{StaticResource RoundedSettingButtonStyle}"
+                        Margin="0,0,0,5"
+                        Height="26"
+                        Click="ExcelCellCollectorButton_Click"/>
                 <Button Content="개발Git주소"
                         ToolTip="와서 조언해주시면 감사합니다."
                         Style="{StaticResource RoundedSettingButtonStyle}"
