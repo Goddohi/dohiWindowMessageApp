@@ -47,15 +47,12 @@ namespace WalkieDohi.ToolMenus.Views
                 {
                     return;
                 }
-                if (dlg.ShowDialog() == true)
+                foreach (string f in dlg.FileNames)
                 {
-                    foreach (string f in dlg.FileNames)
+                    if (!_filePaths.Contains(f))
                     {
-                        if (!_filePaths.Contains(f))
-                        {
-                            _filePaths.Add(f);
-                            lstFiles.Items.Add(f);
-                        }
+                        _filePaths.Add(f);
+                        lstFiles.Items.Add(f);
                     }
                 }
 
