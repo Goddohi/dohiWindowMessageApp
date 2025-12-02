@@ -1,18 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data;
 using System.IO;
 using System.Windows;
 using Microsoft.Win32;
 using ClosedXML.Excel;
 using WalkieDohi.ToolMenus.Entity;
+using System.Windows.Controls;
 
 namespace WalkieDohi.ToolMenus.Views
 {
     public partial class ExcelCellCollectorWindow : Window
     {
         private readonly List<string> _filePaths = new List<string>();
-        private readonly List<ExcelCellDefinition> _cellDefs = new List<ExcelCellDefinition>();
+        private readonly List<ExcelCellDefinition> _2cellDefs = new List<ExcelCellDefinition>();
+        private readonly ObservableCollection<ExcelCellDefinition> _cellDefs = new ObservableCollection<ExcelCellDefinition>();
         private DataTable _table;
 
         public ExcelCellCollectorWindow()
@@ -21,38 +24,56 @@ namespace WalkieDohi.ToolMenus.Views
 
             // 셀 정의 바인딩(휘발성)
             dgCellDefs.ItemsSource = _cellDefs;
+            _cellDefs.CollectionChanged += (s, e) =>
+             {
+                 UpdateRowNumbers();
+             };
         }
 
         private void BtnAddFiles_Click(object sender, RoutedEventArgs e)
         {
-            OpenFileDialog dlg = new OpenFileDialog();
-            dlg.Filter = "Excel Files|*.xlsx;*.xlsm;*.xls";
-            dlg.Multiselect = true;
-
-            if (dlg.ShowDialog() == true)
-            {
-                foreach (string f in dlg.FileNames)
+           try { 
+                OpenFileDialog dlg = new OpenFileDialog
                 {
-                    if (!_filePaths.Contains(f))
+                    Filter = "Excel Files|*.xlsx;*.xlsm;*.xls",
+                    Multiselect = true,
+                    Title = "값을 가져올 엑셀 파일들을 선택하세요"
+                };
+
+                bool? result = dlg.ShowDialog(this);
+
+                // 취소 또는 닫기 눌렀을 때는 그냥 아무 것도 안 하고 리턴
+                if (result != true)
+                {
+                    return;
+                }
+                if (dlg.ShowDialog() == true)
+                {
+                    foreach (string f in dlg.FileNames)
                     {
-                        _filePaths.Add(f);
-                        lstFiles.Items.Add(f);
+                        if (!_filePaths.Contains(f))
+                        {
+                            _filePaths.Add(f);
+                            lstFiles.Items.Add(f);
+                        }
                     }
                 }
-            }
 
-            RefreshGrid();
+                RefreshGrid();
+           }
+           catch (Exception ex)
+           {   
+            MessageBox.Show(this,
+                "파일 추가 중 오류가 발생했습니다.\n" + ex.Message,
+                "엑셀크롤링..",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+           }
         }
 
         private void BtnAddCellDef_Click(object sender, RoutedEventArgs e)
         {
-            _cellDefs.Add(new ExcelCellDefinition
-            {
-                Header = "",
-                SheetName = "",
-                CellAddress = ""
-            });
-            dgCellDefs.Items.Refresh();
+            _cellDefs.Add(new ExcelCellDefinition());
         }
 
         private void BtnDeleteCellDef_Click(object sender, RoutedEventArgs e)
@@ -61,11 +82,10 @@ namespace WalkieDohi.ToolMenus.Views
             if (def != null)
             {
                 _cellDefs.Remove(def);
-                dgCellDefs.Items.Refresh();
             }
         }
 
-        private void BtnRefresh_Click(object sender, RoutedEventArgs e)
+        private void BtnReGridResult_Click(object sender, RoutedEventArgs e)
         {
             RefreshGrid();
         }
@@ -189,6 +209,30 @@ namespace WalkieDohi.ToolMenus.Views
             }
 
             MessageBox.Show("저장 완료!");
+        }
+
+        private void BtnRefresh_Click(object sender, RoutedEventArgs e)
+        {
+            // 1) 파일 목록 초기화
+            _filePaths.Clear();
+            lstFiles.Items.Clear();
+
+            // 2) 셀 정의 초기화
+            _cellDefs.Clear();
+            dgCellDefs.Items.Refresh();
+
+            // 3) 결과 그리드 초기화
+            _table = null;
+            dgResult.ItemsSource = null;
+        }
+
+        private void UpdateRowNumbers()
+        {
+            for(int i = 0; i<_cellDefs.Count; i++)
+            {
+                _cellDefs[i].RowNumber = i + 1;
+            }
+            dgCellDefs.Items.Refresh();
         }
     }
 }
