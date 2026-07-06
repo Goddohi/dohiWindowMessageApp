@@ -341,14 +341,39 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <None Include="파일구조도.md" />
+    <None Include="..\Docs\파일구조도.md">
+      <Link>Docs\파일구조도.md</Link>
+    </None>
+    <None Include="..\Docs\개발\README.md">
+      <Link>Docs\개발\README.md</Link>
+    </None>
+    <None Include="..\Docs\개발\001-자동시작-수신.md">
+      <Link>Docs\개발\001-자동시작-수신.md</Link>
+    </None>
+    <None Include="..\Docs\개발\002-전송실패-상태.md">
+      <Link>Docs\개발\002-전송실패-상태.md</Link>
+    </None>
+    <None Include="..\Docs\개발\003-메시지시간.md">
+      <Link>Docs\개발\003-메시지시간.md</Link>
+    </None>
+    <None Include="..\Docs\개발\004-파일전송-저장.md">
+      <Link>Docs\개발\004-파일전송-저장.md</Link>
+    </None>
+    <None Include="..\Docs\개발\005-채팅로그-저장.md">
+      <Link>Docs\개발\005-채팅로그-저장.md</Link>
+    </None>
+    <None Include="..\Docs\개발\006-사용자식별.md">
+      <Link>Docs\개발\006-사용자식별.md</Link>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <None Include="개발계획도.md" />
+    <None Include="..\Docs\개발계획도.md">
+      <Link>Docs\개발계획도.md</Link>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="AppResources\Assets\WalkieDohi.ico">

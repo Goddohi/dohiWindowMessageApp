@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows;
+using System.Windows.Interop;
 using WalkieDohi.Core.app;
 using WalkieDohi.Util.Tcp;
 
@@ -47,16 +48,31 @@ namespace WalkieDohi
 
             if (minimized)
             {
+                InitializeHiddenMainWindow();
                 return;
             }
 
             ShowMainWindow();
         }
 
-        private void ShowMainWindow()
+        private void InitializeHiddenMainWindow()
+        {
+            EnsureMainWindowCreated();
+
+            // 숨김 시작이어도 HWND를 만들어 단일 인스턴스 복원 메시지와 수신 초기화가 준비되게 합니다.
+            new WindowInteropHelper(MainWindow).EnsureHandle();
+            MainWindow.Hide();
+        }
+
+        private void EnsureMainWindowCreated()
         {
             if (MainWindow == null)
                 MainWindow = new MainWindow();
+        }
+
+        private void ShowMainWindow()
+        {
+            EnsureMainWindowCreated();
 
             MainWindow.Show();
            // 작업줄 최소화 상태라면 복원
