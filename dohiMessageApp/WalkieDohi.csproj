@@ -130,6 +130,7 @@
       <DependentUpon>PDFPreviewWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Core\app\AutoStartManager.cs" />
+    <Compile Include="Core\app\MessageReceiverService.cs" />
     <Compile Include="Core\app\NativeMethods.cs" />
     <Compile Include="Core\app\TrayIconManager.cs" />
     <Compile Include="Core\DohiEntityBase.cs" />
@@ -364,6 +365,21 @@
     </None>
     <None Include="..\Docs\개발\006-사용자식별.md">
       <Link>Docs\개발\006-사용자식별.md</Link>
+    </None>
+    <None Include="..\Docs\개발\007-수신리스너-서비스분리.md">
+      <Link>Docs\개발\007-수신리스너-서비스분리.md</Link>
+    </None>
+    <None Include="..\Docs\개발\008-전송흐름-결과반환.md">
+      <Link>Docs\개발\008-전송흐름-결과반환.md</Link>
+    </None>
+    <None Include="..\Docs\개발\009-채팅컨트롤-중복정리.md">
+      <Link>Docs\개발\009-채팅컨트롤-중복정리.md</Link>
+    </None>
+    <None Include="..\Docs\개발\010-파일저장-책임분리.md">
+      <Link>Docs\개발\010-파일저장-책임분리.md</Link>
+    </None>
+    <None Include="..\Docs\개발\011-빌드경고-정리.md">
+      <Link>Docs\개발\011-빌드경고-정리.md</Link>
     </None>
   </ItemGroup>
   <ItemGroup>

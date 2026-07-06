@@ -1,18 +1,20 @@
-﻿using System;
-using System.Diagnostics;
+using System;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows;
 using System.Windows.Interop;
+using WalkieDohi.ChattingRooms.Data;
 using WalkieDohi.Core.app;
-using WalkieDohi.Util.Tcp;
+using WalkieDohi.Util.IO;
 
 namespace WalkieDohi
 {
     public partial class App : Application
     {
         private static Mutex _mutex;
+        private MessageReceiverService _messageReceiverService;
+
+        public MessageReceiverService MessageReceiverService => _messageReceiverService;
 
         protected override void OnStartup(StartupEventArgs e)
         {
@@ -29,17 +31,19 @@ namespace WalkieDohi
                     IntPtr.Zero);
                 Environment.Exit(0);
             }
-           
 
             base.OnStartup(e);
 
-            // 최소화 시작 플래그
+            LoadApplicationData();
+            _messageReceiverService = new MessageReceiverService();
+
             bool minimized = e.Args.Any(a => string.Equals(a, "--minimized", StringComparison.OrdinalIgnoreCase));
 
-            // 트레이 먼저 준비
             TrayIconManager.Init(
                 onOpenMainWindow: ShowMainWindow,
-                onExitApp: () => {
+                onExitApp: () =>
+                {
+                    _messageReceiverService?.Dispose();
                     TrayIconManager.Dispose();
                     Shutdown();
                 },
@@ -49,17 +53,31 @@ namespace WalkieDohi
             if (minimized)
             {
                 InitializeHiddenMainWindow();
+                StartMessageReceiver();
                 return;
             }
 
             ShowMainWindow();
+            StartMessageReceiver();
+        }
+
+        private void LoadApplicationData()
+        {
+            ChatListManager.LoadChatList();
+            MainData.currentUser = new UserJsonFileHandler().LoadUser();
+            MainData.Friends = new FriendJsonFileHandler().LoadFriends();
+        }
+
+        private void StartMessageReceiver()
+        {
+            _messageReceiverService?.Start();
         }
 
         private void InitializeHiddenMainWindow()
         {
             EnsureMainWindowCreated();
 
-            // 숨김 시작이어도 HWND를 만들어 단일 인스턴스 복원 메시지와 수신 초기화가 준비되게 합니다.
+            // 숨김 시작이어도 HWND를 만들어 단일 인스턴스 복원 메시지가 준비되게 합니다.
             new WindowInteropHelper(MainWindow).EnsureHandle();
             MainWindow.Hide();
         }
@@ -67,7 +85,7 @@ namespace WalkieDohi
         private void EnsureMainWindowCreated()
         {
             if (MainWindow == null)
-                MainWindow = new MainWindow();
+                MainWindow = new MainWindow(_messageReceiverService);
         }
 
         private void ShowMainWindow()
@@ -75,7 +93,6 @@ namespace WalkieDohi
             EnsureMainWindowCreated();
 
             MainWindow.Show();
-           // 작업줄 최소화 상태라면 복원
             if (MainWindow.WindowState == WindowState.Minimized)
                 MainWindow.WindowState = WindowState.Normal;
 
@@ -85,9 +102,9 @@ namespace WalkieDohi
 
         protected override void OnExit(ExitEventArgs e)
         {
+            _messageReceiverService?.Dispose();
             TrayIconManager.Dispose(); // 유령 아이콘 방지
             base.OnExit(e);
         }
-    
     }
 }

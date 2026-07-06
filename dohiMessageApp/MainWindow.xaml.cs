@@ -1,15 +1,11 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Forms;
-using System.Drawing;
 using System.Windows.Interop;
-using WalkieDohi.ChattingRooms.Entity;
 using WalkieDohi.Util;
-using WalkieDohi.Util.Tcp;
 using WalkieDohi.Core.app;
+using WalkieDohi.Packet.Messages.Entity;
 using MessageBox = System.Windows.MessageBox;
 using Application = System.Windows.Application;
 using System.Windows.Input;
@@ -25,20 +21,23 @@ namespace WalkieDohi
 {
     public partial class MainWindow : Window
     {
-        private NotifyIcon trayIcon;
-        private PacketReceiver MainReceiver;
-        private MessengerSender msgSender = new MessengerSender();
+        private readonly MessageReceiverService _messageReceiverService;
         private ChatRoomListTabControl _chatRoomListTabControl;
         private FriendMainListView _startTabControl;
 
         public MainWindow()
+            : this((Application.Current as App)?.MessageReceiverService)
         {
-            InitializeComponent();
-            ChatListManager.LoadChatList();
-            LoadUser();
-            LoadFriend();
+        }
 
-            StartReceiver();
+        public MainWindow(MessageReceiverService messageReceiverService)
+        {
+            _messageReceiverService = messageReceiverService;
+
+            InitializeComponent();
+
+            BindCurrentUser();
+            SubscribeMessageReceiver();
             AddStartTab();
             AddChatRoomTab();
 
@@ -50,10 +49,6 @@ namespace WalkieDohi
             var handle = new WindowInteropHelper(this).Handle;
             HwndSource.FromHwnd(handle)?.AddHook(WndProc);
         }
-        private void LoadFriend()
-        {
-            MainData.Friends = new Util.IO.FriendJsonFileHandler().LoadFriends();
-        }
         private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
             if (msg == NativeMethods.WM_SHOWME)
@@ -64,9 +59,8 @@ namespace WalkieDohi
             return IntPtr.Zero;
         }
 
-        private void LoadUser()
+        private void BindCurrentUser()
         {
-            MainData.currentUser = new Util.IO.UserJsonFileHandler().LoadUser();
             NicknameBox.Text = MainData.currentUser.Nickname;
         }
         /*  App.xaml.cs -> TrayIconManager.cs 호출 방식으로  이관
@@ -97,19 +91,15 @@ namespace WalkieDohi
             trayIcon.ContextMenuStrip.Items.Add("종료", null, (s, e) => ExitApplication());
         }
         */
-        private void StartReceiver()
+        private void SubscribeMessageReceiver()
         {
-            MainReceiver = new PacketReceiver(MainData.GetPort());
-            MainReceiver.OnMessageReceived += async (msg) =>
-            {
-                await Dispatcher.InvokeAsync(() =>
-                {
-                    msg.Sender = MainData.GetFriendNameOrReturnOriginal(msg.Sender, msg.SenderIp);
-                    ChatListManager.UpdateChatList(msg);
-                    _chatRoomListTabControl?.HandleIncomingMessage(msg);
-                });
-            };
-            MainReceiver.Start();
+            if (_messageReceiverService != null)
+                _messageReceiverService.MessageReceived += MessageReceiverService_MessageReceived;
+        }
+
+        private void MessageReceiverService_MessageReceived(MessageEntity msg)
+        {
+            _chatRoomListTabControl?.HandleIncomingMessage(msg);
         }
 
         private void AddStartTab()
@@ -169,7 +159,9 @@ namespace WalkieDohi
 
         protected override void OnClosed(EventArgs e)
         {
-            MainReceiver?.Stop();
+            if (_messageReceiverService != null)
+                _messageReceiverService.MessageReceived -= MessageReceiverService_MessageReceived;
+
             base.OnClosed(e);
         }
 
