@@ -220,6 +220,7 @@
     <Compile Include="Util\Provider\UserFileProvider.cs" />
     <Compile Include="Util\Tcp\PacketReceiver.cs" />
     <Compile Include="Util\Tcp\PacketSender.cs" />
+    <Compile Include="Util\Tcp\SendResult.cs" />
     <Compile Include="Util\TemplateSelectors\DirectionToAlignmentConverter.cs" />
     <Page Include="ChattingRooms\UserControls\DoodlePadControl.xaml">
       <SubType>Designer</SubType>

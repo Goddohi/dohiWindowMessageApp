@@ -29,22 +29,29 @@ namespace WalkieDohi.Util
             }
 
 
+            ChatMessage display = null;
+
             if (msg.CheckMessageTypeText)
             {
-                return new TextMessage(msg.Sender, msg.Content, direction, msg.Timestamp , msg.SenderIp, msg.Group,IsReload);
+                display = new TextMessage(msg.Sender, msg.Content, direction, msg.Timestamp , msg.SenderIp, msg.Group,IsReload);
             }
-
-            if (msg.CheckMessageTypeImage)
+            else if (msg.CheckMessageTypeImage)
             {
-                return new ImageMessage(msg.Sender, msg.FileName, msg.Content, msg.ContentPath, direction, msg.Timestamp, msg.SenderIp, msg.Group, IsReload);
+                display = new ImageMessage(msg.Sender, msg.FileName, msg.Content, msg.ContentPath, direction, msg.Timestamp, msg.SenderIp, msg.Group, IsReload);
             }
-
-            if (msg.CheckMessageTypeFile)
+            else if (msg.CheckMessageTypeFile)
             {
-                return new FileMessage(msg.Sender, msg.FileName,msg.ContentPath, direction, msg.Timestamp, msg.SenderIp, msg.Group, IsReload);
+                display = new FileMessage(msg.Sender, msg.FileName,msg.ContentPath, direction, msg.Timestamp, msg.SenderIp, msg.Group, IsReload);
             }
 
-            return null;
+            if (display != null)
+            {
+                display.IsFailed = msg.IsFailed;
+                display.FailureText = msg.FailureText;
+                display.FailureDetail = msg.FailureDetail;
+            }
+
+            return display;
         }
     }
 }

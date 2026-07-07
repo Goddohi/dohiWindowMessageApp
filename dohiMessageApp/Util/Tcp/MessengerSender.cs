@@ -15,17 +15,33 @@ namespace WalkieDohi.Util
     {
         private readonly PacketSender _packetSender = new PacketSender();
 
-        public async Task SendMessageAsync(string ip, MessageEntity message)
+        public async Task<SendResult> SendMessageAsync(string ip, MessageEntity message)
         {
-
-            var packet = PacketEntity.FromObject(PacketType.Message, message,ip);
             try
             {
-                await _packetSender.SendPacketAsync(ip, MainData.GetPort(), packet);
+                if (message == null)
+                {
+                    return SendResult.Fail(ip, "전송할 메시지가 없습니다.");
+                }
+
+                var packet = PacketEntity.FromObject(PacketType.Message, message, ip);
+                var result = await _packetSender.SendPacketAsync(ip, MainData.GetPort(), packet);
+
+                if (result.Succeeded)
+                {
+                    message.ResultSetSuccess();
+                }
+                else
+                {
+                    message.ResultSetFail();
+                }
+
+                return result;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                message.ResultSetFail();
+                message?.ResultSetFail();
+                return SendResult.Fail(ip, ex.Message);
             }
         }
     }

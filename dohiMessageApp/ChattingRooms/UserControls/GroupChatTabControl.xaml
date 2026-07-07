@@ -39,6 +39,18 @@
                        HorizontalAlignment="{Binding Direction, Converter={StaticResource DirToAlign}}"
                        Margin="0,2,0,0"
                        Text="{Binding Timestamp, StringFormat={}{0:MM-dd HH:mm}}"/>
+                <TextBlock Text="전송중"
+                       FontSize="11"
+                       Foreground="#64748B"
+                       HorizontalAlignment="{Binding Direction, Converter={StaticResource DirToAlign}}"
+                       Visibility="{Binding SendingVisibility}"/>
+                <TextBlock Text="{Binding FailureText}"
+                       FontSize="11"
+                       FontWeight="SemiBold"
+                       Foreground="#DC2626"
+                       HorizontalAlignment="{Binding Direction, Converter={StaticResource DirToAlign}}"
+                       Visibility="{Binding FailedVisibility}"
+                       ToolTip="{Binding FailureDetail}"/>
             </StackPanel>
         </DataTemplate>
 
@@ -58,6 +70,18 @@
                        HorizontalAlignment="{Binding Direction, Converter={StaticResource DirToAlign}}"
                        Margin="0,2,0,0"
                        Text="{Binding Timestamp, StringFormat={}{0:MM-dd HH:mm}}"/>
+                <TextBlock Text="전송중"
+                       FontSize="11"
+                       Foreground="#64748B"
+                       HorizontalAlignment="{Binding Direction, Converter={StaticResource DirToAlign}}"
+                       Visibility="{Binding SendingVisibility}"/>
+                <TextBlock Text="{Binding FailureText}"
+                       FontSize="11"
+                       FontWeight="SemiBold"
+                       Foreground="#DC2626"
+                       HorizontalAlignment="{Binding Direction, Converter={StaticResource DirToAlign}}"
+                       Visibility="{Binding FailedVisibility}"
+                       ToolTip="{Binding FailureDetail}"/>
             </StackPanel>
         </DataTemplate>
 
@@ -83,6 +107,18 @@
                        HorizontalAlignment="{Binding Direction, Converter={StaticResource DirToAlign}}"
                        Margin="0,2,0,0"
                        Text="{Binding Timestamp, StringFormat={}{0:MM-dd HH:mm}}"/>
+                <TextBlock Text="전송중"
+                       FontSize="11"
+                       Foreground="#64748B"
+                       HorizontalAlignment="{Binding Direction, Converter={StaticResource DirToAlign}}"
+                       Visibility="{Binding SendingVisibility}"/>
+                <TextBlock Text="{Binding FailureText}"
+                       FontSize="11"
+                       FontWeight="SemiBold"
+                       Foreground="#DC2626"
+                       HorizontalAlignment="{Binding Direction, Converter={StaticResource DirToAlign}}"
+                       Visibility="{Binding FailedVisibility}"
+                       ToolTip="{Binding FailureDetail}"/>
             </StackPanel>
         </DataTemplate>
     </UserControl.Resources>

@@ -35,6 +35,7 @@ using UserControl = System.Windows.Controls.UserControl;
 using WalkieDohi.ChattingRooms.ViewModels;
 using WalkieDohi.ChattingRooms.Views;
 using System.Text.RegularExpressions;
+using WalkieDohi.Util.Tcp;
 
 namespace WalkieDohi.ChattingRooms.UserControls
 {
@@ -46,9 +47,9 @@ namespace WalkieDohi.ChattingRooms.UserControls
         public string TargetIp { get; set; }
         //public int TargetPort { get; set; }
 
-        public event EventHandler<string> OnSendMessage;
+        public event SendMessageRequestedEventHandler OnSendMessage;
 
-        public event EventHandler<(string FileName, string Base64Content)> OnSendFile;
+        public event SendFileRequestedEventHandler OnSendFile;
 
         private ChatViewModel viewModel;
 
@@ -266,7 +267,7 @@ namespace WalkieDohi.ChattingRooms.UserControls
 
                 foreach (var filePath in droppedFiles)
                 {
-                    HandleDroppedFile(filePath);
+                    await HandleDroppedFileAsync(filePath);
                 }
             }
         }
@@ -278,7 +279,7 @@ namespace WalkieDohi.ChattingRooms.UserControls
         /// <summary>
         /// 메세지 보내는 로직
         /// </summary>
-        private void Send()
+        private async void Send()
         {
             var text = InputBox.Text.Trim();
             if (!string.IsNullOrEmpty(text))
@@ -286,15 +287,56 @@ namespace WalkieDohi.ChattingRooms.UserControls
                 string base64 = "";
                 string path = "";
 
-                OnSendMessage?.Invoke(this, text);
                 var display = ChatMessage.CreateSendMessage(text,base64, path, MessageType.Text);
-                AddMessage(display, MessageDirection.Send);
+                display.IsSending = true;
                 InputBox.Clear();
 
-                Dispatcher.BeginInvoke(new Action(() =>
+                AddMessage(display, MessageDirection.Send, saveImmediately: false);
+
+                _ = Dispatcher.BeginInvoke(new Action(() =>
                 {
                     InputBox.Focus();
                 }), DispatcherPriority.Background);
+
+                var result = await RequestSendMessageAsync(text);
+                display.ApplySendResult(result);
+                SaveOldMessages();
+            }
+        }
+
+        private async Task<SendResult> RequestSendMessageAsync(string text)
+        {
+            var handler = OnSendMessage;
+            if (handler == null)
+            {
+                return SendResult.Fail(TargetIp, "메시지 전송 처리기가 연결되지 않았습니다.");
+            }
+
+            try
+            {
+                return await handler(this, text);
+            }
+            catch (Exception ex)
+            {
+                return SendResult.Fail(TargetIp, ex.Message);
+            }
+        }
+
+        private async Task<SendResult> RequestSendFileAsync((string FileName, string Base64Content) fileInfo)
+        {
+            var handler = OnSendFile;
+            if (handler == null)
+            {
+                return SendResult.Fail(TargetIp, "파일 전송 처리기가 연결되지 않았습니다.");
+            }
+
+            try
+            {
+                return await handler(this, fileInfo);
+            }
+            catch (Exception ex)
+            {
+                return SendResult.Fail(TargetIp, ex.Message);
             }
         }
 
@@ -325,7 +367,7 @@ namespace WalkieDohi.ChattingRooms.UserControls
             string filePath = GetOpenFilePath();
             if (!string.IsNullOrEmpty(filePath))
             {
-                HandleDroppedFile(filePath);
+                await HandleDroppedFileAsync(filePath);
             }
         }
 
@@ -335,7 +377,7 @@ namespace WalkieDohi.ChattingRooms.UserControls
         /// </summary>
         /// <param name="filePath"></param>
         /// <returns></returns>
-        private void HandleDroppedFile(string filePath)
+        private async Task HandleDroppedFileAsync(string filePath)
         {
             if (!File.Exists(filePath)) return;
 
@@ -356,14 +398,18 @@ namespace WalkieDohi.ChattingRooms.UserControls
 
                 var fileMessage = MessageEntity.OfSendFileMassage(base64, Path.GetFileName(filePath));
 
-                OnSendFile?.Invoke(this, (fileMessage.FileName, base64));
                 if (MessageImageUtil.isImagecheck(fileMessage.FileName))
                 {
                     messageType = MessageType.Image;
                 }
 
                 var display = ChatMessage.CreateSendMessage(fileMessage.FileName, fileMessage.Content, filePath, messageType);
-                AddMessage(display, MessageDirection.Send);
+                display.IsSending = true;
+                AddMessage(display, MessageDirection.Send, saveImmediately: false);
+
+                var result = await RequestSendFileAsync((fileMessage.FileName, base64));
+                display.ApplySendResult(result);
+                SaveOldMessages();
             }
             catch (Exception ex)
             {
@@ -374,25 +420,29 @@ namespace WalkieDohi.ChattingRooms.UserControls
         /// 클립보드에 있는 사진 전송로직 (경로보기불가)
         /// </summary>
         /// <param name="base64"></param>
-        private void SendClipboardImageMessage(string base64)
+        private async void SendClipboardImageMessage(string base64)
         {
             string randomName = MessageImageUtil.GetRandomClipboadImgName();
             var fileMessage = MessageEntity.OfSendFileMassage(base64, randomName);
             string filePath = ""; // 경로없음
-            OnSendFile?.Invoke(this, (fileMessage.FileName, base64));
             var display = ChatMessage.CreateSendMessage(fileMessage.FileName, fileMessage.Content,filePath, MessageType.Image); //경로없음 
+            display.IsSending = true;
+            AddMessage(display, MessageDirection.Send, saveImmediately: false);
 
-            AddMessage(display, MessageDirection.Send);
+            var result = await RequestSendFileAsync((fileMessage.FileName, base64));
+            display.ApplySendResult(result);
+            SaveOldMessages();
         }
 
 
-        public void AddMessage(ChatMessage display, MessageDirection type)
+        public void AddMessage(ChatMessage display, MessageDirection type, bool saveImmediately = true)
         {
             viewModel.ChatMessages.Add(display);
 
-            
+            if (saveImmediately)
+            {
                 SaveOldMessages();
-            
+            }
 
             //스크롤 내려주는 코드 
             Dispatcher.BeginInvoke(
@@ -490,8 +540,6 @@ namespace WalkieDohi.ChattingRooms.UserControls
         #endregion
 
 
-        private DateTime _lastSavedMessageTime = DateTime.MinValue;
-
         private void SaveOldMessages()
         {
             try
@@ -508,7 +556,7 @@ namespace WalkieDohi.ChattingRooms.UserControls
 
                 // 새 메시지 추출
                 var newMessages = viewModel.ChatMessages
-                    .Where(m => !m.IsReload && m.Timestamp > _lastSavedMessageTime)
+                    .Where(m => !m.IsReload && !m.IsSending && !m.IsSaved)
                     .OrderBy(m => m.Timestamp)
                     .ToList();
 
@@ -520,7 +568,11 @@ namespace WalkieDohi.ChattingRooms.UserControls
 
                 File.WriteAllText(filePath, JsonUtil.Serialize(existing, indented: true));
 
-                _lastSavedMessageTime = newMessages.Last().Timestamp;
+                foreach (var message in newMessages)
+                {
+                    message.IsSaved = true;
+                }
+
             }
             catch (Exception ex)
             {

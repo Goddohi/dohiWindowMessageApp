@@ -31,6 +31,8 @@ namespace WalkieDohi.Packet.Messages.Entity
 
         public string ContentPath { get; set; } //파일경로 저장 필요할 경우 사용 (주로 reload에서 이용)
         public bool IsFailed { get; set; } = false;
+        public string FailureText { get; set; } = "";
+        public string FailureDetail { get; set; } = "";
         public DateTime Timestamp { get; set; } = DateTime.Now; //해당문제로 종종 날짜가 다 지금으로 되는 경우 발생
 
 

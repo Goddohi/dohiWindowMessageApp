@@ -13,7 +13,9 @@ namespace WalkieDohi.Util.Tcp
 {
     public class PacketSender
     {
-        public async Task SendPacketAsync(string ip, int port, PacketEntity packet)
+        private static readonly TimeSpan ConnectTimeout = TimeSpan.FromSeconds(5);
+
+        public async Task<SendResult> SendPacketAsync(string ip, int port, PacketEntity packet)
         {
             try
             {
@@ -23,7 +25,7 @@ namespace WalkieDohi.Util.Tcp
 
                 using (var client = new TcpClient())
                 {
-                    await client.ConnectAsync(ip, port);
+                    await ConnectAsync(client, ip, port);
                     using (var stream = client.GetStream())
                     {
                         await stream.WriteAsync(length, 0, 4);
@@ -31,12 +33,30 @@ namespace WalkieDohi.Util.Tcp
                         await stream.FlushAsync();
                     }
                 }
+
+                return SendResult.Success(ip);
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"[패킷 전송 실패] {ex.Message}");
-                packet.SendFailPacket();
+                packet?.SendFailPacket();
+                return SendResult.Fail(ip, ex.Message);
             }
+        }
+
+        private static async Task ConnectAsync(TcpClient client, string ip, int port)
+        {
+            var connectTask = client.ConnectAsync(ip, port);
+            var timeoutTask = Task.Delay(ConnectTimeout);
+            var completedTask = await Task.WhenAny(connectTask, timeoutTask);
+
+            if (completedTask == timeoutTask)
+            {
+                client.Close();
+                throw new TimeoutException($"연결 시간이 초과되었습니다. ({ConnectTimeout.TotalSeconds:0}초)");
+            }
+
+            await connectTask;
         }
     }
 

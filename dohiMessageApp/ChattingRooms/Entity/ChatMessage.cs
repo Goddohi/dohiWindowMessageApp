@@ -1,23 +1,101 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.IO;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
 using WalkieDohi.ChattingRooms.Views;
 using WalkieDohi.Groups.Entity;
 using WalkieDohi.Packet.Messages.Entity;
 using WalkieDohi.Util;
+using WalkieDohi.Util.Tcp;
 
 namespace WalkieDohi.ChattingRooms.Entity
 {
-    public abstract class ChatMessage
+    public abstract class ChatMessage : INotifyPropertyChanged
     {
+        private bool _isFailed;
+        private bool _isSending;
+        private string _failureText = "전송 실패";
+        private string _failureDetail = "";
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
         public string Sender { get; set; }
-        public bool IsFailed { get; set; } = false;
+        public bool IsFailed
+        {
+            get { return _isFailed; }
+            set
+            {
+                if (_isFailed == value) return;
+
+                _isFailed = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(FailedVisibility));
+            }
+        }
+
+        [JsonIgnore]
+        public bool IsSending
+        {
+            get { return _isSending; }
+            set
+            {
+                if (_isSending == value) return;
+
+                _isSending = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(SendingVisibility));
+            }
+        }
+
+        public string FailureText
+        {
+            get { return string.IsNullOrWhiteSpace(_failureText) ? "전송 실패" : _failureText; }
+            set
+            {
+                var next = string.IsNullOrWhiteSpace(value) ? "전송 실패" : value;
+                if (_failureText == next) return;
+
+                _failureText = next;
+                OnPropertyChanged();
+            }
+        }
+
+        public string FailureDetail
+        {
+            get { return _failureDetail ?? ""; }
+            set
+            {
+                var next = value ?? "";
+                if (_failureDetail == next) return;
+
+                _failureDetail = next;
+                OnPropertyChanged();
+            }
+        }
+
+        [JsonIgnore]
+        public Visibility FailedVisibility
+        {
+            get { return IsFailed ? Visibility.Visible : Visibility.Collapsed; }
+        }
+
+        [JsonIgnore]
+        public Visibility SendingVisibility
+        {
+            get { return IsSending ? Visibility.Visible : Visibility.Collapsed; }
+        }
+
         public MessageDirection Direction { get; set; }
 
         [JsonIgnore]
         public bool IsReload { get; set; } = false;
+
+        [JsonIgnore]
+        public bool IsSaved { get; set; } = false;
 
         /// <summary>
         /// 메세지별 보여줄 컨텐츠
@@ -32,16 +110,25 @@ namespace WalkieDohi.ChattingRooms.Entity
         {
             if (msg == null) return null;
 
+            ChatMessage display = null;
+
             if (msg.CheckMessageTypeText)
-                return new TextMessage(msg.Sender, msg.Content, direction,msg.Timestamp ,msg.SenderIp,msg.Group);
+                display = new TextMessage(msg.Sender, msg.Content, direction,msg.Timestamp ,msg.SenderIp,msg.Group);
 
-            if (msg.CheckMessageTypeImage)
-                return new ImageMessage(msg.Sender, msg.FileName, msg.Content, path, direction, msg.Timestamp, msg.SenderIp, msg.Group);
+            else if (msg.CheckMessageTypeImage)
+                display = new ImageMessage(msg.Sender, msg.FileName, msg.Content, path, direction, msg.Timestamp, msg.SenderIp, msg.Group);
 
-            if (msg.CheckMessageTypeFile)
-                return new FileMessage(msg.Sender, msg.FileName, path, direction, msg.Timestamp, msg.SenderIp, msg.Group);
+            else if (msg.CheckMessageTypeFile)
+                display = new FileMessage(msg.Sender, msg.FileName, path, direction, msg.Timestamp, msg.SenderIp, msg.Group);
 
-            return null;
+            if (display != null)
+            {
+                display.IsFailed = msg.IsFailed;
+                display.FailureText = msg.FailureText;
+                display.FailureDetail = msg.FailureDetail;
+            }
+
+            return display;
         }
 
         public static ChatMessage CreateSendMessage(string content, string base64, string path, MessageType type,bool isFailed = false)
@@ -74,6 +161,28 @@ namespace WalkieDohi.ChattingRooms.Entity
             if (this.IsReload)
                 return sender;
             return dir == MessageDirection.Send ? "📤 나" : sender;
+        }
+
+        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public void ApplySendResult(SendResult result)
+        {
+            if (result == null)
+            {
+                IsSending = false;
+                IsFailed = false;
+                FailureText = "";
+                FailureDetail = "";
+                return;
+            }
+
+            IsSending = false;
+            IsFailed = result.Failed;
+            FailureText = result.FailureText;
+            FailureDetail = result.FailureDetail;
         }
     }
 

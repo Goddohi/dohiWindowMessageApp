@@ -55,24 +55,32 @@ namespace WalkieDohi.ChattingRooms.UserControls
                 control.OnSendMessage += async (s, text) =>
                 {
                     ChatListManager.UpdateChatList(item.Group);
-                    var msg = MessageEntity.OfGroupSendTextMassage(item.Group, text);
                     var tasks = item.Group.Ips
                         .Where(ip => ip != NetworkHelper.GetLocalIPv4())
-                        .Select(ip => new MessengerSender().SendMessageAsync(ip, msg));
-                    await System.Threading.Tasks.Task.WhenAll(tasks);
+                        .Select(ip =>
+                        {
+                            var msg = MessageEntity.OfGroupSendTextMassage(item.Group, text);
+                            return new MessengerSender().SendMessageAsync(ip, msg);
+                        });
+                    var results = await System.Threading.Tasks.Task.WhenAll(tasks);
+                    return SendResult.Aggregate(results, ResolveSendTargetName);
                 };
 
                 control.OnSendFile += async (s, fileInfo) =>
                 {
                     ChatListManager.UpdateChatList(item.Group);
-                    var msg = MessageEntity.OfGroupSendFileMassage(item.Group, fileInfo.Base64Content, fileInfo.FileName);
-                    if (MessageImageUtil.isImagecheck(msg.FileName))
-                        msg.Type = MessageType.Image;
-
                     var tasks = item.Group.Ips
                         .Where(ip => ip != NetworkHelper.GetLocalIPv4())
-                        .Select(ip => new MessengerSender().SendMessageAsync(ip, msg));
-                    await System.Threading.Tasks.Task.WhenAll(tasks);
+                        .Select(ip =>
+                        {
+                            var msg = MessageEntity.OfGroupSendFileMassage(item.Group, fileInfo.Base64Content, fileInfo.FileName);
+                            if (MessageImageUtil.isImagecheck(msg.FileName))
+                                msg.Type = MessageType.Image;
+
+                            return new MessengerSender().SendMessageAsync(ip, msg);
+                        });
+                    var results = await System.Threading.Tasks.Task.WhenAll(tasks);
+                    return SendResult.Aggregate(results, ResolveSendTargetName);
 
                 };
 
@@ -90,8 +98,7 @@ namespace WalkieDohi.ChattingRooms.UserControls
                 {
                     ChatListManager.UpdateChatList(item.Name, item.Ip);
                     var msg = MessageEntity.OfSendTextMassage(text);
-                    await new MessengerSender().SendMessageAsync(item.Ip, msg);
-
+                    return await new MessengerSender().SendMessageAsync(item.Ip, msg);
                 };
 
                 control.OnSendFile += async (s, fileInfo) =>
@@ -100,11 +107,16 @@ namespace WalkieDohi.ChattingRooms.UserControls
                     var msg = MessageEntity.OfSendFileMassage(fileInfo.Base64Content, fileInfo.FileName);
                     if (MessageImageUtil.isImagecheck(msg.FileName))
                         msg.Type = MessageType.Image;
-                    await new MessengerSender().SendMessageAsync(item.Ip, msg);
+                    return await new MessengerSender().SendMessageAsync(item.Ip, msg);
                 };
 
                 return control;
             }
+        }
+
+        private static string ResolveSendTargetName(string ip)
+        {
+            return MainData.GetFriendNameOrReturnOriginal("", ip);
         }
 
         public void HandleIncomingMessage(MessageEntity msg)

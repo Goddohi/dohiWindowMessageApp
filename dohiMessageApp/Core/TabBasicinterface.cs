@@ -5,14 +5,19 @@ using System.Text;
 using System.Threading.Tasks;
 using WalkieDohi.ChattingRooms.Entity;
 using WalkieDohi.Packet.Messages.Entity;
+using WalkieDohi.Util.Tcp;
 
 namespace WalkieDohi.Core
 {
+    public delegate Task<SendResult> SendMessageRequestedEventHandler(object sender, string text);
+
+    public delegate Task<SendResult> SendFileRequestedEventHandler(object sender, (string FileName, string Base64Content) fileInfo);
+
     public interface TabBasicinterface
     {
-        event EventHandler<string> OnSendMessage;
+        event SendMessageRequestedEventHandler OnSendMessage;
 
-        event EventHandler<(string FileName, string Base64Content)> OnSendFile;
+        event SendFileRequestedEventHandler OnSendFile;
 
         void AddReceivedMessage(MessageEntity msg);
 
