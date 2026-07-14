@@ -110,7 +110,6 @@ namespace WalkieDohi.ChattingRooms.Data
         #region 채팅 내역만 삭제 로직 
         public static void DeleteChatLog(string key)
         {
-            // SQLite 저장소의 채팅 로그 삭제
             try
             {
                 ChatLogStore.DeleteRoom(key);
@@ -118,22 +117,6 @@ namespace WalkieDohi.ChattingRooms.Data
             catch (Exception ex)
             {
                 MessageBox.Show("채팅 DB 로그 삭제 실패: " + ex.Message);
-            }
-
-            // 이전 버전에서 저장한 채팅 파일 삭제
-            try
-            {
-                //string dir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ChatLogs", key);
-
-                string dir = Path.Combine(DirectoryManager.GetAppDataDirectoryCombineFileName("ChatLogs"), key);
-                if (Directory.Exists(dir))
-                {
-                    Directory.Delete(dir, true); // 하위 파일 포함 삭제
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("채팅 로그 폴더 삭제 실패: " + ex.Message);
             }
         }
         #endregion

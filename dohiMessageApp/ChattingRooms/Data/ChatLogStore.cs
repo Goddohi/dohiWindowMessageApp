@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
-using System.IO;
 using System.Linq;
 using WalkieDohi.ChattingRooms.Entity;
 using WalkieDohi.Groups.Entity;
@@ -33,11 +32,6 @@ namespace WalkieDohi.ChattingRooms.Data
                 return "";
 
             return $"group_{DirectoryManager.MakeSafeFileName(group.Key)}";
-        }
-
-        public static string GetLegacyRoomDirectory(string roomKey)
-        {
-            return Path.Combine(DirectoryManager.GetAppDataDirectoryCombineFileName("ChatLogs"), roomKey);
         }
 
         public static void SaveMessages(string roomKey, IEnumerable<ChatMessage> messages)
@@ -176,66 +170,6 @@ namespace WalkieDohi.ChattingRooms.Data
                 command.Parameters.AddWithValue("@room_key", roomKey);
                 command.Parameters.AddWithValue("@message_id", messageId);
                 return Convert.ToInt64(command.ExecuteScalar()) > 0;
-            }
-        }
-
-        public static void MigrateLegacyFilesIfNeeded(string roomKey)
-        {
-            if (string.IsNullOrWhiteSpace(roomKey) || CountMessages(roomKey) > 0)
-                return;
-
-            var legacyDirectory = GetLegacyRoomDirectory(roomKey);
-            if (!Directory.Exists(legacyDirectory))
-                return;
-
-            var files = Directory.EnumerateFiles(legacyDirectory)
-                .Where(f => System.Text.RegularExpressions.Regex.IsMatch(
-                    Path.GetFileName(f),
-                    @"^chat_.*\.(json|dohi)$",
-                    System.Text.RegularExpressions.RegexOptions.IgnoreCase))
-                .OrderBy(f => f)
-                .ToList();
-
-            foreach (var file in files)
-            {
-                try
-                {
-                    var json = File.ReadAllText(file);
-                    var entities = JsonUtil.Deserialize<List<MessageEntity>>(json) ?? new List<MessageEntity>();
-                    var messages = new List<ChatMessage>();
-                    foreach (var entity in entities)
-                    {
-                        try
-                        {
-                            var message = entity.ToChatMessage(true);
-                            if (message != null)
-                                messages.Add(message);
-                        }
-                        catch
-                        {
-                            // 손상된 메시지 하나 때문에 같은 파일의 나머지 로그를 버리지 않습니다.
-                        }
-                    }
-
-                    SaveMessages(roomKey, messages);
-                }
-                catch
-                {
-                    // 손상된 과거 로그 하나 때문에 채팅방 전체 로딩이 막히지 않게 넘깁니다.
-                }
-            }
-        }
-
-        private static long CountMessages(string roomKey)
-        {
-            EnsureSchema();
-
-            using (var connection = OpenConnection())
-            using (var command = connection.CreateCommand())
-            {
-                command.CommandText = "SELECT COUNT(*) FROM chat_messages WHERE room_key = @room_key;";
-                command.Parameters.AddWithValue("@room_key", roomKey);
-                return Convert.ToInt64(command.ExecuteScalar());
             }
         }
 

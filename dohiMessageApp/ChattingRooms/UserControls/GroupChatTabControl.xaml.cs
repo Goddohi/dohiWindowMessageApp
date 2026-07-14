@@ -614,8 +614,6 @@ namespace WalkieDohi.ChattingRooms.UserControls
 
         private void InitializeMessageFiles()
         {
-            var roomKey = GetRoomKey();
-            ChatLogStore.MigrateLegacyFilesIfNeeded(roomKey);
             _loadedMessageCount = 0;
             _hasMoreMessages = true;
             _messageStoreInitialized = true;
