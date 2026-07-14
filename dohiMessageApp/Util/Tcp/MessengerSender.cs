@@ -24,6 +24,7 @@ namespace WalkieDohi.Util
                     return SendResult.Fail(ip, "전송할 메시지가 없습니다.");
                 }
 
+                message.EnsureMessageId();
                 var packet = PacketEntity.FromObject(PacketType.Message, message, ip);
                 var result = await _packetSender.SendPacketAsync(ip, MainData.GetPort(), packet);
 

@@ -19,6 +19,7 @@ namespace WalkieDohi.Packet.Messages.Entity
     public class MessageEntity : DohiEntityBase
     {
         public MessageType Type { get; set; }
+        public string MessageId { get; set; }
         public string Sender { get; set; }
         public GroupEntity Group { get; set; }
 
@@ -40,31 +41,47 @@ namespace WalkieDohi.Packet.Messages.Entity
 
         public MessageEntity() {}
 
-        public static MessageEntity OfTextMassage(string sender, string senderIp, string content)
+        public static string CreateMessageId()
+        {
+            return Guid.NewGuid().ToString("N");
+        }
+
+        public void EnsureMessageId()
+        {
+            if (string.IsNullOrWhiteSpace(MessageId))
+            {
+                MessageId = CreateMessageId();
+            }
+        }
+
+        public static MessageEntity OfTextMassage(string sender, string senderIp, string content, string messageId = null)
         {
             return new MessageEntity
             {
                 Type = MessageType.Text,
+                MessageId = string.IsNullOrWhiteSpace(messageId) ? CreateMessageId() : messageId,
                 Sender = sender,
                 SenderIp = senderIp,
                 Content = content
             };
         }
-        public static MessageEntity OfSendTextMassage(string content)
+        public static MessageEntity OfSendTextMassage(string content, string messageId = null)
         {
             return new MessageEntity
             {
                 Type = MessageType.Text,
+                MessageId = string.IsNullOrWhiteSpace(messageId) ? CreateMessageId() : messageId,
                 Sender = MainData.currentUser.Nickname,
                 SenderIp = NetworkHelper.GetLocalIPv4(),
                 Content = content
             };
         }
-        public static MessageEntity OfFileMassage(string sender, string senderIp, string content, string fileName, string filepath = "")
+        public static MessageEntity OfFileMassage(string sender, string senderIp, string content, string fileName, string filepath = "", string messageId = null)
         {
             return new MessageEntity
             {
                 Type = MessageType.File,
+                MessageId = string.IsNullOrWhiteSpace(messageId) ? CreateMessageId() : messageId,
                 Sender = sender,
                 SenderIp = senderIp,
                 Content = content,
@@ -72,11 +89,12 @@ namespace WalkieDohi.Packet.Messages.Entity
                 FileName = fileName
             };
         }
-        public static MessageEntity OfSendFileMassage( string content, string fileName,string filepath="")
+        public static MessageEntity OfSendFileMassage( string content, string fileName,string filepath="", string messageId = null)
         {
             return new MessageEntity
             {
                 Type = MessageType.File,
+                MessageId = string.IsNullOrWhiteSpace(messageId) ? CreateMessageId() : messageId,
                 Sender = MainData.currentUser.Nickname,
                 SenderIp = NetworkHelper.GetLocalIPv4(),
                 Content = content,
@@ -86,22 +104,24 @@ namespace WalkieDohi.Packet.Messages.Entity
         }
 
 
-        public static MessageEntity OfGroupTextMassage(GroupEntity group, string sender, string senderIp, string content)
+        public static MessageEntity OfGroupTextMassage(GroupEntity group, string sender, string senderIp, string content, string messageId = null)
         {
             return new MessageEntity
             {
                 Type = MessageType.Text,
+                MessageId = string.IsNullOrWhiteSpace(messageId) ? CreateMessageId() : messageId,
                 Group = group,
                 Sender = sender,
                 SenderIp = senderIp,
                 Content = content
             };
         }
-        public static MessageEntity OfGroupSendTextMassage(GroupEntity group, string content)
+        public static MessageEntity OfGroupSendTextMassage(GroupEntity group, string content, string messageId = null)
         {
             return new MessageEntity
             {
                 Type = MessageType.Text,
+                MessageId = string.IsNullOrWhiteSpace(messageId) ? CreateMessageId() : messageId,
                 Group = group,
                 Sender = MainData.currentUser.Nickname,
                 SenderIp = NetworkHelper.GetLocalIPv4(),
@@ -118,11 +138,12 @@ namespace WalkieDohi.Packet.Messages.Entity
         /// <param name="fileName"></param>
         /// <param name="filepath"></param>
         /// <returns></returns>
-        public static MessageEntity OfGroupFileMassage(GroupEntity group, string sender, string senderIp, string content, string fileName, string filepath = "")
+        public static MessageEntity OfGroupFileMassage(GroupEntity group, string sender, string senderIp, string content, string fileName, string filepath = "", string messageId = null)
         {
             return new MessageEntity
             {
                 Type = MessageType.File,
+                MessageId = string.IsNullOrWhiteSpace(messageId) ? CreateMessageId() : messageId,
                 Group = group,
                 Sender = sender,
                 SenderIp = senderIp,
@@ -140,11 +161,12 @@ namespace WalkieDohi.Packet.Messages.Entity
         /// <param name="fileName"></param>
         /// <param name="filepath"></param>
         /// <returns></returns>
-        public static MessageEntity OfGroupSendFileMassage(GroupEntity group,string content, string fileName, string filepath = "")
+        public static MessageEntity OfGroupSendFileMassage(GroupEntity group,string content, string fileName, string filepath = "", string messageId = null)
         {
             return new MessageEntity
             {
                 Type = MessageType.File,
+                MessageId = string.IsNullOrWhiteSpace(messageId) ? CreateMessageId() : messageId,
                 Group = group,
                 Sender = MainData.currentUser.Nickname,
                 SenderIp = NetworkHelper.GetLocalIPv4(),

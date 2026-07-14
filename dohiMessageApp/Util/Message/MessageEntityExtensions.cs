@@ -46,6 +46,7 @@ namespace WalkieDohi.Util
 
             if (display != null)
             {
+                display.MessageId = msg.MessageId;
                 display.IsFailed = msg.IsFailed;
                 display.FailureText = msg.FailureText;
                 display.FailureDetail = msg.FailureDetail;

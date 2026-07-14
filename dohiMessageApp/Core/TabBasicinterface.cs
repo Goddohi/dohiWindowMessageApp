@@ -9,9 +9,35 @@ using WalkieDohi.Util.Tcp;
 
 namespace WalkieDohi.Core
 {
-    public delegate Task<SendResult> SendMessageRequestedEventHandler(object sender, string text);
+    public class MessageSendRequest
+    {
+        public string MessageId { get; private set; }
+        public string Text { get; private set; }
 
-    public delegate Task<SendResult> SendFileRequestedEventHandler(object sender, (string FileName, string Base64Content) fileInfo);
+        public MessageSendRequest(string messageId, string text)
+        {
+            MessageId = messageId;
+            Text = text;
+        }
+    }
+
+    public class FileSendRequest
+    {
+        public string MessageId { get; private set; }
+        public string FileName { get; private set; }
+        public string Base64Content { get; private set; }
+
+        public FileSendRequest(string messageId, string fileName, string base64Content)
+        {
+            MessageId = messageId;
+            FileName = fileName;
+            Base64Content = base64Content;
+        }
+    }
+
+    public delegate Task<SendResult> SendMessageRequestedEventHandler(object sender, MessageSendRequest request);
+
+    public delegate Task<SendResult> SendFileRequestedEventHandler(object sender, FileSendRequest request);
 
     public interface TabBasicinterface
     {

@@ -21,6 +21,7 @@ WalkieDohi는 별도 메신저 서버를 둘 수 없는 폐쇄망 환경에서 W
 - WPF
 - .NET Framework 4.7.2
 - Newtonsoft.Json
+- System.Data.SQLite
 - WebView2
 - ClosedXML
 
@@ -59,6 +60,7 @@ WalkieDohi는 별도 메신저 서버를 둘 수 없는 폐쇄망 환경에서 W
 
 - 자동 시작 최소화 상태에서도 메시지 수신이 동작하도록 개선
 - 전송 실패 상태를 UI와 저장소에 반영
+- 채팅 로그를 SQLite 기반 로컬 DB에 저장
+- MessageId 기반으로 중복 수신과 중복 저장을 방지
 - IP 중심 식별 구조를 사용자 UUID 중심으로 개선
 - 수신 파일 저장 경로와 중복 파일명 처리 개선
-- 채팅 로그 저장 안정성 개선

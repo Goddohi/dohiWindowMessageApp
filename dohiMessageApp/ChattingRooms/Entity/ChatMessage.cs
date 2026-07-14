@@ -23,6 +23,7 @@ namespace WalkieDohi.ChattingRooms.Entity
 
         public event PropertyChangedEventHandler PropertyChanged;
 
+        public string MessageId { get; set; }
         public string Sender { get; set; }
         public bool IsFailed
         {
@@ -123,6 +124,7 @@ namespace WalkieDohi.ChattingRooms.Entity
 
             if (display != null)
             {
+                display.MessageId = msg.MessageId;
                 display.IsFailed = msg.IsFailed;
                 display.FailureText = msg.FailureText;
                 display.FailureDetail = msg.FailureDetail;
@@ -131,18 +133,27 @@ namespace WalkieDohi.ChattingRooms.Entity
             return display;
         }
 
-        public static ChatMessage CreateSendMessage(string content, string base64, string path, MessageType type,bool isFailed = false)
+        public static ChatMessage CreateSendMessage(string content, string base64, string path, MessageType type,bool isFailed = false, string messageId = null)
         {
+            var nextMessageId = string.IsNullOrWhiteSpace(messageId) ? MessageEntity.CreateMessageId() : messageId;
             switch (type)
             {
                 case MessageType.Text:
-                    return new TextMessage("📤 나", content, MessageDirection.Send, DateTime.Now,NetworkHelper.GetLocalIPv4()) { IsFailed = isFailed };
+                    return new TextMessage("📤 나", content, MessageDirection.Send, DateTime.Now,NetworkHelper.GetLocalIPv4()) { IsFailed = isFailed, MessageId = nextMessageId };
                 case MessageType.Image:
-                    return new ImageMessage("📤 나", content, base64, path, MessageDirection.Send, DateTime.Now, NetworkHelper.GetLocalIPv4()) { IsFailed = isFailed };
+                    return new ImageMessage("📤 나", content, base64, path, MessageDirection.Send, DateTime.Now, NetworkHelper.GetLocalIPv4()) { IsFailed = isFailed, MessageId = nextMessageId };
                 case MessageType.File:
-                    return new FileMessage("📤 나", content, path, MessageDirection.Send, DateTime.Now, NetworkHelper.GetLocalIPv4()) { IsFailed = isFailed };
+                    return new FileMessage("📤 나", content, path, MessageDirection.Send, DateTime.Now, NetworkHelper.GetLocalIPv4()) { IsFailed = isFailed, MessageId = nextMessageId };
                 default:
                     return null;
+            }
+        }
+
+        public void EnsureMessageId()
+        {
+            if (string.IsNullOrWhiteSpace(MessageId))
+            {
+                MessageId = MessageEntity.CreateMessageId();
             }
         }
 

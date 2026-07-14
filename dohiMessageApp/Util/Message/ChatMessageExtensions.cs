@@ -11,8 +11,11 @@ namespace WalkieDohi.Util
     {
         public static MessageEntity ToEntity(this ChatMessage msg)
         {
+            msg.EnsureMessageId();
+
             var entity = new MessageEntity
             {
+                MessageId = msg.MessageId,
                 Sender = msg.Sender,
                 IsFailed = msg.IsFailed,
                 FailureText = msg.IsFailed ? msg.FailureText : "",

@@ -19,6 +19,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 using WalkieDohi.Core;
+using WalkieDohi.ChattingRooms.Data;
 using WalkieDohi.ChattingRooms.Entity;
 using WalkieDohi.Packet.Messages.Entity;
 using WalkieDohi.Util;
@@ -286,8 +287,9 @@ namespace WalkieDohi.ChattingRooms.UserControls
             {
                 string base64 = "";
                 string path = "";
+                string messageId = MessageEntity.CreateMessageId();
 
-                var display = ChatMessage.CreateSendMessage(text,base64, path, MessageType.Text);
+                var display = ChatMessage.CreateSendMessage(text,base64, path, MessageType.Text, false, messageId);
                 display.IsSending = true;
                 InputBox.Clear();
 
@@ -298,13 +300,13 @@ namespace WalkieDohi.ChattingRooms.UserControls
                     InputBox.Focus();
                 }), DispatcherPriority.Background);
 
-                var result = await RequestSendMessageAsync(text);
+                var result = await RequestSendMessageAsync(messageId, text);
                 display.ApplySendResult(result);
                 SaveOldMessages();
             }
         }
 
-        private async Task<SendResult> RequestSendMessageAsync(string text)
+        private async Task<SendResult> RequestSendMessageAsync(string messageId, string text)
         {
             var handler = OnSendMessage;
             if (handler == null)
@@ -314,7 +316,7 @@ namespace WalkieDohi.ChattingRooms.UserControls
 
             try
             {
-                return await handler(this, text);
+                return await handler(this, new MessageSendRequest(messageId, text));
             }
             catch (Exception ex)
             {
@@ -322,7 +324,7 @@ namespace WalkieDohi.ChattingRooms.UserControls
             }
         }
 
-        private async Task<SendResult> RequestSendFileAsync((string FileName, string Base64Content) fileInfo)
+        private async Task<SendResult> RequestSendFileAsync(string messageId, string fileName, string base64Content)
         {
             var handler = OnSendFile;
             if (handler == null)
@@ -332,7 +334,7 @@ namespace WalkieDohi.ChattingRooms.UserControls
 
             try
             {
-                return await handler(this, fileInfo);
+                return await handler(this, new FileSendRequest(messageId, fileName, base64Content));
             }
             catch (Exception ex)
             {
@@ -395,19 +397,20 @@ namespace WalkieDohi.ChattingRooms.UserControls
                 var messageType = MessageType.File;
                 byte[] fileData = File.ReadAllBytes(filePath);
                 string base64 = Convert.ToBase64String(fileData);
+                string messageId = MessageEntity.CreateMessageId();
 
-                var fileMessage = MessageEntity.OfSendFileMassage(base64, Path.GetFileName(filePath));
+                var fileMessage = MessageEntity.OfSendFileMassage(base64, Path.GetFileName(filePath), "", messageId);
 
                 if (MessageImageUtil.isImagecheck(fileMessage.FileName))
                 {
                     messageType = MessageType.Image;
                 }
 
-                var display = ChatMessage.CreateSendMessage(fileMessage.FileName, fileMessage.Content, filePath, messageType);
+                var display = ChatMessage.CreateSendMessage(fileMessage.FileName, fileMessage.Content, filePath, messageType, false, messageId);
                 display.IsSending = true;
                 AddMessage(display, MessageDirection.Send, saveImmediately: false);
 
-                var result = await RequestSendFileAsync((fileMessage.FileName, base64));
+                var result = await RequestSendFileAsync(messageId, fileMessage.FileName, base64);
                 display.ApplySendResult(result);
                 SaveOldMessages();
             }
@@ -423,13 +426,14 @@ namespace WalkieDohi.ChattingRooms.UserControls
         private async void SendClipboardImageMessage(string base64)
         {
             string randomName = MessageImageUtil.GetRandomClipboadImgName();
-            var fileMessage = MessageEntity.OfSendFileMassage(base64, randomName);
+            string messageId = MessageEntity.CreateMessageId();
+            var fileMessage = MessageEntity.OfSendFileMassage(base64, randomName, "", messageId);
             string filePath = ""; // 경로없음
-            var display = ChatMessage.CreateSendMessage(fileMessage.FileName, fileMessage.Content,filePath, MessageType.Image); //경로없음 
+            var display = ChatMessage.CreateSendMessage(fileMessage.FileName, fileMessage.Content, filePath, MessageType.Image, false, messageId); //경로없음
             display.IsSending = true;
             AddMessage(display, MessageDirection.Send, saveImmediately: false);
 
-            var result = await RequestSendFileAsync((fileMessage.FileName, base64));
+            var result = await RequestSendFileAsync(messageId, fileMessage.FileName, base64);
             display.ApplySendResult(result);
             SaveOldMessages();
         }
@@ -544,16 +548,6 @@ namespace WalkieDohi.ChattingRooms.UserControls
         {
             try
             {
-                string filePath = GetTodayFilePath();
-
-                // 기존 메시지 읽기
-                List<MessageEntity> existing = new List<MessageEntity>();
-                if (File.Exists(filePath))
-                {
-                    var oldJson = File.ReadAllText(filePath);
-                    existing = JsonUtil.Deserialize<List<MessageEntity>>(oldJson);
-                }
-
                 // 새 메시지 추출
                 var newMessages = viewModel.ChatMessages
                     .Where(m => !m.IsReload && !m.IsSending && !m.IsSaved)
@@ -562,17 +556,17 @@ namespace WalkieDohi.ChattingRooms.UserControls
 
                 if (!newMessages.Any()) return;
 
-                // 누적 저장
-                var append = newMessages.Select(m => m.ToEntity());
-                existing.AddRange(append);
-
-                File.WriteAllText(filePath, JsonUtil.Serialize(existing, indented: true));
+                ChatLogStore.SaveMessages(GetRoomKey(), newMessages);
 
                 foreach (var message in newMessages)
                 {
                     message.IsSaved = true;
                 }
 
+                if (_messageStoreInitialized)
+                {
+                    _loadedMessageCount += newMessages.Count;
+                }
             }
             catch (Exception ex)
             {
@@ -580,48 +574,34 @@ namespace WalkieDohi.ChattingRooms.UserControls
             }
         }
 
-        private string GetChatDirectory()
+        private string GetRoomKey()
         {
-            string baseDir = Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "WalkieDohi"), "ChatLogs");
-
             if (!string.IsNullOrWhiteSpace(TargetIp))
             {
-                return Path.Combine(baseDir, TargetIp);
+                return ChatLogStore.GetSingleRoomKey(TargetIp);
             }
 
             throw new InvalidOperationException("대상이 없습니다.");
         }
-        private string GetTodayFilePath()
-        {
-            string dir = GetChatDirectory();
-            Directory.CreateDirectory(dir);
 
-            string today = DateTime.Now.ToString("yyyyMMdd");
-            return Path.Combine(dir, $"chat_{today}.dohi");
-        }
-
-
-        private Queue<string> _remainingFiles; // 아직 안 연 파일들 (과거순으로)
-        private HashSet<string> _loadedFiles; // 이미 연 파일들
+        private int _loadedMessageCount;
+        private bool _hasMoreMessages;
+        private bool _messageStoreInitialized;
 
         private void InitializeMessageFiles()
         {
-            string dir = GetChatDirectory();
-            if (!Directory.Exists(dir)) return;
-
-            var files = Directory.EnumerateFiles(dir)
-                .Where(f => Regex.IsMatch(Path.GetFileName(f), @"^chat_.*\.(json|dohi)$"))
-                .OrderByDescending(f => f) // 최신 → 과거 순
-                .ToList();
-
-            _remainingFiles = new Queue<string>(files);
-            _loadedFiles = new HashSet<string>();
+            var roomKey = GetRoomKey();
+            ChatLogStore.MigrateLegacyFilesIfNeeded(roomKey);
+            _loadedMessageCount = 0;
+            _hasMoreMessages = true;
+            _messageStoreInitialized = true;
         }
+
         public void LoadLatestMessages()
         {
             ChatRoomNameDisplay.Text = MainData.GetFriendNameOrReturnOriginal("미등록 친구", TargetIp);
 
-            InitializeMessageFiles(); // 파일 큐 초기화
+            InitializeMessageFiles(); // 저장소 페이지 상태 초기화
 
             LoadNextOldMessageFile(); // 최신 1개 로드
 
@@ -637,31 +617,28 @@ namespace WalkieDohi.ChattingRooms.UserControls
 
         public void LoadNextOldMessageFile()
         {
-            if (_remainingFiles == null || _remainingFiles.Count == 0)
+            if (!_hasMoreMessages)
                 return;
-
-            string nextFile = _remainingFiles.Dequeue();
-
-            if (_loadedFiles.Contains(nextFile))
-                return; // 이미 읽은 파일은 무시
 
             try
             {
-                var json = File.ReadAllText(nextFile);
-                var entities = JsonUtil.Deserialize<List<MessageEntity>>(json);
-
-                var messages = entities
-                    .Select(e => e.ToChatMessage(true))
-                    .Where(m => m != null)
-                    .ToList();
+                var messages = ChatLogStore.LoadMessages(GetRoomKey(), _loadedMessageCount, ChatLogStore.DefaultPageSize);
+                if (messages.Count == 0)
+                {
+                    _hasMoreMessages = false;
+                    return;
+                }
 
                 for (int i = messages.Count - 1; i >= 0; i--)
                 {
                     viewModel.ChatMessages.Insert(0, messages[i]);
                 }
-                var LoadlastItem = viewModel.ChatMessages[messages.Count - 1];
-                ChatList.ScrollIntoView(LoadlastItem);
-                _loadedFiles.Add(nextFile);
+
+                _loadedMessageCount += messages.Count;
+                _hasMoreMessages = messages.Count >= ChatLogStore.DefaultPageSize;
+
+                var loadLastItem = viewModel.ChatMessages[messages.Count - 1];
+                ChatList.ScrollIntoView(loadLastItem);
             }
             catch (Exception ex)
             {
