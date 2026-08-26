@@ -1,65 +1,61 @@
-﻿<UserControl x:Class="WalkieDohi.ChattingRooms.UserControls.ChatRoomListTabControl"
+<UserControl x:Class="WalkieDohi.ChattingRooms.UserControls.ChatRoomListTabControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              Height="Auto" Width="Auto">
-    <Grid>
+    <Grid Background="{StaticResource AppBackgroundBrush}">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="200"/>
-            <!-- 왼쪽: 리스트 -->
-            <ColumnDefinition Width="14"/>
+            <ColumnDefinition Width="240"/>
+            <ColumnDefinition Width="2"/>
             <ColumnDefinition Width="*"/>
-            <!-- 오른쪽: 채팅창 -->
         </Grid.ColumnDefinitions>
 
-        <Grid Grid.Column="0" Margin="3">
-
-            <Grid Grid.Column="0">
+        <Border Grid.Column="0"
+                Background="{StaticResource PanelAltBrush}"
+                BorderBrush="{StaticResource BorderBrushStrong}"
+                BorderThickness="0,0,1,0"
+                Padding="10">
+            <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/> <!-- 상단 다른 UI -->
-                    <RowDefinition Height="*"/>    <!-- ListBox가 차지 -->
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <Grid Margin="0,0,0,0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <!-- 그룹을 검색하세요 -->
-                        <ColumnDefinition Width="Auto"/>
-                        <!-- 버튼 -->
-                    </Grid.ColumnDefinitions>
+                <TextBlock Grid.Row="0"
+                           Text="채팅방"
+                           Style="{StaticResource SectionTitleTextStyle}"
+                           Margin="0,0,0,8"/>
 
-                    <Button x:Name="ManageGroupsButton"
-                            Grid.Row="0"
-                            Content="그룹채팅방 생성"
-                            Style="{StaticResource RoundedSettingButtonStyle}"
-                            Click="ManageGroups_Click"
-                            Height="30"
-                            Margin="5,0"/>
-                </Grid>
+                <Button x:Name="ManageGroupsButton"
+                        Grid.Row="1"
+                        Content="그룹 만들기"
+                        Style="{StaticResource RoundedBasicButtonStyle}"
+                        Click="ManageGroups_Click"
+                        Height="32"
+                        Margin="0,0,0,8"/>
 
                 <ListBox x:Name="ChatRoomListBox"
-                 
-                         Grid.Row="1"
-                 Margin="5"
-                 DisplayMemberPath="DisplayName"
-                 SelectionChanged="ChatRoomListBox_SelectionChanged"
-                 Loaded="ChatRoomListBox_Loaded"
-                 VerticalAlignment="Stretch"
-                 ScrollViewer.VerticalScrollBarVisibility="Auto"
-                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"/>
+                         Grid.Row="2"
+                         DisplayMemberPath="DisplayName"
+                         SelectionChanged="ChatRoomListBox_SelectionChanged"
+                         Loaded="ChatRoomListBox_Loaded"
+                         VerticalAlignment="Stretch"
+                         ScrollViewer.VerticalScrollBarVisibility="Auto"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled"/>
             </Grid>
+        </Border>
 
-
-        </Grid>
-        <!-- Splitter -->
         <GridSplitter Grid.Column="1"
-                      Width="5"
-                      Background="#E2E8F0"
+                      Width="2"
+                      Background="{StaticResource BorderBrushStrong}"
                       HorizontalAlignment="Stretch"
                       VerticalAlignment="Stretch"
                       ShowsPreview="True"/>
-        
-        <ContentControl x:Name="ChatContentArea"
-                        Grid.Column="2"
-                        Margin="10"/>
+
+        <Border Grid.Column="2"
+                Background="{StaticResource PanelBrush}">
+            <ContentControl x:Name="ChatContentArea"
+                            Margin="0"/>
+        </Border>
     </Grid>
 </UserControl>

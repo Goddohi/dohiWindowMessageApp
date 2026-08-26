@@ -31,6 +31,7 @@ namespace WalkieDohi.Friends.Views
     {
         public FriendManagerWindowViewModel viewModel = new FriendManagerWindowViewModel();
         FriendFileProvider friendFilePrvider = new FriendJsonFileHandler();
+        private bool isUpdatingIpBoxes = false;
         
         public FriendManagerWindow()
         {
@@ -141,8 +142,266 @@ namespace WalkieDohi.Friends.Views
 
         private void IpBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
-            // 숫자가 아니면 입력 차단
-            e.Handled = !e.Text.All(char.IsDigit);
+            if (!(sender is TextBox textBox))
+            {
+                return;
+            }
+
+            int boxIndex = GetIpBoxIndex(textBox);
+            if (boxIndex < 0)
+            {
+                e.Handled = true;
+                return;
+            }
+
+            string nextText = BuildIpBoxTextAfterInput(textBox, e.Text);
+
+            if (nextText.Contains("."))
+            {
+                e.Handled = true;
+                DistributeDottedIpText(boxIndex, nextText);
+                return;
+            }
+
+            string digitsOnly = new string(nextText.Where(char.IsDigit).ToArray());
+            if (nextText != digitsOnly)
+            {
+                e.Handled = true;
+                return;
+            }
+
+            if (digitsOnly.Length > textBox.MaxLength)
+            {
+                e.Handled = true;
+                DistributeIpDigits(boxIndex, digitsOnly);
+                return;
+            }
+
+            e.Handled = false;
+        }
+
+        private void IpBox_Pasting(object sender, DataObjectPastingEventArgs e)
+        {
+            if (!(sender is TextBox textBox)
+                || !e.DataObject.GetDataPresent(DataFormats.Text))
+            {
+                e.CancelCommand();
+                return;
+            }
+
+            string pastedText = e.DataObject.GetData(DataFormats.Text) as string;
+            if (string.IsNullOrEmpty(pastedText))
+            {
+                e.CancelCommand();
+                return;
+            }
+
+            string nextText = BuildIpBoxTextAfterInput(textBox, pastedText);
+            int boxIndex = GetIpBoxIndex(textBox);
+            if (boxIndex < 0)
+            {
+                e.CancelCommand();
+                return;
+            }
+
+            e.CancelCommand();
+            if (nextText.Contains("."))
+            {
+                DistributeDottedIpText(boxIndex, nextText);
+                return;
+            }
+
+            string digitsOnly = new string(nextText.Where(char.IsDigit).ToArray());
+            if (!string.IsNullOrEmpty(digitsOnly))
+            {
+                DistributeIpDigits(boxIndex, digitsOnly);
+            }
+        }
+
+        private void IpBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (isUpdatingIpBoxes || !(sender is TextBox textBox) || !textBox.IsKeyboardFocusWithin)
+            {
+                return;
+            }
+
+            int boxIndex = GetIpBoxIndex(textBox);
+            if (boxIndex < 0)
+            {
+                return;
+            }
+
+            if (textBox.Text.Contains("."))
+            {
+                DistributeDottedIpText(boxIndex, textBox.Text);
+                return;
+            }
+
+            string digitsOnly = new string(textBox.Text.Where(char.IsDigit).ToArray());
+            if (textBox.Text != digitsOnly)
+            {
+                SetIpBoxText(textBox, digitsOnly);
+            }
+
+            if (digitsOnly.Length > textBox.MaxLength)
+            {
+                DistributeIpDigits(boxIndex, digitsOnly);
+                return;
+            }
+
+            if (digitsOnly.Length == textBox.MaxLength)
+            {
+                MoveFocusToNextIpBox(textBox);
+            }
+        }
+
+        private string BuildIpBoxTextAfterInput(TextBox textBox, string inputText)
+        {
+            int selectionStart = Math.Min(textBox.SelectionStart, textBox.Text.Length);
+            int selectionLength = Math.Min(textBox.SelectionLength, textBox.Text.Length - selectionStart);
+
+            return textBox.Text
+                .Remove(selectionStart, selectionLength)
+                .Insert(selectionStart, inputText);
+        }
+
+        private int GetIpBoxIndex(TextBox textBox)
+        {
+            TextBox[] ipBoxes = GetIpBoxes();
+            return Array.IndexOf(ipBoxes, textBox);
+        }
+
+        private TextBox[] GetIpBoxes()
+        {
+            return new[] { IpBox1, IpBox2, IpBox3, IpBox4 };
+        }
+
+        private void SetIpBoxText(TextBox textBox, string text)
+        {
+            try
+            {
+                isUpdatingIpBoxes = true;
+                textBox.Text = text.Length > textBox.MaxLength
+                    ? text.Substring(0, textBox.MaxLength)
+                    : text;
+                textBox.CaretIndex = textBox.Text.Length;
+            }
+            finally
+            {
+                isUpdatingIpBoxes = false;
+            }
+        }
+
+        private void DistributeIpDigits(int startIndex, string digits)
+        {
+            if (startIndex < 0 || string.IsNullOrEmpty(digits))
+            {
+                return;
+            }
+
+            TextBox[] ipBoxes = GetIpBoxes();
+            int offset = 0;
+            int focusIndex = startIndex;
+
+            try
+            {
+                isUpdatingIpBoxes = true;
+                for (int index = startIndex; index < ipBoxes.Length && offset < digits.Length; index++)
+                {
+                    int length = Math.Min(ipBoxes[index].MaxLength, digits.Length - offset);
+                    ipBoxes[index].Text = digits.Substring(offset, length);
+                    ipBoxes[index].CaretIndex = ipBoxes[index].Text.Length;
+                    offset += length;
+                    focusIndex = index;
+                }
+            }
+            finally
+            {
+                isUpdatingIpBoxes = false;
+            }
+
+            if (offset >= digits.Length && focusIndex < ipBoxes.Length - 1 && ipBoxes[focusIndex].Text.Length == ipBoxes[focusIndex].MaxLength)
+            {
+                focusIndex++;
+            }
+
+            FocusIpBoxOrSubmitButton(focusIndex);
+        }
+
+        private void DistributeDottedIpText(int startIndex, string text)
+        {
+            if (startIndex < 0)
+            {
+                return;
+            }
+
+            TextBox[] ipBoxes = GetIpBoxes();
+            string[] parts = text.Split('.');
+            int focusIndex = startIndex;
+
+            try
+            {
+                isUpdatingIpBoxes = true;
+                for (int partIndex = 0; partIndex < parts.Length && startIndex + partIndex < ipBoxes.Length; partIndex++)
+                {
+                    string digitsOnly = new string(parts[partIndex].Where(char.IsDigit).ToArray());
+                    TextBox targetBox = ipBoxes[startIndex + partIndex];
+                    targetBox.Text = digitsOnly.Length > targetBox.MaxLength
+                        ? digitsOnly.Substring(0, targetBox.MaxLength)
+                        : digitsOnly;
+                    targetBox.CaretIndex = targetBox.Text.Length;
+                    focusIndex = startIndex + partIndex;
+                }
+            }
+            finally
+            {
+                isUpdatingIpBoxes = false;
+            }
+
+            if (focusIndex < ipBoxes.Length - 1 && ipBoxes[focusIndex].Text.Length == ipBoxes[focusIndex].MaxLength)
+            {
+                focusIndex++;
+            }
+
+            FocusIpBoxOrSubmitButton(focusIndex);
+        }
+
+        private void MoveFocusToNextIpBox(TextBox currentBox)
+        {
+            int boxIndex = GetIpBoxIndex(currentBox);
+            if (boxIndex < 0)
+            {
+                return;
+            }
+
+            FocusIpBoxOrSubmitButton(boxIndex + 1);
+        }
+
+        private void FocusIpBoxOrSubmitButton(int boxIndex)
+        {
+            TextBox[] ipBoxes = GetIpBoxes();
+
+            Dispatcher.BeginInvoke(new Action(() =>
+            {
+                if (!IsVisible)
+                {
+                    return;
+                }
+
+                if (boxIndex >= ipBoxes.Length)
+                {
+                    btnAddFriend.Focus();
+                    return;
+                }
+
+                if (boxIndex < 0)
+                {
+                    return;
+                }
+
+                ipBoxes[boxIndex].Focus();
+                ipBoxes[boxIndex].CaretIndex = ipBoxes[boxIndex].Text.Length;
+            }), System.Windows.Threading.DispatcherPriority.Background);
         }
 
         private void txtAddBox_KeyDown(object sender, KeyEventArgs e)

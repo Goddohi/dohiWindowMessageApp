@@ -1,4 +1,4 @@
-﻿<Window x:Class="WalkieDohi.ChattingRooms.Views.ToastWindow"
+<Window x:Class="WalkieDohi.ChattingRooms.Views.ToastWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         WindowStyle="None"
@@ -7,23 +7,17 @@
         ShowInTaskbar="False"
         Topmost="True"
         ResizeMode="NoResize"
-        Width="260" Height="130"
-        Loaded="ToastWindow_Loaded">
+        Width="300" Height="140"
+        Loaded="ToastWindow_Loaded"
+        FontFamily="Segoe UI, Malgun Gothic"
+        UseLayoutRounding="True">
 
-    <Window.Resources>
-        <DropShadowEffect x:Key="DropShadowEffect"
-                          BlurRadius="12"
-                          ShadowDepth="3"
-                          Direction="270"
-                          Color="Black"
-                          Opacity="0.4"/>
-    </Window.Resources>
-
-    <Border Background="{StaticResource PrimaryColor}"
-            CornerRadius="20"
+    <Border Background="{StaticResource PanelBrush}"
+            BorderBrush="{StaticResource BorderBrushStrong}"
+            BorderThickness="1"
+            CornerRadius="4"
             Padding="12"
             Opacity="0.98"
-            Effect="{StaticResource DropShadowEffect}"
             MouseLeftButtonDown="Window_MouseLeftButtonDown">
 
         <Grid>
@@ -32,32 +26,30 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <!-- 로고 + 제목 -->
             <StackPanel Orientation="Horizontal"
                         VerticalAlignment="Top"
                         Margin="0,0,0,10"
                         Grid.Row="0">
-                <Image Width="20" Height="20"
+                <Image Width="22" Height="22"
                        Source="{StaticResource WalkieDohiLogo}"
-                       Margin="0,0,4,0"/>
+                       Margin="0,0,6,0"/>
                 <TextBlock Text="워키도히 알림"
                            VerticalAlignment="Center"
-                           Foreground="{StaticResource SecondaryColor}"
-                           FontWeight="Bold"
-                           FontSize="15"/>
+                           Foreground="{StaticResource TextBrush}"
+                           FontWeight="SemiBold"
+                           FontSize="14"/>
             </StackPanel>
 
-            <!-- 본문 -->
             <StackPanel Grid.Row="1">
                 <TextBlock x:Name="TitleText"
                            FontSize="13"
-                           FontWeight="Bold"
-                           Foreground="#203040"
+                           FontWeight="SemiBold"
+                           Foreground="{StaticResource TextBrush}"
                            TextWrapping="Wrap"
                            Margin="0,0,0,6"/>
                 <TextBlock x:Name="MessageText"
                            FontSize="12"
-                           Foreground="#2C2C2C"
+                           Foreground="{StaticResource MutedTextBrush}"
                            TextWrapping="Wrap"/>
             </StackPanel>
         </Grid>

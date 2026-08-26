@@ -40,6 +40,7 @@ namespace WalkieDohi
             SubscribeMessageReceiver();
             AddStartTab();
             AddChatRoomTab();
+            ActivateFriendView();
 
             this.SourceInitialized += OnSourceInitialized;
         }
@@ -110,32 +111,20 @@ namespace WalkieDohi
             {
                 MainData.GetFriendNameOrReturnOriginal(friend);
                 ChatListManager.UpdateChatList(friend.Name, friend.Ip);
+                ActivateChatRoomTab();
+                _chatRoomListTabControl?.SelectChatByKey(friend.Ip);
             };
             _startTabControl.OnStartGroupChat += group =>
             {
                 ChatListManager.UpdateChatList(group);
+                ActivateChatRoomTab();
+                _chatRoomListTabControl?.SelectChatByKey(group.Key);
             };
-
-            var tab = new TabItem
-            {
-                Header = "친구리스트",
-                Content = _startTabControl,
-                Name =  "FriendMainList"
-            };
-            ChatTabControlHost.Items.Add(tab);
         }
 
         private void AddChatRoomTab()
         {
             _chatRoomListTabControl = new ChatRoomListTabControl();
-
-            var tab = new TabItem
-            {
-                Header = "💬 채팅방",
-                Content = _chatRoomListTabControl
-            };
-
-            ChatTabControlHost.Items.Add(tab);
         }
 
         private void ShowMainWindow()
@@ -244,32 +233,63 @@ namespace WalkieDohi
 
         private void ActivateChatRoomTab()
         {
-            foreach (TabItem tab in ChatTabControlHost.Items)
+            if (_chatRoomListTabControl == null)
             {
-                if (tab.Content is ChatRoomListTabControl)
-                {
-                    ChatTabControlHost.SelectedItem = tab;
-                    break;
-                }
+                return;
             }
+
+            MainContentHost.Content = _chatRoomListTabControl;
+            if (ChatNavButton.IsChecked != true)
+            {
+                ChatNavButton.IsChecked = true;
+            }
+
+            CloseToolsPanel();
         }
+
+        private void ActivateFriendView()
+        {
+            if (_startTabControl == null)
+            {
+                return;
+            }
+
+            MainContentHost.Content = _startTabControl;
+            if (FriendNavButton.IsChecked != true)
+            {
+                FriendNavButton.IsChecked = true;
+            }
+
+            CloseToolsPanel();
+        }
+
+        private void FriendNavButton_Checked(object sender, RoutedEventArgs e)
+        {
+            ActivateFriendView();
+        }
+
+        private void ChatNavButton_Checked(object sender, RoutedEventArgs e)
+        {
+            ActivateChatRoomTab();
+        }
+
         private void Window_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Escape)
             {
-                var selectTab = ChatTabControlHost.SelectedItem as TabItem;
-                if (selectTab == null)
+                if (_isToolsPanelOpen)
                 {
+                    CloseToolsPanel();
                     return;
                 }
 
-                if (string.Equals(selectTab.Name, "FriendMainList"))
+                if (MainContentHost.Content == _startTabControl)
                 {
                     this.Close();
                 }
                 else
                 {
-                    ChatTabControlHost.SelectedIndex = 0;
+                    ActivateFriendView();
                 }
                 
             }
@@ -281,20 +301,28 @@ namespace WalkieDohi
         {
             if (_isToolsPanelOpen)
             {
-                // 닫기
-                var sb = (Storyboard)FindResource("HideToolsPanelStoryboard");
-                sb.Begin();
-                ToolsPanel.IsHitTestVisible = false;
+                CloseToolsPanel();
             }
             else
             {
-                // 열기
                 ToolsPanel.IsHitTestVisible = true;
                 var sb = (Storyboard)FindResource("ShowToolsPanelStoryboard");
                 sb.Begin();
+                _isToolsPanelOpen = true;
+            }
+        }
+
+        private void CloseToolsPanel()
+        {
+            if (!_isToolsPanelOpen)
+            {
+                return;
             }
 
-            _isToolsPanelOpen = !_isToolsPanelOpen;
+            var sb = (Storyboard)FindResource("HideToolsPanelStoryboard");
+            sb.Begin();
+            ToolsPanel.IsHitTestVisible = false;
+            _isToolsPanelOpen = false;
         }
 
 
@@ -344,11 +372,7 @@ namespace WalkieDohi
                 clicked = VisualTreeHelper.GetParent(clicked);
             }
 
-            // 여기까지 왔다는 건 메뉴 밖을 클릭한 경우 → 닫기
-            var sb = (Storyboard)FindResource("HideToolsPanelStoryboard");
-            sb.Begin();
-            ToolsPanel.IsHitTestVisible = false;
-            _isToolsPanelOpen = false;
+            CloseToolsPanel();
         }
 
         private void TextCountToolButton_Click(object sender, RoutedEventArgs e)

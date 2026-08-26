@@ -1,47 +1,99 @@
-﻿<Window x:Class="WalkieDohi.Users.Views.SettingWindow"
+<Window x:Class="WalkieDohi.Users.Views.SettingWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="설정"
-        Height="400" Width="400"
+        Height="360" Width="420"
         Loaded="Window_Loaded"
         KeyDown="Window_KeyDown"
         WindowStartupLocation="CenterOwner"
-        ResizeMode="NoResize">
+        ResizeMode="NoResize"
+        Background="{StaticResource AppBackgroundBrush}"
+        FontFamily="Segoe UI, Malgun Gothic"
+        UseLayoutRounding="True">
 
-    <Grid Margin="10">
-        <StackPanel>
-            <TextBlock x:Name="HiddenTrigger" Text="설정 메뉴"
-                        MouseDown="HiddenTrigger_MouseDown" FontSize="20" FontWeight="Bold" Margin="0,0,0,20"/>
-            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                <TextBlock Text="포트 번호:" Width="100" VerticalAlignment="Center"/>
-                <TextBox x:Name="PortTextBox" Width="100" />
+    <Border Margin="12"
+            Background="{StaticResource PanelBrush}"
+            BorderBrush="{StaticResource BorderBrushStrong}"
+            BorderThickness="1"
+            CornerRadius="3"
+            Padding="16">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <StackPanel Grid.Row="0" Margin="0,0,0,14">
+                <TextBlock x:Name="HiddenTrigger"
+                           Text="설정"
+                           MouseDown="HiddenTrigger_MouseDown"
+                           Style="{StaticResource SectionTitleTextStyle}"
+                           FontSize="18"/>
+                <TextBlock Text="앱 실행과 친구 목록 표시 방식을 관리합니다."
+                           Style="{StaticResource CaptionTextStyle}"
+                           Margin="0,4,0,0"/>
             </StackPanel>
 
-            <!-- 친구 정렬 설정 -->
-            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                <TextBlock Text="친구 정렬:" Width="100" VerticalAlignment="Center"/>
-                <ComboBox x:Name="SortOptionComboBox" Width="150" SelectedIndex="0">
-                    <ComboBoxItem Content="이름순"/>
-                    <ComboBoxItem Content="IP순"/>
-                </ComboBox>
+            <StackPanel Grid.Row="1">
+                <Grid Margin="0,0,0,10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="110"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="포트 번호" VerticalAlignment="Center"/>
+                    <TextBox x:Name="PortTextBox"
+                             Grid.Column="1"
+                             Width="120"
+                             HorizontalAlignment="Left"/>
+                </Grid>
+
+                <Grid Margin="0,0,0,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="110"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="친구 정렬" VerticalAlignment="Center"/>
+                    <ComboBox x:Name="SortOptionComboBox"
+                              Grid.Column="1"
+                              Width="150"
+                              SelectedIndex="0"
+                              HorizontalAlignment="Left">
+                        <ComboBoxItem Content="이름순"/>
+                        <ComboBoxItem Content="IP순"/>
+                    </ComboBox>
+                </Grid>
+
+                <Border Background="{StaticResource PanelAltBrush}"
+                        BorderBrush="{StaticResource BorderBrushStrong}"
+                        BorderThickness="1"
+                        CornerRadius="3"
+                        Padding="10">
+                    <StackPanel>
+                        <CheckBox x:Name="AutoStartCheckBox"
+                                  Content="윈도우 로그인 시 자동 시작"
+                                  Margin="0,0,0,8"
+                                  Checked="AutoStartCheckBox_Checked"
+                                  Unchecked="AutoStartCheckBox_Unchecked"/>
+                        <TextBlock Text="현재 사용자 계정에만 적용됩니다."
+                                   Style="{StaticResource CaptionTextStyle}"/>
+                    </StackPanel>
+                </Border>
             </StackPanel>
 
-            <StackPanel>
-                <CheckBox x:Name="AutoStartCheckBox"
-                      Content="윈도우 로그인 시 자동 시작"
-                      Margin="0,0,0,12"
-                      Checked="AutoStartCheckBox_Checked"
-                      Unchecked="AutoStartCheckBox_Unchecked"/>
-                <TextBlock Text="체크하면 현재 사용자 계정에만 적용됩니다."
-                       Foreground="Gray" />
+            <StackPanel Grid.Row="2"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Right"
+                        Margin="0,14,0,0">
+                <Button Content="저장"
+                        Width="82"
+                        Style="{StaticResource RoundedBasicButtonStyle}"
+                        Margin="0,0,8,0"
+                        Click="Save_Click"/>
+                <Button Content="닫기"
+                        Width="82"
+                        Click="Close_Click"/>
             </StackPanel>
-
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
-                <Button Content="저장" Width="80" Margin="0,0,10,0" Click="Save_Click"/>
-                <Button Content="닫기" Width="80" Click="Close_Click"/>
-            </StackPanel>
-            
-            
-        </StackPanel>
-    </Grid>
+        </Grid>
+    </Border>
 </Window>

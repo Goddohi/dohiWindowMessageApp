@@ -1,33 +1,74 @@
-﻿<Window x:Class="WalkieDohi.ChattingRooms.Views.ImagePreviewWindow"
+<Window x:Class="WalkieDohi.ChattingRooms.Views.ImagePreviewWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="이미지 미리보기" Height="600" Width="800"
+        Title="이미지 미리보기"
+        Height="620"
+        Width="840"
         WindowStartupLocation="CenterScreen"
         PreviewMouseWheel="Window_PreviewMouseWheel"
-        Background="Black" KeyDown="Window_KeyDown">
-    <Grid Background="White">
-        <ScrollViewer x:Name="ScrollViewerHost"
-              HorizontalScrollBarVisibility="Auto"
-              VerticalScrollBarVisibility="Auto"
-              PreviewMouseLeftButtonDown="ScrollViewerHost_PreviewMouseLeftButtonDown"
-              PreviewMouseMove="ScrollViewerHost_PreviewMouseMove"
-              PreviewMouseLeftButtonUp="ScrollViewerHost_PreviewMouseLeftButtonUp"
-              Margin="15,40,15,15">
-            <Grid>
-                <Image x:Name="ZoomBox" Stretch="None" RenderOptions.BitmapScalingMode="HighQuality"/>
-            </Grid>
-        </ScrollViewer>
+        Background="{StaticResource AppBackgroundBrush}"
+        KeyDown="Window_KeyDown"
+        FontFamily="Segoe UI, Malgun Gothic"
+        UseLayoutRounding="True">
+    <Grid Background="{StaticResource AppBackgroundBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
-        <!-- 확대/축소 버튼 -->
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="10">
-            <Button x:Name="btnPathOpen" Content="경로열기" Width="60" Margin="2" Click="PathOpen_Click" Visibility="Collapsed"
-                    Style="{StaticResource RoundedSettingButtonStyle}" />
-            <Button Content="+" Width="30" Margin="2" Click="ZoomIn_Click"
-                    Style="{StaticResource RoundedSettingButtonStyle}"/>
-            <Button Content="-" Width="30" Margin="2" Click="ZoomOut_Click"
-                    Style="{StaticResource RoundedSettingButtonStyle}"/>
-            <Button Content="닫기" Width="50" Margin="2" Click="Close_Click"
-                    Style="{StaticResource RoundedSettingButtonStyle}"/>
-        </StackPanel>
+        <Border Grid.Row="0"
+                Background="{StaticResource PanelBrush}"
+                BorderBrush="{StaticResource BorderBrushStrong}"
+                BorderThickness="0,0,0,1"
+                Padding="10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="이미지 미리보기"
+                           Style="{StaticResource SectionTitleTextStyle}"
+                           VerticalAlignment="Center"/>
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <Button x:Name="btnPathOpen"
+                            Content="경로 열기"
+                            Width="84"
+                            Margin="0,0,6,0"
+                            Click="PathOpen_Click"
+                            Visibility="Collapsed"/>
+                    <Button Content="+"
+                            Style="{StaticResource IconButtonStyle}"
+                            Margin="0,0,6,0"
+                            Click="ZoomIn_Click"/>
+                    <Button Content="-"
+                            Style="{StaticResource IconButtonStyle}"
+                            Margin="0,0,6,0"
+                            Click="ZoomOut_Click"/>
+                    <Button Content="닫기"
+                            Width="68"
+                            Click="Close_Click"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="1"
+                Margin="12"
+                Background="{StaticResource PanelBrush}"
+                BorderBrush="{StaticResource BorderBrushStrong}"
+                BorderThickness="1"
+                CornerRadius="3">
+            <ScrollViewer x:Name="ScrollViewerHost"
+                          HorizontalScrollBarVisibility="Auto"
+                          VerticalScrollBarVisibility="Auto"
+                          PreviewMouseLeftButtonDown="ScrollViewerHost_PreviewMouseLeftButtonDown"
+                          PreviewMouseMove="ScrollViewerHost_PreviewMouseMove"
+                          PreviewMouseLeftButtonUp="ScrollViewerHost_PreviewMouseLeftButtonUp">
+                <Grid Background="#FF111827">
+                    <Image x:Name="ZoomBox"
+                           Stretch="None"
+                           RenderOptions.BitmapScalingMode="HighQuality"/>
+                </Grid>
+            </ScrollViewer>
+        </Border>
     </Grid>
 </Window>

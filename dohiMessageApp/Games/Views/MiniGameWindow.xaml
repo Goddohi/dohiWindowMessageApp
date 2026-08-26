@@ -1,13 +1,22 @@
-﻿<Window x:Class="WalkieDohi.Games.Views.MiniGameWindow"
+<Window x:Class="WalkieDohi.Games.Views.MiniGameWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:games="clr-namespace:WalkieDohi.Games.UserControls"
         Title="미니게임 센터"
-        Height="550" Width="600"
-        WindowStartupLocation="CenterOwner">
+        Height="560" Width="640"
+        WindowStartupLocation="CenterOwner"
+        Background="{StaticResource AppBackgroundBrush}"
+        FontFamily="Segoe UI, Malgun Gothic"
+        UseLayoutRounding="True">
 
-    <Grid>
-        <TabControl>
+    <Border Margin="12"
+            Background="{StaticResource PanelBrush}"
+            BorderBrush="{StaticResource BorderBrushStrong}"
+            BorderThickness="1"
+            CornerRadius="3"
+            Padding="10">
+        <TabControl Style="{StaticResource RoundedTabControlStyle}"
+                    ItemContainerStyle="{StaticResource RoundedTabItemStyle}">
             <TabItem Header="숫자 맞추기">
                 <games:NumberGuessGameControl />
             </TabItem>
@@ -24,8 +33,10 @@
                 <games:ShootingGameControl />
             </TabItem>
             <TabItem Header="도히의 모험(예정)">
-                <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"> 출시 준비중...</TextBlock>
+                <TextBlock HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           Style="{StaticResource CaptionTextStyle}">출시 준비중...</TextBlock>
             </TabItem>
         </TabControl>
-    </Grid>
+    </Border>
 </Window>
