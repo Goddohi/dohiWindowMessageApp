@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Media;
 using WalkieDohi.Core;
 using WalkieDohi.ChattingRooms.Data;
@@ -20,11 +22,42 @@ namespace WalkieDohi.ChattingRooms.UserControls
     public partial class ChatRoomListTabControl : UserControl
     {
         private Dictionary<string, TabBasicinterface> _chatControls = new Dictionary<string, TabBasicinterface>();
+        private ICollectionView _chatRoomsView;
+        private bool _isContextMenuInitialized = false;
 
         public ChatRoomListTabControl()
         {
             InitializeComponent();
-            ChatRoomListBox.ItemsSource = ChatListManager.GetChatList();
+            _chatRoomsView = CollectionViewSource.GetDefaultView(ChatListManager.GetChatList());
+            _chatRoomsView.Filter = FilterChatRoom;
+            ChatRoomListBox.ItemsSource = _chatRoomsView;
+        }
+
+        private bool FilterChatRoom(object item)
+        {
+            if (!(item is ChatListItem chatItem))
+            {
+                return false;
+            }
+
+            string keyword = ChatRoomSearchBox?.Text?.Trim().ToLowerInvariant();
+            if (string.IsNullOrEmpty(keyword))
+            {
+                return true;
+            }
+
+            string searchText = $"{chatItem.RoomName} {chatItem.RoomSummary} {chatItem.Ip} {chatItem.Group?.TooltipText}".ToLowerInvariant();
+            return searchText.Contains(keyword);
+        }
+
+        private void RefreshChatRoomList()
+        {
+            _chatRoomsView?.Refresh();
+        }
+
+        private void ChatRoomSearchBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            RefreshChatRoomList();
         }
 
         private void ChatRoomListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -169,7 +202,12 @@ namespace WalkieDohi.ChattingRooms.UserControls
         private MenuItem _miGroupRename;
         private void ChatRoomListBox_Loaded(object sender, RoutedEventArgs e)
         {
-            var style = new Style(typeof(ListBoxItem));
+            if (_isContextMenuInitialized)
+            {
+                return;
+            }
+
+            _isContextMenuInitialized = true;
             var contextMenu = new ContextMenu();
             var leaveItem = new MenuItem { Header = "채팅방 나가기" };
             leaveItem.Click += LeaveChatRoom_Click;
@@ -189,9 +227,7 @@ namespace WalkieDohi.ChattingRooms.UserControls
             ChatRoomListBox.PreviewMouseRightButtonDown += ChatRoomListBox_PreviewMouseRightButtonDown;
             // 메뉴 뜨기 직전에 가시성 토글
             ChatRoomListBox.ContextMenuOpening += ChatRoomListBox_ContextMenuOpening;
-
-            style.Setters.Add(new Setter(ListBoxItem.ContextMenuProperty, contextMenu));
-            ChatRoomListBox.ItemContainerStyle = style;
+            ChatRoomListBox.ContextMenu = contextMenu;
         }
 
         private void GroupNameChange_Click(object sender, RoutedEventArgs e)
@@ -222,8 +258,7 @@ namespace WalkieDohi.ChattingRooms.UserControls
 
                     ChatListManager.ChangeNameChatListItem(key, popup.ResponseText);
                     // UI 갱신
-                    ChatRoomListBox.ItemsSource = null;
-                    ChatRoomListBox.ItemsSource = ChatListManager.GetChatList();
+                    RefreshChatRoomList();
                 }
             }
         }
@@ -266,8 +301,7 @@ namespace WalkieDohi.ChattingRooms.UserControls
                 ChatListManager.DeleteChatLog(chatpathKey);
 
                 // UI 갱신
-                ChatRoomListBox.ItemsSource = null;
-                ChatRoomListBox.ItemsSource = ChatListManager.GetChatList();
+                RefreshChatRoomList();
 
             }
         }
@@ -306,8 +340,7 @@ namespace WalkieDohi.ChattingRooms.UserControls
                 ChatListManager.DeleteChatLog(chatpathKey);
 
                 // UI 갱신
-                ChatRoomListBox.ItemsSource = null;
-                ChatRoomListBox.ItemsSource = ChatListManager.GetChatList();
+                RefreshChatRoomList();
 
             }
         }
@@ -348,6 +381,9 @@ namespace WalkieDohi.ChattingRooms.UserControls
 
         public void SelectChatByKey(string key)
         {
+            ChatRoomSearchBox.Clear();
+            RefreshChatRoomList();
+
             var list = ChatListManager.GetChatList();
             var item = list.FirstOrDefault(c => c.UniqueKey == key);
             if (item != null)

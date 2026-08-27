@@ -211,7 +211,32 @@ namespace WalkieDohi.ChattingRooms.Data
         public string Ip { get; set; }
         public GroupEntity Group { get; set; }
 
-        public string DisplayName => Group == null ? $"👤 {Name} ({Ip})" : $"👥 {Name}";
+        [JsonIgnore]
+        public bool IsGroup => Group != null;
+
+        [JsonIgnore]
+        public string RoomName => Group == null ? Name : Group.GroupName;
+
+        [JsonIgnore]
+        public string RoomSummary
+        {
+            get
+            {
+                if (Group == null)
+                {
+                    return Ip;
+                }
+
+                int memberCount = Group.Ips?.Count ?? 0;
+                return $"{memberCount}명 참여";
+            }
+        }
+
+        [JsonIgnore]
+        public string ChatIconGlyph => IsGroup ? "\uE716" : "\uE77B";
+
+        [JsonIgnore]
+        public string DisplayName => Group == null ? $"{Name} ({Ip})" : Name;
 
         public string UniqueKey => Group?.Key ?? Ip;
     }

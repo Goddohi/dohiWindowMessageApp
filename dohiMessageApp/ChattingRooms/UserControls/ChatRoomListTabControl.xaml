@@ -1,10 +1,46 @@
 <UserControl x:Class="WalkieDohi.ChattingRooms.UserControls.ChatRoomListTabControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:util="clr-namespace:WalkieDohi.Util"
              Height="Auto" Width="Auto">
+    <UserControl.Resources>
+        <util:StringNullOrEmptyToVisibilityConverter x:Key="StringNullOrEmptyToVisibilityConverter"/>
+
+        <Style x:Key="ChatRoomListItemStyle" TargetType="ListBoxItem">
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Margin" Value="0,1"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListBoxItem">
+                        <Border x:Name="ItemChrome"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="Transparent"
+                                BorderThickness="1"
+                                CornerRadius="3"
+                                Padding="0">
+                            <ContentPresenter/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ItemChrome" Property="Background" Value="#FFF6FAFC"/>
+                                <Setter TargetName="ItemChrome" Property="BorderBrush" Value="{StaticResource BorderBrushSoft}"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="ItemChrome" Property="Background" Value="#FFDDEFF5"/>
+                                <Setter TargetName="ItemChrome" Property="BorderBrush" Value="{StaticResource SecondaryColor}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
     <Grid Background="{StaticResource AppBackgroundBrush}">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="240"/>
+            <ColumnDefinition Width="280"/>
             <ColumnDefinition Width="2"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
@@ -18,30 +54,115 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <TextBlock Grid.Row="0"
-                           Text="채팅방"
-                           Style="{StaticResource SectionTitleTextStyle}"
-                           Margin="0,0,0,8"/>
+                <Grid Grid.Row="0"
+                      Margin="0,0,0,10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
 
-                <Button x:Name="ManageGroupsButton"
-                        Grid.Row="1"
-                        Content="그룹 만들기"
-                        Style="{StaticResource RoundedBasicButtonStyle}"
-                        Click="ManageGroups_Click"
-                        Height="32"
-                        Margin="0,0,0,8"/>
+                    <TextBlock Text="채팅방"
+                               Style="{StaticResource SectionTitleTextStyle}"
+                               FontSize="16"
+                               VerticalAlignment="Center"/>
+
+                    <Button x:Name="ManageGroupsButton"
+                            Grid.Column="1"
+                            Content="+"
+                            ToolTip="그룹 만들기"
+                            Style="{StaticResource IconButtonStyle}"
+                            Click="ManageGroups_Click"
+                            Width="28"
+                            Height="28"/>
+                </Grid>
+
+                <Grid Grid.Row="1"
+                      Margin="0,0,0,10">
+                    <TextBox x:Name="ChatRoomSearchBox"
+                             Height="30"
+                             TextChanged="ChatRoomSearchBox_TextChanged"/>
+                    <TextBlock Text="이름 또는 IP 검색"
+                               Foreground="{StaticResource MutedTextBrush}"
+                               Margin="9,0,0,0"
+                               VerticalAlignment="Center"
+                               IsHitTestVisible="False"
+                               Visibility="{Binding Text, ElementName=ChatRoomSearchBox, Converter={StaticResource StringNullOrEmptyToVisibilityConverter}}"/>
+                </Grid>
+
+                <Border Grid.Row="2"
+                        Height="1"
+                        Background="{StaticResource BorderBrushSoft}"
+                        Margin="0,0,0,6"/>
 
                 <ListBox x:Name="ChatRoomListBox"
-                         Grid.Row="2"
-                         DisplayMemberPath="DisplayName"
+                         Grid.Row="3"
+                         Background="Transparent"
+                         BorderThickness="0"
+                         Padding="0"
                          SelectionChanged="ChatRoomListBox_SelectionChanged"
                          Loaded="ChatRoomListBox_Loaded"
+                         ItemContainerStyle="{StaticResource ChatRoomListItemStyle}"
                          VerticalAlignment="Stretch"
                          ScrollViewer.VerticalScrollBarVisibility="Auto"
-                         ScrollViewer.HorizontalScrollBarVisibility="Disabled"/>
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid MinHeight="56"
+                                  Margin="2,0"
+                                  ToolTip="{Binding Group.TooltipText}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="44"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <Border x:Name="Avatar"
+                                        Width="34"
+                                        Height="34"
+                                        CornerRadius="17"
+                                        Background="#FFEAF0F3"
+                                        BorderBrush="{StaticResource BorderBrushSoft}"
+                                        BorderThickness="1"
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding ChatIconGlyph}"
+                                               FontFamily="Segoe MDL2 Assets"
+                                               FontSize="15"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"
+                                               Foreground="{StaticResource MutedTextBrush}"/>
+                                </Border>
+
+                                <Grid Grid.Column="1"
+                                      VerticalAlignment="Center">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Text="{Binding RoomName}"
+                                               FontWeight="SemiBold"
+                                               FontSize="13"
+                                               TextTrimming="CharacterEllipsis"/>
+                                    <TextBlock Grid.Row="1"
+                                               Text="{Binding RoomSummary}"
+                                               Style="{StaticResource CaptionTextStyle}"
+                                               Margin="0,3,0,0"
+                                               TextTrimming="CharacterEllipsis"/>
+                                </Grid>
+                            </Grid>
+                            <DataTemplate.Triggers>
+                                <DataTrigger Binding="{Binding IsGroup}" Value="True">
+                                    <Setter TargetName="Avatar" Property="Background" Value="{StaticResource PrimaryColor}"/>
+                                    <Setter TargetName="Avatar" Property="BorderBrush" Value="{StaticResource SecondaryColor}"/>
+                                </DataTrigger>
+                            </DataTemplate.Triggers>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
             </Grid>
         </Border>
 

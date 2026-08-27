@@ -54,6 +54,43 @@
             </Setter>
         </Style>
 
+        <Style x:Key="GroupHeaderToggleStyle" TargetType="ToggleButton">
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="MinWidth" Value="86"/>
+            <Setter Property="Padding" Value="10,4"/>
+            <Setter Property="Background" Value="{StaticResource ButtonBrush}"/>
+            <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderBrushSoft}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Border x:Name="Chrome"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="3">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"
+                                              Margin="{TemplateBinding Padding}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Chrome" Property="Background" Value="{StaticResource ButtonHoverBrush}"/>
+                                <Setter TargetName="Chrome" Property="BorderBrush" Value="{StaticResource BorderBrushStrong}"/>
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Chrome" Property="Background" Value="{StaticResource PrimaryColor}"/>
+                                <Setter TargetName="Chrome" Property="BorderBrush" Value="{StaticResource SecondaryColor}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <DataTemplate DataType="{x:Type entity:TextMessage}">
             <StackPanel Margin="10,3" MaxWidth="560"
                         HorizontalAlignment="{Binding Direction, Converter={StaticResource DirToAlign}}">
@@ -169,16 +206,65 @@
                 BorderBrush="{StaticResource BorderBrushStrong}"
                 BorderThickness="0,0,0,1"
                 Padding="12,8">
-            <Expander Header="그룹원"
-                      IsExpanded="False"
-                      x:Name="GroupMemberList_viewr"
-                      FontWeight="SemiBold">
-                <ListBox x:Name="GroupMemberList"
-                         Height="100"
-                         DisplayMemberPath="DisplayText"
-                         FontWeight="Normal"
-                         Margin="0,8,0,0"/>
-            </Expander>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0"
+                            VerticalAlignment="Center">
+                    <TextBlock x:Name="GroupTitleText"
+                               Text="그룹 채팅"
+                               Style="{StaticResource SectionTitleTextStyle}"
+                               FontSize="15"
+                               TextTrimming="CharacterEllipsis"/>
+                    <TextBlock x:Name="GroupMemberSummaryText"
+                               Text="그룹원"
+                               Style="{StaticResource CaptionTextStyle}"
+                               Margin="0,2,0,0"/>
+                </StackPanel>
+
+                <ToggleButton x:Name="GroupMemberToggle"
+                              Grid.Column="1"
+                              Content="그룹원"
+                              Style="{StaticResource GroupHeaderToggleStyle}"
+                              VerticalAlignment="Center"/>
+
+                <Popup PlacementTarget="{Binding ElementName=GroupMemberToggle}"
+                       Placement="Bottom"
+                       IsOpen="{Binding IsChecked, ElementName=GroupMemberToggle}"
+                       StaysOpen="False"
+                       AllowsTransparency="True"
+                       PopupAnimation="Fade">
+                    <Border Width="260"
+                            MaxHeight="240"
+                            Background="{StaticResource PanelBrush}"
+                            BorderBrush="{StaticResource BorderBrushStrong}"
+                            BorderThickness="1"
+                            CornerRadius="3"
+                            Padding="10">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Text="그룹원"
+                                       Style="{StaticResource SectionTitleTextStyle}"
+                                       Margin="0,0,0,8"/>
+                            <ListBox x:Name="GroupMemberList"
+                                     Grid.Row="1"
+                                     MaxHeight="190"
+                                     DisplayMemberPath="DisplayText"
+                                     FontWeight="Normal"
+                                     BorderThickness="0"
+                                     Background="Transparent"
+                                     Padding="0"/>
+                        </Grid>
+                    </Border>
+                </Popup>
+            </Grid>
         </Border>
 
         <ListBox x:Name="ChatList"

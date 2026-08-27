@@ -3,8 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         KeyDown="Window_KeyDown"
         Title="입력"
-        Height="170"
-        Width="340"
+        Height="190"
+        Width="360"
         WindowStartupLocation="CenterOwner"
         Background="{StaticResource AppBackgroundBrush}"
         FontFamily="Segoe UI, Malgun Gothic"
@@ -26,11 +26,13 @@
             <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
                 <Button Content="확인"
                         Width="72"
+                        Height="30"
                         Style="{StaticResource RoundedBasicButtonStyle}"
                         Margin="0,0,8,0"
                         Click="Ok_Click"/>
                 <Button Content="취소"
                         Width="72"
+                        Height="30"
                         Click="Cancel_Click"/>
             </StackPanel>
         </Grid>

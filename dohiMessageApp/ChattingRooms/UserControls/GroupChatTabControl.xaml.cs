@@ -73,9 +73,14 @@ namespace WalkieDohi.ChattingRooms.UserControls
             }).ToList();
 
             GroupMemberList.ItemsSource = members;
-            if(GroupMemberList_viewr != null)
+            if (GroupTitleText != null)
             {
-                GroupMemberList_viewr.Header = TargetGroup.GroupName + " - 그룹원 보기";
+                GroupTitleText.Text = TargetGroup.GroupName;
+            }
+
+            if (GroupMemberSummaryText != null)
+            {
+                GroupMemberSummaryText.Text = $"{members.Count}명 참여";
             }
         }
         #endregion
