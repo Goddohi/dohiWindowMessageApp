@@ -256,11 +256,33 @@
                             <ListBox x:Name="GroupMemberList"
                                      Grid.Row="1"
                                      MaxHeight="190"
-                                     DisplayMemberPath="DisplayText"
                                      FontWeight="Normal"
                                      BorderThickness="0"
                                      Background="Transparent"
-                                     Padding="0"/>
+                                     Padding="0">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid MinHeight="30">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <TextBlock Text="{Binding DisplayText}"
+                                                       VerticalAlignment="Center"
+                                                       TextTrimming="CharacterEllipsis"/>
+                                            <Button Grid.Column="1"
+                                                    Content="+"
+                                                    ToolTip="친구 추가"
+                                                    Style="{StaticResource IconButtonStyle}"
+                                                    Width="24"
+                                                    Height="24"
+                                                    Visibility="{Binding AddFriendVisibility}"
+                                                    Click="AddGroupMemberFriend_Click"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
                         </Grid>
                     </Border>
                 </Popup>

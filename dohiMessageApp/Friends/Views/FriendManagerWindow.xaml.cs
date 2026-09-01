@@ -17,6 +17,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using WalkieDohi;
 using System.Collections.ObjectModel;
+using WalkieDohi.ChattingRooms.Data;
+using WalkieDohi.Util;
 using WalkieDohi.Util.IO;
 using WalkieDohi.Util.Provider;
 using WalkieDohi.Friends.Entity;
@@ -32,6 +34,8 @@ namespace WalkieDohi.Friends.Views
         public FriendManagerWindowViewModel viewModel = new FriendManagerWindowViewModel();
         FriendFileProvider friendFilePrvider = new FriendJsonFileHandler();
         private bool isUpdatingIpBoxes = false;
+        private bool closeAfterSuccessfulAdd = false;
+        private bool closeAfterSuccessfulEdit = false;
         
         public FriendManagerWindow()
         {
@@ -40,10 +44,115 @@ namespace WalkieDohi.Friends.Views
             viewModel.Friends = new ObservableCollection<Friend>(MainData.GetsortedFriends()); // 복사본
 
         }
+
+        public FriendManagerWindow(string suggestedName, string suggestedIp)
+            : this()
+        {
+            closeAfterSuccessfulAdd = true;
+            ApplyFriendSuggestion(suggestedName, suggestedIp);
+        }
+
+        public FriendManagerWindow(Friend editTarget)
+            : this()
+        {
+            closeAfterSuccessfulEdit = true;
+            BeginEditFriend(editTarget);
+        }
+
         private void Window_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Escape)
                 this.Close();
+        }
+
+        private void ApplyFriendSuggestion(string suggestedName, string suggestedIp)
+        {
+            if (!string.IsNullOrWhiteSpace(suggestedName))
+            {
+                NameBox.Text = suggestedName.Trim();
+            }
+
+            SetIpBoxes(suggestedIp);
+
+            Dispatcher.BeginInvoke(new Action(() =>
+            {
+                if (string.IsNullOrWhiteSpace(NameBox.Text))
+                {
+                    NameBox.Focus();
+                    return;
+                }
+
+                btnAddFriend.Focus();
+            }), System.Windows.Threading.DispatcherPriority.Background);
+        }
+
+        private void BeginEditFriend(Friend editTarget)
+        {
+            if (editTarget == null)
+            {
+                return;
+            }
+
+            int targetIndex = FindFriendIndex(editTarget);
+            if (targetIndex < 0)
+            {
+                ApplyFriendSuggestion(editTarget.Name, editTarget.Ip);
+                return;
+            }
+
+            LoadFriendForEdit(viewModel.Friends[targetIndex], targetIndex);
+
+            Dispatcher.BeginInvoke(new Action(() =>
+            {
+                NameBox.Focus();
+                NameBox.SelectAll();
+            }), System.Windows.Threading.DispatcherPriority.Background);
+        }
+
+        private int FindFriendIndex(Friend target)
+        {
+            for (int index = 0; index < viewModel.Friends.Count; index++)
+            {
+                Friend friend = viewModel.Friends[index];
+                bool sameUuid = !string.IsNullOrWhiteSpace(target.UserUuid)
+                    && string.Equals(friend.UserUuid, target.UserUuid, StringComparison.Ordinal);
+                bool sameIp = NetworkHelper.AreSameIPv4(friend.Ip, target.Ip);
+
+                if (sameUuid || sameIp)
+                {
+                    return index;
+                }
+            }
+
+            return -1;
+        }
+
+        private void SetIpBoxes(string ip)
+        {
+            string normalizedIp;
+            if (!NetworkHelper.TryNormalizeIPv4(ip, out normalizedIp))
+            {
+                return;
+            }
+
+            var parts = normalizedIp.Split('.');
+            if (parts.Length != 4)
+            {
+                return;
+            }
+
+            try
+            {
+                isUpdatingIpBoxes = true;
+                IpBox1.Text = parts[0];
+                IpBox2.Text = parts[1];
+                IpBox3.Text = parts[2];
+                IpBox4.Text = parts[3];
+            }
+            finally
+            {
+                isUpdatingIpBoxes = false;
+            }
         }
 
 
@@ -70,15 +179,16 @@ namespace WalkieDohi.Friends.Views
         private void AddFriend_Click(object sender, RoutedEventArgs e)
         {
             string name = NameBox.Text.Trim();
-            string ip = GetIpFullstring();
+            string ipText = GetIpFullstring();
 
-            if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(ip))
+            if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(ipText))
             {
                 MessageBox.Show("모든 항목을 입력해주세요.");
                 return;
             }
 
-            if (!IPAddress.TryParse(ip, out _))
+            string ip;
+            if (!NetworkHelper.TryNormalizeIPv4(ipText, out ip))
             {
                 MessageBox.Show("올바른 IP 주소를 입력하세요.");
                 return;
@@ -87,7 +197,7 @@ namespace WalkieDohi.Friends.Views
             // 자기 자신을 제외한 IP 중복 검사 (수정모드가 아닐때는 -1이므로 영향 없음)
             bool duplicateIp = viewModel.Friends
                 .Where((f, index) => index != editIndex)
-                .Any(f => f.Ip == ip);
+                .Any(f => NetworkHelper.AreSameIPv4(f.Ip, ip));
             if (duplicateIp)
             {
                 MessageBox.Show("같은 IP가 이미 존재합니다.");
@@ -100,44 +210,39 @@ namespace WalkieDohi.Friends.Views
                 {
                     viewModel.Friends[editIndex].Name = name;
                     viewModel.Friends[editIndex].Ip = ip;
-                    FriendList.Items.Refresh();
                     SaveFriends();
+
+                    SelectedFriend = viewModel.Friends[editIndex];
+                    if (closeAfterSuccessfulEdit)
+                    {
+                        DialogResult = true;
+                        Close();
+                        return;
+                    }
                 }
-                FriendUpdateCancleLogic();
+                ResetToAddMode();
                 return;
             }      
             
-            viewModel.Friends.Add(new Friend { Name = name, Ip = ip});
+            var addedFriend = new Friend { Name = name, Ip = ip };
+            viewModel.Friends.Add(addedFriend);
             SaveFriends();
 
+            SelectedFriend = addedFriend;
+            if (closeAfterSuccessfulAdd)
+            {
+                DialogResult = true;
+                Close();
+                return;
+            }
+
             AddBoxAllClear();
-        }
-
-        private void RemoveFriend_Click(object sender, RoutedEventArgs e)
-        {
-            int selectedIndex = FriendList.SelectedIndex;
-            if (isEditMode)
-            {
-                selectedIndex = editIndex;
-            }
-                
-            if (selectedIndex < 0) return;
-
-            var friend = viewModel.Friends[selectedIndex];
-
-            string removeShow = isEditMode ? $"수정중이신 {friend.Name}을 삭제할까요?" : $"{friend.Name}을 삭제할까요?";
-
-            if (MessageBox.Show(removeShow, "삭제 확인", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
-            {
-                viewModel.Friends.RemoveAt(selectedIndex);
-                SaveFriends();
-                FriendUpdateCancleLogic() ;
-            }
         }
 
         private void SaveFriends()
         {
             friendFilePrvider.SaveFriends(viewModel.Friends);
+            ChatListManager.RefreshSingleChatNamesFromFriends();
         }
 
         private void IpBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
@@ -440,47 +545,35 @@ namespace WalkieDohi.Friends.Views
         /// </summary>
         private bool isEditMode = false;
         private int editIndex = -1;
-        private void FriendList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+
+        private void LoadFriendForEdit(Friend friend, int friendIndex)
         {
-            if (FriendList.SelectedItem is Friend friend)
+            if (friend == null || friendIndex < 0)
             {
-                NameBox.Text = friend.Name;
-                var ipParts = friend.Ip.Split('.');
-                if (ipParts.Length == 4)
-                {
-                    IpBox1.Text = ipParts[0];
-                    IpBox2.Text = ipParts[1];
-                    IpBox3.Text = ipParts[2];
-                    IpBox4.Text = ipParts[3];
-                }
-
-                isEditMode = true;
-                editIndex = FriendList.SelectedIndex;
-                btnUpdateCancle.Visibility = Visibility.Visible;
-                btnAddFriend.Content = "수정 완료";
+                return;
             }
+
+            NameBox.Text = friend.Name;
+            SetIpBoxes(friend.Ip);
+
+            isEditMode = true;
+            editIndex = friendIndex;
+            SetWindowModeText("친구 수정");
         }
 
-        private void UpdateCancle_Click(object sender, RoutedEventArgs e)
+        private void ResetToAddMode()
         {
-            FriendUpdateCancleLogic();
+            isEditMode = false;
+            editIndex = -1;
+            SetWindowModeText("친구추가");
+            AddBoxAllClear();
         }
 
-        private void FriendUpdateCancleLogic()
+        private void SetWindowModeText(string text)
         {
-            isEditMode = false;
-            btnUpdateCancle.Visibility = Visibility.Hidden;
-            editIndex = -1;
-            btnAddFriend.Content = "추가";
-            AddBoxAllClear();
-        }
-        private void FriendUpdateStarteLogic()
-        {
-            isEditMode = false;
-            btnUpdateCancle.Visibility = Visibility.Hidden;
-            editIndex = -1;
-            btnAddFriend.Content = "추가";
-            AddBoxAllClear();
+            Title = text;
+            TitleText.Text = text;
+            btnAddFriend.Content = text;
         }
     }
 }

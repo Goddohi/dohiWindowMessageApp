@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -37,6 +38,7 @@ using WalkieDohi.ChattingRooms.ViewModels;
 using WalkieDohi.ChattingRooms.Views;
 using System.Text.RegularExpressions;
 using WalkieDohi.Util.Tcp;
+using WalkieDohi.Friends.Views;
 
 namespace WalkieDohi.ChattingRooms.UserControls
 {
@@ -462,15 +464,15 @@ namespace WalkieDohi.ChattingRooms.UserControls
            );
         }
 
-        public void AddReceivedMessage(MessageEntity msg)
+        public void AddReceivedMessage(MessageEntity msg, bool saveImmediately = true)
         {
             string path = "";
             ChatMessage display = ChatMessage.CreateFromEntity(msg, path);
-            AddMessage(display, MessageDirection.Receive);
+            AddMessage(display, MessageDirection.Receive, saveImmediately);
         }
 
 
-        public void AddReceivedFile(MessageEntity msg)
+        public void AddReceivedFile(MessageEntity msg, bool saveImmediately = true)
         {
             if (MessageImageUtil.isImagecheck(msg.FileName))
             {
@@ -487,7 +489,7 @@ namespace WalkieDohi.ChattingRooms.UserControls
                 filePath = MessageUtil.GetFilePath(msg.FileName);
             }
             ChatMessage display = ChatMessage.CreateFromEntity(msg, filePath);
-            AddMessage(display, MessageDirection.Receive);
+            AddMessage(display, MessageDirection.Receive, saveImmediately);
             
 
         }
@@ -597,7 +599,7 @@ namespace WalkieDohi.ChattingRooms.UserControls
 
         public void LoadLatestMessages()
         {
-            ChatRoomNameDisplay.Text = MainData.GetFriendNameOrReturnOriginal("미등록 친구", TargetIp);
+            RefreshHeader();
 
             InitializeMessageFiles(); // 저장소 페이지 상태 초기화
 
@@ -642,6 +644,46 @@ namespace WalkieDohi.ChattingRooms.UserControls
             {
                 MessageBox.Show("이전 메시지 로딩 실패: " + ex.Message);
             }
+        }
+
+        public void RefreshHeader()
+        {
+            var friend = MainData.Friends.FirstOrDefault(f =>
+                string.Equals(f.Ip, TargetIp, StringComparison.OrdinalIgnoreCase));
+
+            string displayName = friend?.Name;
+            if (string.IsNullOrWhiteSpace(displayName))
+            {
+                displayName = "미등록 친구";
+            }
+
+            ChatRoomNameDisplay.Text = string.IsNullOrWhiteSpace(TargetIp)
+                ? displayName
+                : $"{displayName} ({TargetIp})";
+
+            bool canAddFriend = friend == null
+                && IPAddress.TryParse(TargetIp, out _)
+                && !string.Equals(TargetIp, NetworkHelper.GetLocalIPv4(), StringComparison.OrdinalIgnoreCase);
+
+            AddFriendButton.Visibility = canAddFriend ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        private void AddFriendButton_Click(object sender, RoutedEventArgs e)
+        {
+            var popup = new FriendManagerWindow("", TargetIp)
+            {
+                Owner = Window.GetWindow(this)
+            };
+
+            popup.ShowDialog();
+            var friend = MainData.Friends.FirstOrDefault(f =>
+                string.Equals(f.Ip, TargetIp, StringComparison.OrdinalIgnoreCase));
+            if (friend != null)
+            {
+                ChatListManager.UpdateChatList(friend.Name, friend.Ip);
+            }
+
+            RefreshHeader();
         }
         private void BtnDoodle_Click(object sender, RoutedEventArgs e)
         {

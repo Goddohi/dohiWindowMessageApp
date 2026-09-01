@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -31,6 +32,14 @@ namespace WalkieDohi.ChattingRooms.UserControls
             _chatRoomsView = CollectionViewSource.GetDefaultView(ChatListManager.GetChatList());
             _chatRoomsView.Filter = FilterChatRoom;
             ChatRoomListBox.ItemsSource = _chatRoomsView;
+            MainData.FriendsChanged += MainData_FriendsChanged;
+            Unloaded += ChatRoomListTabControl_Unloaded;
+        }
+
+        private void ChatRoomListTabControl_Unloaded(object sender, RoutedEventArgs e)
+        {
+            MainData.FriendsChanged -= MainData_FriendsChanged;
+            Unloaded -= ChatRoomListTabControl_Unloaded;
         }
 
         private bool FilterChatRoom(object item)
@@ -55,6 +64,27 @@ namespace WalkieDohi.ChattingRooms.UserControls
             _chatRoomsView?.Refresh();
         }
 
+        private void RefreshOpenSingleChatHeaders()
+        {
+            foreach (var chatControl in _chatControls.Values.OfType<SingleChatTabControl>())
+            {
+                chatControl.RefreshHeader();
+            }
+        }
+
+        private void MainData_FriendsChanged()
+        {
+            if (!Dispatcher.CheckAccess())
+            {
+                Dispatcher.BeginInvoke(new Action(MainData_FriendsChanged));
+                return;
+            }
+
+            ChatListManager.RefreshSingleChatNamesFromFriends();
+            RefreshChatRoomList();
+            RefreshOpenSingleChatHeaders();
+        }
+
         private void ChatRoomSearchBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             RefreshChatRoomList();
@@ -71,6 +101,11 @@ namespace WalkieDohi.ChattingRooms.UserControls
                     _chatControls[key] = chatControl;
                 }
                 ChatContentArea.Content = chatControl;
+
+                if (chatControl is SingleChatTabControl singleChatControl)
+                {
+                    singleChatControl.RefreshHeader();
+                }
             }
         }
 
@@ -164,10 +199,14 @@ namespace WalkieDohi.ChattingRooms.UserControls
                 ? ChatLogStore.GetGroupRoomKey(msg.Group)
                 : ChatLogStore.GetSingleRoomKey(msg.SenderIp);
 
-            if (ChatLogStore.HasMessage(roomKey, msg.MessageId))
+            bool alreadySaved = ChatLogStore.HasMessage(roomKey, msg.MessageId);
+            bool displayOnlyLocalEcho = IsLocalhostEcho(msg) && _chatControls.ContainsKey(key);
+            if (alreadySaved && !displayOnlyLocalEcho)
             {
                 return;
             }
+
+            bool saveIncoming = !alreadySaved && !displayOnlyLocalEcho;
 
             if (!_chatControls.TryGetValue(key, out var chatControl))
             {
@@ -185,18 +224,30 @@ namespace WalkieDohi.ChattingRooms.UserControls
             {
                 MessageUtil.CheckFileDrietory();
                 File.WriteAllBytes(MessageUtil.GetFilePath(msg.FileName), Convert.FromBase64String(msg.Content));
-                chatControl.AddReceivedFile(msg);
+                chatControl.AddReceivedFile(msg, saveIncoming);
             }
             else if (msg.CheckMessageTypeImage)
             {
                 MessageUtil.CheckImageDrietory();
                 File.WriteAllBytes(MessageUtil.GetImagePath(msg.FileName), Convert.FromBase64String(msg.Content));
-                chatControl.AddReceivedFile(msg);
+                chatControl.AddReceivedFile(msg, saveIncoming);
             }
             else
             {
-                chatControl.AddReceivedMessage(msg);
+                chatControl.AddReceivedMessage(msg, saveIncoming);
             }
+        }
+
+        private static bool IsLocalhostEcho(MessageEntity msg)
+        {
+            if (msg == null
+                || string.IsNullOrWhiteSpace(msg.SenderUserUuid)
+                || !string.Equals(msg.SenderUserUuid, MainData.currentUser?.UserUuid, StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+
+            return IPAddress.TryParse(msg.SenderIp, out var senderIp) && IPAddress.IsLoopback(senderIp);
         }
 
         private MenuItem _miGroupRename;

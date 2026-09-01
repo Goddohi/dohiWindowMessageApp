@@ -15,6 +15,7 @@ namespace WalkieDohi
     public static class MainData
     {
         public static int GetPort() { return MainData.currentUser.getPreferencesPort(); }
+        public static event Action FriendsChanged;
 
         private static ObservableCollection<Friend> friends = new ObservableCollection<Friend>();
 
@@ -25,6 +26,7 @@ namespace WalkieDohi
                 if (friends != value)
                 {
                     friends = value;
+                    FriendsChanged?.Invoke();
                 }
             }
             

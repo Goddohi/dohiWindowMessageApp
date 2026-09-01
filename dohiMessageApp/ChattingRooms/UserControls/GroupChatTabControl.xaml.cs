@@ -31,6 +31,7 @@ using WalkieDohi.ChattingRooms.ViewModels;
 using WalkieDohi.ChattingRooms.Views;
 using System.Text.RegularExpressions;
 using WalkieDohi.Util.Tcp;
+using WalkieDohi.Friends.Views;
 
 namespace WalkieDohi.ChattingRooms.UserControls
 {
@@ -49,6 +50,31 @@ namespace WalkieDohi.ChattingRooms.UserControls
 
         private ChatViewModel viewModel;
 
+        private class GroupMemberListItem
+        {
+            public string Name { get; set; }
+            public string Ip { get; set; }
+            public bool IsCurrentUser { get; set; }
+            public bool IsFriend { get; set; }
+
+            public string DisplayText
+            {
+                get
+                {
+                    if (IsCurrentUser)
+                    {
+                        return $"본인 ({Ip})";
+                    }
+
+                    return $"{(string.IsNullOrWhiteSpace(Name) ? "(이름 없음)" : Name)} ({Ip})";
+                }
+            }
+
+            public Visibility AddFriendVisibility => !IsCurrentUser && !IsFriend
+                ? Visibility.Visible
+                : Visibility.Collapsed;
+        }
+
         #region 초기화
         public GroupChatTabControl()
         {
@@ -62,13 +88,18 @@ namespace WalkieDohi.ChattingRooms.UserControls
         {
             if (TargetGroup == null) return;
 
+            var friends = allFriends ?? new ObservableCollection<Friend>();
+            var myIp = NetworkHelper.GetLocalIPv4();
             var members = TargetGroup.Ips.Select(ip =>
             {
-                var name = allFriends.FirstOrDefault(f => f.Ip == ip)?.Name;
-                return new
+                var friend = friends.FirstOrDefault(f =>
+                    string.Equals(f.Ip, ip, StringComparison.OrdinalIgnoreCase));
+                return new GroupMemberListItem
                 {
                     Ip = ip,
-                    DisplayText = (ip == NetworkHelper.GetLocalIPv4()) ? "본인" : $"{name ?? "(이름 없음)"} ({ip})"
+                    Name = friend?.Name,
+                    IsCurrentUser = string.Equals(ip, myIp, StringComparison.OrdinalIgnoreCase),
+                    IsFriend = friend != null
                 };
             }).ToList();
 
@@ -82,6 +113,24 @@ namespace WalkieDohi.ChattingRooms.UserControls
             {
                 GroupMemberSummaryText.Text = $"{members.Count}명 참여";
             }
+        }
+
+        private void AddGroupMemberFriend_Click(object sender, RoutedEventArgs e)
+        {
+            var item = (sender as FrameworkElement)?.DataContext as GroupMemberListItem;
+            if (item == null || string.IsNullOrWhiteSpace(item.Ip))
+            {
+                return;
+            }
+
+            var popup = new FriendManagerWindow("", item.Ip)
+            {
+                Owner = Window.GetWindow(this)
+            };
+
+            popup.ShowDialog();
+            SetGroupMembers(MainData.Friends);
+            e.Handled = true;
         }
         #endregion
 
@@ -486,15 +535,15 @@ namespace WalkieDohi.ChattingRooms.UserControls
                );
         }
 
-        public void AddReceivedMessage(MessageEntity msg)
+        public void AddReceivedMessage(MessageEntity msg, bool saveImmediately = true)
         {
             string path = "";
             ChatMessage display = ChatMessage.CreateFromEntity(msg, path);
-            AddMessage(display, MessageDirection.Receive);
+            AddMessage(display, MessageDirection.Receive, saveImmediately);
         }
 
         
-        public void AddReceivedFile(MessageEntity msg)
+        public void AddReceivedFile(MessageEntity msg, bool saveImmediately = true)
         {
             string extension = Path.GetExtension(msg.FileName).ToLower();
             if (MessageImageUtil.isImagecheck(msg.FileName))
@@ -514,7 +563,7 @@ namespace WalkieDohi.ChattingRooms.UserControls
 
             ChatMessage display = ChatMessage.CreateFromEntity(msg, filePath);
 
-            AddMessage(display, MessageDirection.Receive);
+            AddMessage(display, MessageDirection.Receive, saveImmediately);
 
         }
 

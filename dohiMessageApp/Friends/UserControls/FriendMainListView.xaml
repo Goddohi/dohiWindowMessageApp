@@ -35,7 +35,7 @@
 
                     <Button x:Name="ManageFriendsButton"
                             Grid.Column="1"
-                            Content="친구 관리"
+                            Content="친구추가"
                             Style="{StaticResource RoundedSettingButtonStyle}"
                             Click="ManageFriends_Click"
                             Height="30"

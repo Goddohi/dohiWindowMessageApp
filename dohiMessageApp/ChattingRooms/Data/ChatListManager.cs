@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Interop;
 using WalkieDohi.ChattingRooms.Entity;
+using WalkieDohi.Core;
 using WalkieDohi.Groups.Entity;
 using WalkieDohi.Packet.Messages.Entity;
 using WalkieDohi.Util.IO;
@@ -64,9 +65,13 @@ namespace WalkieDohi.ChattingRooms.Data
 
         public static void UpdateChatList(string name, string ip)
         {
+            name = MainData.GetFriendNameOrReturnOriginal(name, ip);
+
             var existing = _chatList.FirstOrDefault(c => c.Ip == ip);
             if (existing != null)
             {
+                existing.Name = name;
+                existing.Ip = ip;
                 _chatList.Remove(existing);
                 _chatList.Insert(0, existing);
             }
@@ -75,6 +80,30 @@ namespace WalkieDohi.ChattingRooms.Data
                 _chatList.Insert(0, new ChatListItem { Name = name, Ip = ip, Group = null });
             }
             SaveChatList();
+        }
+
+        public static void RefreshSingleChatNamesFromFriends()
+        {
+            bool changed = false;
+
+            foreach (var item in _chatList.Where(c => c.Group == null && !string.IsNullOrWhiteSpace(c.Ip)))
+            {
+                var friend = MainData.Friends.FirstOrDefault(f =>
+                    string.Equals(f.Ip, item.Ip, StringComparison.OrdinalIgnoreCase));
+
+                if (friend == null || string.Equals(item.Name, friend.Name, StringComparison.Ordinal))
+                {
+                    continue;
+                }
+
+                item.Name = friend.Name;
+                changed = true;
+            }
+
+            if (changed)
+            {
+                SaveChatList();
+            }
         }
 
         #endregion
@@ -205,11 +234,67 @@ namespace WalkieDohi.ChattingRooms.Data
 
     }
 
-    public class ChatListItem
+    public class ChatListItem : DohiEntityBase
     {
-        public string Name { get; set; }
-        public string Ip { get; set; }
-        public GroupEntity Group { get; set; }
+        private string _name;
+        private string _ip;
+        private GroupEntity _group;
+
+        public string Name
+        {
+            get => _name;
+            set
+            {
+                if (_name == value)
+                {
+                    return;
+                }
+
+                _name = value;
+                OnPropertyChanged(nameof(Name));
+                OnPropertyChanged(nameof(RoomName));
+                OnPropertyChanged(nameof(DisplayName));
+            }
+        }
+
+        public string Ip
+        {
+            get => _ip;
+            set
+            {
+                if (_ip == value)
+                {
+                    return;
+                }
+
+                _ip = value;
+                OnPropertyChanged(nameof(Ip));
+                OnPropertyChanged(nameof(RoomSummary));
+                OnPropertyChanged(nameof(DisplayName));
+                OnPropertyChanged(nameof(UniqueKey));
+            }
+        }
+
+        public GroupEntity Group
+        {
+            get => _group;
+            set
+            {
+                if (_group == value)
+                {
+                    return;
+                }
+
+                _group = value;
+                OnPropertyChanged(nameof(Group));
+                OnPropertyChanged(nameof(IsGroup));
+                OnPropertyChanged(nameof(RoomName));
+                OnPropertyChanged(nameof(RoomSummary));
+                OnPropertyChanged(nameof(ChatIconGlyph));
+                OnPropertyChanged(nameof(DisplayName));
+                OnPropertyChanged(nameof(UniqueKey));
+            }
+        }
 
         [JsonIgnore]
         public bool IsGroup => Group != null;

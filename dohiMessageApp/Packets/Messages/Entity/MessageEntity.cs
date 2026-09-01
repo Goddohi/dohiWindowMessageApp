@@ -20,6 +20,7 @@ namespace WalkieDohi.Packet.Messages.Entity
     {
         public MessageType Type { get; set; }
         public string MessageId { get; set; }
+        public string SenderUserUuid { get; set; }
         public string Sender { get; set; }
         public GroupEntity Group { get; set; }
 

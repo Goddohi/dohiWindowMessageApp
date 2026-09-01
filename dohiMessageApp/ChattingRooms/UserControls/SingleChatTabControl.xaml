@@ -150,9 +150,27 @@
                 BorderBrush="{StaticResource BorderBrushStrong}"
                 BorderThickness="0,0,0,1"
                 Padding="12,8">
-            <TextBlock x:Name="ChatRoomNameDisplay"
-                       Text=""
-                       Style="{StaticResource SectionTitleTextStyle}"/>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock x:Name="ChatRoomNameDisplay"
+                           Text=""
+                           Style="{StaticResource SectionTitleTextStyle}"
+                           VerticalAlignment="Center"
+                           TextTrimming="CharacterEllipsis"/>
+                <Button x:Name="AddFriendButton"
+                        Grid.Column="1"
+                        Content="+"
+                        ToolTip="친구 추가"
+                        Style="{StaticResource IconButtonStyle}"
+                        Width="28"
+                        Height="28"
+                        Visibility="Collapsed"
+                        Click="AddFriendButton_Click"/>
+            </Grid>
         </Border>
 
         <ListBox x:Name="ChatList"

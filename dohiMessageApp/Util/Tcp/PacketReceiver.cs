@@ -58,6 +58,8 @@ namespace WalkieDohi.Util.Tcp
         {
             try
             {
+                string remoteIp = GetRemoteIp(client);
+
                 using (var stream = client.GetStream())
                 {
                     byte[] lengthBytes = await ReadExactAsync(stream, 4);
@@ -71,6 +73,7 @@ namespace WalkieDohi.Util.Tcp
                     {
                         case PacketType.Message:
                             var message = JsonConvert.DeserializeObject<MessageEntity>(packet.Data);
+                            ApplyPacketSenderInfo(packet, message, remoteIp);
                             OnMessageReceived?.Invoke(message);
                             break;
 
@@ -84,6 +87,56 @@ namespace WalkieDohi.Util.Tcp
             {
                 Console.WriteLine($"[클라이언트 처리 오류] {ex.Message}");
             }
+        }
+
+        private static void ApplyPacketSenderInfo(PacketEntity packet, MessageEntity message, string remoteIp)
+        {
+            if (message == null)
+            {
+                return;
+            }
+
+            string senderIp = FirstValidIp(packet?.MyIp, message.SenderIp, remoteIp);
+            if (!string.IsNullOrWhiteSpace(senderIp))
+            {
+                message.SenderIp = senderIp;
+            }
+
+            if (TryNormalizeUuid(packet?.UserUUID, out string senderUuid))
+            {
+                message.SenderUserUuid = senderUuid;
+            }
+        }
+
+        private static string GetRemoteIp(TcpClient client)
+        {
+            var endPoint = client?.Client?.RemoteEndPoint as IPEndPoint;
+            return endPoint?.Address?.ToString();
+        }
+
+        private static string FirstValidIp(params string[] values)
+        {
+            foreach (var value in values)
+            {
+                if (IPAddress.TryParse(value, out _))
+                {
+                    return value;
+                }
+            }
+
+            return "";
+        }
+
+        private static bool TryNormalizeUuid(string value, out string normalized)
+        {
+            normalized = "";
+            if (!Guid.TryParse(value, out Guid parsed))
+            {
+                return false;
+            }
+
+            normalized = parsed.ToString("D");
+            return true;
         }
 
 

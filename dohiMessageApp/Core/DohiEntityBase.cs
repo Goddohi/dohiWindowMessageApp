@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace WalkieDohi.Core
 {
-    public class DohiEntityBase
+    public class DohiEntityBase : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged(string propertyName) =>

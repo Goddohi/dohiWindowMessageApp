@@ -45,9 +45,9 @@ namespace WalkieDohi.Core
 
         event SendFileRequestedEventHandler OnSendFile;
 
-        void AddReceivedMessage(MessageEntity msg);
+        void AddReceivedMessage(MessageEntity msg, bool saveImmediately = true);
 
-        void AddReceivedFile(MessageEntity msg);
+        void AddReceivedFile(MessageEntity msg, bool saveImmediately = true);
 
 
     }

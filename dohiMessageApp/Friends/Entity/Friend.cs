@@ -20,19 +20,26 @@ namespace WalkieDohi.Friends.Entity
         #region private 필드
         private string _name;
         private string _ip;
+        private string _userUuid;
         #endregion
 
         #region public 필드
         public string Name
         {
             get => _name;
-            set { _name = value; OnPropertyChanged(nameof(Name)); }
+            set { _name = value; OnPropertyChanged(nameof(Name)); OnPropertyChanged(nameof(DisplayName)); }
         }
 
 
         public string Ip {
             get => _ip;
-            set { _ip = value; OnPropertyChanged(nameof(Ip)); }
+            set { _ip = value; OnPropertyChanged(nameof(Ip)); OnPropertyChanged(nameof(DisplayName)); }
+        }
+
+        public string UserUuid
+        {
+            get => _userUuid;
+            set { _userUuid = value; OnPropertyChanged(nameof(UserUuid)); }
         }
 
         [JsonIgnore]

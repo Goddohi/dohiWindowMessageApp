@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using WalkieDohi.ChattingRooms.Entity;
+using WalkieDohi.Util;
 using WalkieDohi.Friends.Entity;
 using WalkieDohi.Util.Provider;
 
@@ -47,15 +48,53 @@ namespace WalkieDohi.Util.IO
 
         public void SaveFriends(ObservableCollection<Friend> friends)
         {
-            string json = JsonConvert.SerializeObject(friends, Formatting.Indented);
+            ObservableCollection<Friend> normalizedFriends = NormalizeFriends(friends);
+            string json = JsonConvert.SerializeObject(normalizedFriends, Formatting.Indented);
             File.WriteAllText(DohifilePath, json);
-            MainData.Friends = friends;
+            MainData.Friends = normalizedFriends;
         }
 
         public ObservableCollection<Friend> LoadFriends()
         {
             ObservableCollection<Friend> LoadFriend = ActualFriendFilePath;
-            return LoadFriend;
+            return NormalizeFriends(LoadFriend);
+        }
+
+        private ObservableCollection<Friend> NormalizeFriends(IEnumerable<Friend> friends)
+        {
+            var result = new ObservableCollection<Friend>();
+            var seenIps = new HashSet<string>(StringComparer.Ordinal);
+
+            if (friends == null)
+            {
+                return result;
+            }
+
+            foreach (Friend friend in friends)
+            {
+                if (friend == null)
+                {
+                    continue;
+                }
+
+                string normalizedIp;
+                if (!NetworkHelper.TryNormalizeIPv4(friend.Ip, out normalizedIp))
+                {
+                    result.Add(friend);
+                    continue;
+                }
+
+                if (seenIps.Contains(normalizedIp))
+                {
+                    continue;
+                }
+
+                seenIps.Add(normalizedIp);
+                friend.Ip = normalizedIp;
+                result.Add(friend);
+            }
+
+            return result;
         }
     }
 }
