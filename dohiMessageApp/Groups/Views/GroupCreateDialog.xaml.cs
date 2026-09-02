@@ -171,6 +171,7 @@ namespace WalkieDohi.Groups.Views
             };
 
             group.MakeRandomKey();
+            group.RefreshMemberIdentitiesFromFriends();
 
             ResultGroup = group;
             DialogResult = true;

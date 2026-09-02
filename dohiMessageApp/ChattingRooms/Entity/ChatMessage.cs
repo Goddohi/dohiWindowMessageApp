@@ -237,6 +237,7 @@ namespace WalkieDohi.ChattingRooms.Entity
             Direction = dir;
             FileName = fileName;
             ContentPath = path;
+            Timestamp = timestamp;
             Ip = ip;
             Image = MessageImageUtil.LoadImageFromBase64(base64);
             NotifyIfReceive(sender,ip, fileName, dir, group);
@@ -267,6 +268,7 @@ namespace WalkieDohi.ChattingRooms.Entity
             Direction = dir;
             FileName = fileName;
             ContentPath = path;
+            Timestamp = timestamp;
             Ip = ip;
             NotifyIfReceive(sender, ip, fileName, dir, group);
         }

@@ -63,9 +63,9 @@ namespace WalkieDohi
 
         private void LoadApplicationData()
         {
-            ChatListManager.LoadChatList();
             MainData.currentUser = new UserJsonFileHandler().LoadUser();
             MainData.Friends = new FriendJsonFileHandler().LoadFriends();
+            ChatListManager.LoadChatList();
         }
 
         private void StartMessageReceiver()

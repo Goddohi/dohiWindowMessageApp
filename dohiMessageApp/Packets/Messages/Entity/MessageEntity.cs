@@ -73,6 +73,7 @@ namespace WalkieDohi.Packet.Messages.Entity
                 Type = MessageType.Text,
                 MessageId = string.IsNullOrWhiteSpace(messageId) ? CreateMessageId() : messageId,
                 Sender = MainData.currentUser.Nickname,
+                SenderUserUuid = MainData.currentUser?.UserUuid,
                 SenderIp = NetworkHelper.GetLocalIPv4(),
                 Content = content
             };
@@ -97,6 +98,7 @@ namespace WalkieDohi.Packet.Messages.Entity
                 Type = MessageType.File,
                 MessageId = string.IsNullOrWhiteSpace(messageId) ? CreateMessageId() : messageId,
                 Sender = MainData.currentUser.Nickname,
+                SenderUserUuid = MainData.currentUser?.UserUuid,
                 SenderIp = NetworkHelper.GetLocalIPv4(),
                 Content = content,
                 ContentPath = filepath,
@@ -125,6 +127,7 @@ namespace WalkieDohi.Packet.Messages.Entity
                 MessageId = string.IsNullOrWhiteSpace(messageId) ? CreateMessageId() : messageId,
                 Group = group,
                 Sender = MainData.currentUser.Nickname,
+                SenderUserUuid = MainData.currentUser?.UserUuid,
                 SenderIp = NetworkHelper.GetLocalIPv4(),
                 Content = content
             };
@@ -170,6 +173,7 @@ namespace WalkieDohi.Packet.Messages.Entity
                 MessageId = string.IsNullOrWhiteSpace(messageId) ? CreateMessageId() : messageId,
                 Group = group,
                 Sender = MainData.currentUser.Nickname,
+                SenderUserUuid = MainData.currentUser?.UserUuid,
                 SenderIp = NetworkHelper.GetLocalIPv4(),
                 Content = content,
                 ContentPath = filepath,

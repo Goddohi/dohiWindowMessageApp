@@ -159,8 +159,7 @@ namespace WalkieDohi.ChattingRooms.UserControls
                 control.OnSendMessage += async (s, request) =>
                 {
                     ChatListManager.UpdateChatList(item.Group);
-                    var tasks = item.Group.Ips
-                        .Where(ip => ip != NetworkHelper.GetLocalIPv4())
+                    var tasks = item.Group.GetSendTargetIps()
                         .Select(ip =>
                         {
                             var msg = MessageEntity.OfGroupSendTextMassage(item.Group, request.Text, request.MessageId);
@@ -173,8 +172,7 @@ namespace WalkieDohi.ChattingRooms.UserControls
                 control.OnSendFile += async (s, request) =>
                 {
                     ChatListManager.UpdateChatList(item.Group);
-                    var tasks = item.Group.Ips
-                        .Where(ip => ip != NetworkHelper.GetLocalIPv4())
+                    var tasks = item.Group.GetSendTargetIps()
                         .Select(ip =>
                         {
                             var msg = MessageEntity.OfGroupSendFileMassage(item.Group, request.Base64Content, request.FileName, "", request.MessageId);

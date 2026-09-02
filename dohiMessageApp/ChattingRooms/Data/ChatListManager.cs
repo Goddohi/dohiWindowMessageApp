@@ -33,14 +33,27 @@ namespace WalkieDohi.ChattingRooms.Data
             }
             else if (msg.IsSingleMessage)
             {
-                string name = MainData.GetFriendNameOrReturnOriginal(msg.Sender, msg.SenderIp);
-                UpdateChatList(name, msg.SenderIp);
+                string targetIp = MainData.ResolveIncomingSingleChatIp(msg.SenderIp, msg.SenderUserUuid);
+                string name = MainData.GetFriendNameOrReturnOriginal(msg.Sender, targetIp, msg.SenderUserUuid);
+                UpdateChatList(name, targetIp);
             }
         }
 
 
         public static void UpdateChatList(GroupEntity group)
         {
+            if (group == null)
+            {
+                return;
+            }
+
+            group.RefreshMemberIdentitiesFromFriends();
+            if (ApplyFriendUuidHintsFromGroup(group))
+            {
+                new FriendJsonFileHandler().SaveFriends(MainData.Friends);
+            }
+            group.RefreshMemberIdentitiesFromFriends();
+
             // 그룹 기준으로 동일한 항목 찾기
             var existing = _chatList.FirstOrDefault(c =>
                 c.Group != null &&
@@ -62,6 +75,22 @@ namespace WalkieDohi.ChattingRooms.Data
                 });
             }
             SaveChatList();
+        }
+
+        private static bool ApplyFriendUuidHintsFromGroup(GroupEntity group)
+        {
+            if (group?.Members == null)
+            {
+                return false;
+            }
+
+            bool changed = false;
+            foreach (var member in group.Members)
+            {
+                changed |= MainData.TryAttachFriendUuidByIp(member.Ip, member.UserUuid);
+            }
+
+            return changed;
         }
 
         public static void UpdateChatList(string name, string ip)
@@ -315,10 +344,29 @@ namespace WalkieDohi.ChattingRooms.Data
                 var list = JsonConvert.DeserializeObject<ObservableCollection<ChatListItem>>(json);
 
                 _chatList = list ?? new ObservableCollection<ChatListItem>();
+                SyncFriendUuidHintsFromGroups();
             }
             catch
             {
                 _chatList = new ObservableCollection<ChatListItem>();
+            }
+        }
+
+        private static void SyncFriendUuidHintsFromGroups()
+        {
+            bool changed = false;
+
+            foreach (var item in _chatList.Where(c => c.Group != null))
+            {
+                item.Group.RefreshMemberIdentitiesFromFriends();
+                changed |= ApplyFriendUuidHintsFromGroup(item.Group);
+                item.Group.RefreshMemberIdentitiesFromFriends();
+                item.RefreshFriendDependentDisplay();
+            }
+
+            if (changed)
+            {
+                new FriendJsonFileHandler().SaveFriends(MainData.Friends);
             }
         }
 

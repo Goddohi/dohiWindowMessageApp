@@ -23,6 +23,7 @@ using WalkieDohi.Util.IO;
 using WalkieDohi.Util.Provider;
 using WalkieDohi.Friends.Entity;
 using WalkieDohi.Friends.ViewModels;
+using WalkieDohi.Packet.Entity;
 
 namespace WalkieDohi.Friends.Views
 {
@@ -33,15 +34,20 @@ namespace WalkieDohi.Friends.Views
     {
         public FriendManagerWindowViewModel viewModel = new FriendManagerWindowViewModel();
         FriendFileProvider friendFilePrvider = new FriendJsonFileHandler();
+        private const string ProfileUnavailableMessage = "상대방의 프로그램이 꺼져있거나 없는 IP 입니다";
         private bool isUpdatingIpBoxes = false;
         private bool closeAfterSuccessfulAdd = false;
         private bool closeAfterSuccessfulEdit = false;
+        private UserProfileEntity lookupProfile;
+        private string lookupProfileIp;
+        private string blockedSelfIp;
         
         public FriendManagerWindow()
         {
             InitializeComponent();
             this.DataContext = viewModel;
             viewModel.Friends = new ObservableCollection<Friend>(MainData.GetsortedFriends()); // 복사본
+            UpdateAddButtonState();
 
         }
 
@@ -50,6 +56,7 @@ namespace WalkieDohi.Friends.Views
         {
             closeAfterSuccessfulAdd = true;
             ApplyFriendSuggestion(suggestedName, suggestedIp);
+            Loaded += FriendManagerWindow_LoadedAutoLookup;
         }
 
         public FriendManagerWindow(Friend editTarget)
@@ -84,6 +91,12 @@ namespace WalkieDohi.Friends.Views
 
                 btnAddFriend.Focus();
             }), System.Windows.Threading.DispatcherPriority.Background);
+        }
+
+        private async void FriendManagerWindow_LoadedAutoLookup(object sender, RoutedEventArgs e)
+        {
+            Loaded -= FriendManagerWindow_LoadedAutoLookup;
+            await LookupProfileAsync(false);
         }
 
         private void BeginEditFriend(Friend editTarget)
@@ -153,6 +166,8 @@ namespace WalkieDohi.Friends.Views
             {
                 isUpdatingIpBoxes = false;
             }
+
+            UpdateAddButtonState();
         }
 
 
@@ -161,11 +176,13 @@ namespace WalkieDohi.Friends.Views
         {
             NameBox.Clear();
             AddBoxIpClear();
+            UpdateAddButtonState();
         }
 
         private void AddBoxIpClear()
         {
             IpBox1.Clear(); IpBox2.Clear(); IpBox3.Clear(); IpBox4.Clear();
+            UpdateAddButtonState();
         }
 
         #endregion
@@ -178,19 +195,19 @@ namespace WalkieDohi.Friends.Views
 
         private void AddFriend_Click(object sender, RoutedEventArgs e)
         {
-            string name = NameBox.Text.Trim();
-            string ipText = GetIpFullstring();
-
-            if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(ipText))
+            string name;
+            string ip;
+            string validationMessage;
+            if (!TryGetFriendInput(out name, out ip, out validationMessage))
             {
-                MessageBox.Show("모든 항목을 입력해주세요.");
+                SetLookupStatus(validationMessage);
+                MessageBox.Show(validationMessage);
                 return;
             }
 
-            string ip;
-            if (!NetworkHelper.TryNormalizeIPv4(ipText, out ip))
+            if (IsSelfTarget(ip))
             {
-                MessageBox.Show("올바른 IP 주소를 입력하세요.");
+                MessageBox.Show("본인은 친구로 추가할 수 없습니다.");
                 return;
             }
 
@@ -204,6 +221,17 @@ namespace WalkieDohi.Friends.Views
                 return;
             }
 
+            string lookupUuid = GetLookupUserUuidForIp(ip);
+            bool duplicateUuid = !string.IsNullOrWhiteSpace(lookupUuid)
+                && viewModel.Friends
+                    .Where((f, index) => index != editIndex)
+                    .Any(f => string.Equals(f.UserUuid, lookupUuid, StringComparison.OrdinalIgnoreCase));
+            if (duplicateUuid)
+            {
+                MessageBox.Show("같은 사용자가 이미 친구로 등록되어 있습니다.");
+                return;
+            }
+
             if (isEditMode)
             {
                 if (editIndex >= 0 && editIndex < viewModel.Friends.Count)
@@ -211,6 +239,11 @@ namespace WalkieDohi.Friends.Views
                     string oldIp = viewModel.Friends[editIndex].Ip;
                     viewModel.Friends[editIndex].Name = name;
                     viewModel.Friends[editIndex].Ip = ip;
+                    if (!string.IsNullOrWhiteSpace(lookupUuid))
+                    {
+                        viewModel.Friends[editIndex].UserUuid = lookupUuid;
+                    }
+
                     SaveFriends();
                     ChatListManager.ReplaceFriendIpReferences(oldIp, ip, name);
                     MainData.NotifyFriendsChanged();
@@ -227,11 +260,13 @@ namespace WalkieDohi.Friends.Views
                 return;
             }      
             
-            var addedFriend = new Friend { Name = name, Ip = ip };
+            var addedFriend = new Friend { Name = name, Ip = ip, UserUuid = lookupUuid };
             viewModel.Friends.Add(addedFriend);
             SaveFriends();
 
             SelectedFriend = addedFriend;
+            MessageBox.Show($"{addedFriend.Name}님이 추가되었습니다.");
+
             if (closeAfterSuccessfulAdd)
             {
                 DialogResult = true;
@@ -246,6 +281,209 @@ namespace WalkieDohi.Friends.Views
         {
             friendFilePrvider.SaveFriends(viewModel.Friends);
             ChatListManager.RefreshSingleChatNamesFromFriends();
+        }
+
+        private async void LookupProfile_Click(object sender, RoutedEventArgs e)
+        {
+            await LookupProfileAsync(true);
+        }
+
+        private async Task LookupProfileAsync(bool showSearchingStatus)
+        {
+            string ip;
+            if (!NetworkHelper.TryNormalizeIPv4(GetIpFullstring(), out ip))
+            {
+                ClearLookupProfile();
+                SetLookupStatus("올바른 IP 주소를 입력하세요.");
+                return;
+            }
+
+            if (showSearchingStatus)
+            {
+                SetLookupStatus("입력한 IP로 연결 확인 중입니다.");
+            }
+
+            btnLookupProfile.IsEnabled = false;
+            try
+            {
+                var result = await new MessengerSender().RequestUserProfileAsync(ip);
+                if (!result.Succeeded || result.Payload == null)
+                {
+                    ClearLookupProfile();
+                    SetLookupStatus(ProfileUnavailableMessage);
+                    return;
+                }
+
+                string userUuid;
+                if (!TryNormalizeUuid(result.Payload.UserUuid, out userUuid))
+                {
+                    ClearLookupProfile();
+                    SetLookupStatus(ProfileUnavailableMessage);
+                    return;
+                }
+
+                if (string.Equals(userUuid, MainData.currentUser?.UserUuid, StringComparison.OrdinalIgnoreCase))
+                {
+                    MarkSelfTarget(ip);
+                    SetLookupStatus("본인입니다. 자기 자신은 친구로 추가할 수 없습니다.");
+                    return;
+                }
+
+                result.Payload.UserUuid = userUuid;
+                result.Payload.Ip = ip;
+                lookupProfile = result.Payload;
+                lookupProfileIp = ip;
+                blockedSelfIp = null;
+
+                if (!string.IsNullOrWhiteSpace(lookupProfile.Nickname))
+                {
+                    NameBox.Text = lookupProfile.Nickname.Trim();
+                }
+
+                SetLookupStatus($"연결 확인됨: {lookupProfile.Nickname} / UUID: {lookupProfile.UserUuid}");
+            }
+            finally
+            {
+                btnLookupProfile.IsEnabled = true;
+            }
+        }
+
+        private void ClearLookupProfileIfIpChanged()
+        {
+            if (lookupProfile == null && string.IsNullOrWhiteSpace(blockedSelfIp))
+            {
+                return;
+            }
+
+            string currentIp = GetNormalizedCurrentIp();
+            bool sameLookupIp = lookupProfile != null && NetworkHelper.AreSameIPv4(currentIp, lookupProfileIp);
+            bool sameSelfIp = !string.IsNullOrWhiteSpace(blockedSelfIp)
+                && NetworkHelper.AreSameIPv4(currentIp, blockedSelfIp);
+
+            if (!sameLookupIp && !sameSelfIp)
+            {
+                ClearLookupProfile();
+                SetLookupStatus("");
+            }
+        }
+
+        private void ClearLookupProfile()
+        {
+            lookupProfile = null;
+            lookupProfileIp = null;
+            blockedSelfIp = null;
+        }
+
+        private void MarkSelfTarget(string ip)
+        {
+            lookupProfile = null;
+            lookupProfileIp = null;
+            blockedSelfIp = ip;
+        }
+
+        private string GetLookupUserUuidForIp(string ip)
+        {
+            return lookupProfile != null && NetworkHelper.AreSameIPv4(ip, lookupProfileIp)
+                ? lookupProfile.UserUuid
+                : "";
+        }
+
+        private void SetLookupStatus(string message)
+        {
+            LookupStatusTextBlock.Text = message ?? "";
+        }
+
+        private bool TryGetFriendInput(out string name, out string ip, out string validationMessage)
+        {
+            name = NameBox.Text.Trim();
+            ip = "";
+            validationMessage = "";
+
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                validationMessage = "이름을 입력해주세요.";
+                return false;
+            }
+
+            if (!HasAllIpParts())
+            {
+                validationMessage = "IP 주소를 모두 입력해주세요.";
+                return false;
+            }
+
+            if (!NetworkHelper.TryNormalizeIPv4(GetIpFullstring(), out ip))
+            {
+                validationMessage = "올바른 IP 주소를 입력하세요.";
+                return false;
+            }
+
+            return true;
+        }
+
+        private bool HasAllIpParts()
+        {
+            return GetIpBoxes().All(box => !string.IsNullOrWhiteSpace(box.Text));
+        }
+
+        private void UpdateAddButtonState()
+        {
+            if (btnAddFriend == null || NameBox == null)
+            {
+                return;
+            }
+
+            string normalizedIp;
+            btnAddFriend.IsEnabled = !string.IsNullOrWhiteSpace(NameBox.Text)
+                && HasAllIpParts()
+                && NetworkHelper.TryNormalizeIPv4(GetIpFullstring(), out normalizedIp);
+        }
+
+        private void Input_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            UpdateAddButtonState();
+        }
+
+        private bool IsSelfTarget(string ip)
+        {
+            if (IsLoopbackIp(ip)
+                || NetworkHelper.AreSameIPv4(ip, NetworkHelper.GetLocalIPv4())
+                || (!string.IsNullOrWhiteSpace(blockedSelfIp) && NetworkHelper.AreSameIPv4(ip, blockedSelfIp)))
+            {
+                return true;
+            }
+
+            string lookupUuid = GetLookupUserUuidForIp(ip);
+            return !string.IsNullOrWhiteSpace(lookupUuid)
+                && string.Equals(lookupUuid, MainData.currentUser?.UserUuid, StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static bool IsLoopbackIp(string ip)
+        {
+            string normalizedIp;
+            return NetworkHelper.TryNormalizeIPv4(ip, out normalizedIp)
+                && IPAddress.TryParse(normalizedIp, out var address)
+                && IPAddress.IsLoopback(address);
+        }
+
+        private string GetNormalizedCurrentIp()
+        {
+            string currentIp;
+            return NetworkHelper.TryNormalizeIPv4(GetIpFullstring(), out currentIp)
+                ? currentIp
+                : "";
+        }
+
+        private static bool TryNormalizeUuid(string value, out string normalized)
+        {
+            normalized = "";
+            Guid parsed;
+            if (!Guid.TryParse(value, out parsed))
+            {
+                return false;
+            }
+
+            normalized = parsed.ToString("D");
+            return true;
         }
 
         private void IpBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
@@ -342,6 +580,7 @@ namespace WalkieDohi.Friends.Views
             if (textBox.Text.Contains("."))
             {
                 DistributeDottedIpText(boxIndex, textBox.Text);
+                UpdateAddButtonState();
                 return;
             }
 
@@ -354,6 +593,7 @@ namespace WalkieDohi.Friends.Views
             if (digitsOnly.Length > textBox.MaxLength)
             {
                 DistributeIpDigits(boxIndex, digitsOnly);
+                UpdateAddButtonState();
                 return;
             }
 
@@ -361,6 +601,9 @@ namespace WalkieDohi.Friends.Views
             {
                 MoveFocusToNextIpBox(textBox);
             }
+
+            ClearLookupProfileIfIpChanged();
+            UpdateAddButtonState();
         }
 
         private string BuildIpBoxTextAfterInput(TextBox textBox, string inputText)
@@ -434,6 +677,8 @@ namespace WalkieDohi.Friends.Views
             }
 
             FocusIpBoxOrSubmitButton(focusIndex);
+            ClearLookupProfileIfIpChanged();
+            UpdateAddButtonState();
         }
 
         private void DistributeDottedIpText(int startIndex, string text)
@@ -472,6 +717,8 @@ namespace WalkieDohi.Friends.Views
             }
 
             FocusIpBoxOrSubmitButton(focusIndex);
+            ClearLookupProfileIfIpChanged();
+            UpdateAddButtonState();
         }
 
         private void MoveFocusToNextIpBox(TextBox currentBox)

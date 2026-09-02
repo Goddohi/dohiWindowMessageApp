@@ -45,6 +45,23 @@ namespace WalkieDohi.Util
                 return SendResult.Fail(ip, ex.Message);
             }
         }
+
+        public async Task<PacketRequestResult<UserProfileEntity>> RequestUserProfileAsync(string ip)
+        {
+            string normalizedIp;
+            if (!NetworkHelper.TryNormalizeIPv4(ip, out normalizedIp))
+            {
+                return PacketRequestResult<UserProfileEntity>.Fail(ip, "올바른 IP 주소가 아닙니다.");
+            }
+
+            var packet = PacketEntity.FromObject(PacketType.ProfileRequest, new { RequestedAt = DateTime.Now }, normalizedIp);
+            return await _packetSender.SendPacketAndReadResponseAsync<UserProfileEntity>(
+                normalizedIp,
+                MainData.GetPort(),
+                packet,
+                PacketType.ProfileResponse,
+                TimeSpan.FromSeconds(3));
+        }
     }
 
 }

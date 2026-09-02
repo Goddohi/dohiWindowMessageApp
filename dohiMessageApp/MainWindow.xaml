@@ -16,7 +16,7 @@
         UseLayoutRounding="True">
     <Window.Resources>
         <Style x:Key="SidebarNavButtonStyle" TargetType="RadioButton">
-            <Setter Property="Width" Value="58"/>
+            <Setter Property="Width" Value="66"/>
             <Setter Property="Height" Value="48"/>
             <Setter Property="Margin" Value="0,2"/>
             <Setter Property="Background" Value="Transparent"/>
@@ -40,7 +40,7 @@
                                     Background="Transparent"
                                     CornerRadius="0,2,2,0"/>
                             <Border x:Name="Chrome"
-                                    Margin="8,4"
+                                    Margin="10,4"
                                     Background="{TemplateBinding Background}"
                                     BorderBrush="{TemplateBinding BorderBrush}"
                                     BorderThickness="{TemplateBinding BorderThickness}"
@@ -67,11 +67,11 @@
         </Style>
 
         <Style x:Key="SidebarIconButtonStyle" TargetType="Button" BasedOn="{StaticResource WalkieButtonBaseStyle}">
-            <Setter Property="Width" Value="42"/>
+            <Setter Property="Width" Value="44"/>
             <Setter Property="Height" Value="38"/>
             <Setter Property="MinWidth" Value="0"/>
             <Setter Property="MinHeight" Value="0"/>
-            <Setter Property="Margin" Value="8,2"/>
+            <Setter Property="Margin" Value="10,2"/>
             <Setter Property="Padding" Value="0"/>
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="BorderBrush" Value="Transparent"/>
@@ -114,7 +114,7 @@
     <Grid Background="{StaticResource AppBackgroundBrush}"
           MouseDown="RootGrid_MouseDown">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="58"/>
+            <ColumnDefinition Width="66"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
@@ -204,7 +204,7 @@
                 Opacity="0"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Bottom"
-                Margin="64,0,0,12"
+                Margin="72,0,0,12"
                 RenderTransformOrigin="0.5,0"
                 IsHitTestVisible="False">
             <Border.RenderTransform>

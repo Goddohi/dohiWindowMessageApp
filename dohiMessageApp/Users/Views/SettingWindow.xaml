@@ -79,6 +79,46 @@
                                    Style="{StaticResource CaptionTextStyle}"/>
                     </StackPanel>
                 </Border>
+
+                <Border x:Name="IdentityDebugPanel"
+                        Visibility="Collapsed"
+                        Background="{StaticResource PanelAltBrush}"
+                        BorderBrush="{StaticResource BorderBrushStrong}"
+                        BorderThickness="1"
+                        CornerRadius="3"
+                        Padding="10"
+                        Margin="0,10,0,0">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Text="테스트 식별자"
+                                   FontWeight="SemiBold"
+                                   Margin="0,0,0,8"/>
+                        <TextBox x:Name="IdentityDebugTextBox"
+                                 Grid.Row="1"
+                                 Height="116"
+                                 IsReadOnly="True"
+                                 TextWrapping="NoWrap"
+                                 HorizontalScrollBarVisibility="Auto"
+                                 VerticalScrollBarVisibility="Auto"/>
+                        <StackPanel Grid.Row="2"
+                                    Orientation="Horizontal"
+                                    HorizontalAlignment="Right"
+                                    Margin="0,8,0,0">
+                            <Button Content="갱신"
+                                    Width="64"
+                                    Margin="0,0,8,0"
+                                    Click="RefreshIdentityDebug_Click"/>
+                            <Button Content="복사"
+                                    Width="64"
+                                    Click="CopyIdentityDebug_Click"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
             </StackPanel>
 
             <StackPanel Grid.Row="2"

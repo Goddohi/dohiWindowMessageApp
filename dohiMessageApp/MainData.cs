@@ -53,7 +53,7 @@ namespace WalkieDohi
                 return null;
             }
 
-            friend.Name = FindFriendByIp(friend.Ip)?.Name ?? friend.Name;
+            friend.Name = FindFriendByIdentity(friend.Ip, friend.UserUuid)?.Name ?? friend.Name;
             return friend;
         }
 
@@ -66,18 +66,121 @@ namespace WalkieDohi
         /// <returns>해당 IP의 이름, IP가 일치하는 경우가 없을 경우 원래의 이름으로 다시 제공합니다.</returns>
         public static string GetFriendNameOrReturnOriginal(string name,string ip)
         {
-            name = FindFriendByIp(ip)?.Name ?? name;
+            name = FindFriendByIdentity(ip, null)?.Name ?? name;
+            return name;
+        }
+
+        public static string GetFriendNameOrReturnOriginal(string name, string ip, string userUuid)
+        {
+            name = FindFriendByIdentity(ip, userUuid)?.Name ?? name;
             return name;
         }
 
         public static string GetSingleChatDisplayName(string ip)
         {
-            return FindFriendByIp(ip)?.Name ?? "미등록 친구";
+            return FindFriendByIdentity(ip, null)?.Name ?? "미등록 친구";
+        }
+
+        public static string GetSingleChatDisplayName(string ip, string userUuid)
+        {
+            return FindFriendByIdentity(ip, userUuid)?.Name ?? "미등록 친구";
         }
 
         public static Friend FindFriendByIp(string ip)
         {
             return MainData.Friends?.FirstOrDefault(f => NetworkHelper.AreSameIPv4(f.Ip, ip));
+        }
+
+        public static Friend FindFriendByUuid(string userUuid)
+        {
+            string normalizedUuid;
+            if (!TryNormalizeUserUuid(userUuid, out normalizedUuid))
+            {
+                return null;
+            }
+
+            return MainData.Friends?.FirstOrDefault(f =>
+                string.Equals(f.UserUuid, normalizedUuid, StringComparison.OrdinalIgnoreCase));
+        }
+
+        public static Friend FindFriendByIdentity(string ip, string userUuid)
+        {
+            string normalizedUuid;
+            if (TryNormalizeUserUuid(userUuid, out normalizedUuid))
+            {
+                var byUuid = FindFriendByUuid(normalizedUuid);
+                if (byUuid != null)
+                {
+                    return byUuid;
+                }
+
+                var byIp = FindFriendByIp(ip);
+                if (byIp != null && string.IsNullOrWhiteSpace(byIp.UserUuid))
+                {
+                    return byIp;
+                }
+
+                return null;
+            }
+
+            return FindFriendByIp(ip);
+        }
+
+        public static string ResolveIncomingSingleChatIp(string senderIp, string senderUserUuid)
+        {
+            var friend = FindFriendByIdentity(senderIp, senderUserUuid);
+            return !string.IsNullOrWhiteSpace(friend?.Ip)
+                ? friend.Ip
+                : senderIp;
+        }
+
+        public static bool TryAttachFriendUuidByIp(string ip, string userUuid)
+        {
+            if (string.IsNullOrWhiteSpace(ip)
+                || !TryNormalizeUserUuid(userUuid, out string normalizedUuid)
+                || string.Equals(normalizedUuid, currentUser?.UserUuid, StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+
+            if (!NetworkHelper.TryNormalizeIPv4(ip, out string normalizedIp))
+            {
+                return false;
+            }
+
+            var friend = FindFriendByUuid(normalizedUuid);
+            if (friend == null)
+            {
+                friend = FindFriendByIp(normalizedIp);
+            }
+
+            if (friend == null
+                || (!string.IsNullOrWhiteSpace(friend.UserUuid)
+                    && !string.Equals(friend.UserUuid, normalizedUuid, StringComparison.OrdinalIgnoreCase)))
+            {
+                return false;
+            }
+
+            if (string.Equals(friend.UserUuid, normalizedUuid, StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+
+            friend.UserUuid = normalizedUuid;
+            return true;
+        }
+
+        public static bool TryNormalizeUserUuid(string value, out string normalized)
+        {
+            normalized = "";
+            Guid parsed;
+            if (!Guid.TryParse(value, out parsed))
+            {
+                return false;
+            }
+
+            normalized = parsed.ToString("D");
+            return true;
         }
         
         public static ObservableCollection<Friend> GetsortedFriends()

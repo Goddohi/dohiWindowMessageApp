@@ -77,6 +77,12 @@ namespace WalkieDohi.Util.Tcp
                             OnMessageReceived?.Invoke(message);
                             break;
 
+                        case PacketType.ProfileRequest:
+                            var profile = UserProfileEntity.FromCurrentUser(FirstValidIp(remoteIp, packet.MyIp));
+                            var response = PacketEntity.FromObject(PacketType.ProfileResponse, profile, FirstValidIp(remoteIp, packet.MyIp));
+                            await WritePacketAsync(stream, response);
+                            break;
+
                         default:
                             Console.WriteLine($"알 수 없는 패킷 타입: {packet?.Type}");
                             break;
@@ -155,6 +161,17 @@ namespace WalkieDohi.Util.Tcp
             }
 
             return buffer;
+        }
+
+        private static async Task WritePacketAsync(NetworkStream stream, PacketEntity packet)
+        {
+            string json = JsonConvert.SerializeObject(packet);
+            byte[] body = Encoding.UTF8.GetBytes(json);
+            byte[] length = BitConverter.GetBytes(IPAddress.HostToNetworkOrder(body.Length));
+
+            await stream.WriteAsync(length, 0, 4);
+            await stream.WriteAsync(body, 0, body.Length);
+            await stream.FlushAsync();
         }
 
     }

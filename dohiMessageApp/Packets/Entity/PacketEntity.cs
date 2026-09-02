@@ -47,9 +47,29 @@ namespace WalkieDohi.Packet.Entity
     [JsonConverter(typeof(StringEnumConverter))]
     public enum PacketType
     {
-        Message
+        Message,
+        ProfileRequest,
+        ProfileResponse
     }
-    
+
+    public class UserProfileEntity
+    {
+        public string UserUuid { get; set; }
+        public string Nickname { get; set; }
+        public string Ip { get; set; }
+        public string AppVersion { get; set; }
+
+        public static UserProfileEntity FromCurrentUser(string requesterIp)
+        {
+            return new UserProfileEntity
+            {
+                UserUuid = MainData.currentUser?.UserUuid,
+                Nickname = MainData.currentUser?.Nickname,
+                Ip = NetworkHelper.GetOutboundIPv4ForTarget(requesterIp),
+                AppVersion = typeof(UserProfileEntity).Assembly.GetName().Version?.ToString()
+            };
+        }
+    }
 
 
 

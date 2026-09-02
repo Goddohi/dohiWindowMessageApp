@@ -112,6 +112,13 @@ namespace WalkieDohi.Users.Views
             clickCount++;
             if (clickCount >= 5)
             {
+                if ((Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
+                {
+                    ToggleIdentityDebugPanel();
+                    clickCount = 0;
+                    return;
+                }
+
                 var gameWindow = new Games.Views.MiniGameWindow();
                 gameWindow.Owner = this;
                 gameWindow.ShowDialog();
@@ -157,6 +164,60 @@ namespace WalkieDohi.Users.Views
         {
             if (e.Key == Key.Escape)
                 this.Close();
+        }
+
+        private void ToggleIdentityDebugPanel()
+        {
+            bool show = IdentityDebugPanel.Visibility != Visibility.Visible;
+            IdentityDebugPanel.Visibility = show ? Visibility.Visible : Visibility.Collapsed;
+            Height = show ? 520 : 360;
+
+            if (show)
+            {
+                RefreshIdentityDebugText();
+            }
+        }
+
+        private void RefreshIdentityDebug_Click(object sender, RoutedEventArgs e)
+        {
+            RefreshIdentityDebugText();
+        }
+
+        private void CopyIdentityDebug_Click(object sender, RoutedEventArgs e)
+        {
+            RefreshIdentityDebugText();
+            System.Windows.Clipboard.SetText(IdentityDebugTextBox.Text);
+            MessageBox.Show("테스트 식별자 정보를 복사했습니다.");
+        }
+
+        private void RefreshIdentityDebugText()
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine("[내 정보]");
+            sb.AppendLine($"Nickname: {MainData.currentUser?.Nickname ?? ""}");
+            sb.AppendLine($"UserUuid: {MainData.currentUser?.UserUuid ?? "(없음)"}");
+            sb.AppendLine();
+            sb.AppendLine("[친구]");
+
+            var friends = MainData.Friends
+                .OrderBy(f => f.Name)
+                .ThenBy(f => f.Ip)
+                .ToList();
+
+            if (!friends.Any())
+            {
+                sb.AppendLine("(친구 없음)");
+            }
+            else
+            {
+                foreach (var friend in friends)
+                {
+                    string uuid = string.IsNullOrWhiteSpace(friend.UserUuid) ? "(아직 모름)" : friend.UserUuid;
+                    sb.AppendLine($"{friend.Name} / {friend.Ip} / UUID: {uuid}");
+                }
+            }
+
+            IdentityDebugTextBox.Text = sb.ToString();
         }
     }
 }

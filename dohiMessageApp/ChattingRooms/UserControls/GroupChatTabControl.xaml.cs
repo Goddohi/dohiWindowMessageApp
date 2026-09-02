@@ -88,10 +88,12 @@ namespace WalkieDohi.ChattingRooms.UserControls
         {
             if (TargetGroup == null) return;
 
+            TargetGroup.RefreshMemberIdentitiesFromFriends();
+
             var myIp = NetworkHelper.GetLocalIPv4();
             var members = TargetGroup.Ips.Select(ip =>
             {
-                var friend = MainData.FindFriendByIp(ip);
+                var friend = MainData.FindFriendByIdentity(ip, TargetGroup.GetMemberUserUuidByIp(ip));
                 return new GroupMemberListItem
                 {
                     Ip = ip,
