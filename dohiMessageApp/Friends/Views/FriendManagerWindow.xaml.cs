@@ -208,9 +208,12 @@ namespace WalkieDohi.Friends.Views
             {
                 if (editIndex >= 0 && editIndex < viewModel.Friends.Count)
                 {
+                    string oldIp = viewModel.Friends[editIndex].Ip;
                     viewModel.Friends[editIndex].Name = name;
                     viewModel.Friends[editIndex].Ip = ip;
                     SaveFriends();
+                    ChatListManager.ReplaceFriendIpReferences(oldIp, ip, name);
+                    MainData.NotifyFriendsChanged();
 
                     SelectedFriend = viewModel.Friends[editIndex];
                     if (closeAfterSuccessfulEdit)

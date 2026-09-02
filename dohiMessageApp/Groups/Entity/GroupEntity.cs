@@ -12,8 +12,34 @@ namespace WalkieDohi.Groups.Entity
 {
     public class GroupEntity :DohiEntityBase
     {
-        public string GroupName {  get; set; }
-        public List<string> Ips { get; set; } = new List<string>();// Array.Empty<string>();
+        private string _groupName;
+        private List<string> _ips = new List<string>();
+
+        public string GroupName
+        {
+            get => _groupName;
+            set
+            {
+                if (_groupName == value)
+                {
+                    return;
+                }
+
+                _groupName = value;
+                OnPropertyChanged(nameof(GroupName));
+            }
+        }
+
+        public List<string> Ips
+        {
+            get => _ips;
+            set
+            {
+                _ips = value ?? new List<string>();
+                OnPropertyChanged(nameof(Ips));
+                OnPropertyChanged(nameof(TooltipText));
+            }
+        }
 
         public string Key { get; set; }
 
@@ -38,14 +64,19 @@ namespace WalkieDohi.Groups.Entity
             {
                 var names = Ips.Select(ip =>
                 {
-                    if (ip == NetworkHelper.GetLocalIPv4())
+                    if (NetworkHelper.AreSameIPv4(ip, NetworkHelper.GetLocalIPv4()))
                         return $"본인 ({ip})";
-                    var friend = MainData.Friends.FirstOrDefault(f => f.Ip == ip);
+                    var friend = MainData.FindFriendByIp(ip);
                     return $"{(friend?.Name ?? "이름 없음")} ({ip})";
                 });
 
                 return string.Join("\n", names);
             }
+        }
+
+        public void RefreshFriendDisplay()
+        {
+            OnPropertyChanged(nameof(TooltipText));
         }
     }
     public class GroupMemberDisplay

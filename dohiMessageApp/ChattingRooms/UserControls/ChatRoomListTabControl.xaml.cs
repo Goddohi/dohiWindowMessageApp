@@ -64,11 +64,46 @@ namespace WalkieDohi.ChattingRooms.UserControls
             _chatRoomsView?.Refresh();
         }
 
-        private void RefreshOpenSingleChatHeaders()
+        private void RefreshOpenChatDisplays()
         {
-            foreach (var chatControl in _chatControls.Values.OfType<SingleChatTabControl>())
+            SyncSelectedSingleChatTarget();
+
+            foreach (var chatControl in _chatControls.Values)
             {
-                chatControl.RefreshHeader();
+                if (chatControl is SingleChatTabControl singleChatControl)
+                {
+                    singleChatControl.RefreshHeader();
+                    continue;
+                }
+
+                if (chatControl is GroupChatTabControl groupChatControl)
+                {
+                    groupChatControl.SetGroupMembers(MainData.Friends);
+                }
+            }
+        }
+
+        private void SyncSelectedSingleChatTarget()
+        {
+            if (!(ChatRoomListBox.SelectedItem is ChatListItem selectedItem)
+                || selectedItem.Group != null
+                || !(ChatContentArea.Content is SingleChatTabControl selectedChatControl))
+            {
+                return;
+            }
+
+            string previousKey = _chatControls
+                .Where(pair => ReferenceEquals(pair.Value, selectedChatControl))
+                .Select(pair => pair.Key)
+                .FirstOrDefault();
+
+            selectedChatControl.TargetIp = selectedItem.Ip;
+
+            if (!string.IsNullOrWhiteSpace(previousKey)
+                && !string.Equals(previousKey, selectedItem.UniqueKey, StringComparison.Ordinal))
+            {
+                _chatControls.Remove(previousKey);
+                _chatControls[selectedItem.UniqueKey] = selectedChatControl;
             }
         }
 
@@ -82,7 +117,8 @@ namespace WalkieDohi.ChattingRooms.UserControls
 
             ChatListManager.RefreshSingleChatNamesFromFriends();
             RefreshChatRoomList();
-            RefreshOpenSingleChatHeaders();
+            ChatRoomListBox.Items.Refresh();
+            RefreshOpenChatDisplays();
         }
 
         private void ChatRoomSearchBox_TextChanged(object sender, TextChangedEventArgs e)

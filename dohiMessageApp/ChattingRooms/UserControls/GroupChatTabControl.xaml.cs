@@ -88,17 +88,15 @@ namespace WalkieDohi.ChattingRooms.UserControls
         {
             if (TargetGroup == null) return;
 
-            var friends = allFriends ?? new ObservableCollection<Friend>();
             var myIp = NetworkHelper.GetLocalIPv4();
             var members = TargetGroup.Ips.Select(ip =>
             {
-                var friend = friends.FirstOrDefault(f =>
-                    string.Equals(f.Ip, ip, StringComparison.OrdinalIgnoreCase));
+                var friend = MainData.FindFriendByIp(ip);
                 return new GroupMemberListItem
                 {
                     Ip = ip,
                     Name = friend?.Name,
-                    IsCurrentUser = string.Equals(ip, myIp, StringComparison.OrdinalIgnoreCase),
+                    IsCurrentUser = NetworkHelper.AreSameIPv4(ip, myIp),
                     IsFriend = friend != null
                 };
             }).ToList();

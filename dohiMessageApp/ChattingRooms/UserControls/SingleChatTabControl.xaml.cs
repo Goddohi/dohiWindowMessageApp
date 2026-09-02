@@ -648,8 +648,7 @@ namespace WalkieDohi.ChattingRooms.UserControls
 
         public void RefreshHeader()
         {
-            var friend = MainData.Friends.FirstOrDefault(f =>
-                string.Equals(f.Ip, TargetIp, StringComparison.OrdinalIgnoreCase));
+            var friend = MainData.FindFriendByIp(TargetIp);
 
             string displayName = friend?.Name;
             if (string.IsNullOrWhiteSpace(displayName))
@@ -662,8 +661,8 @@ namespace WalkieDohi.ChattingRooms.UserControls
                 : $"{displayName} ({TargetIp})";
 
             bool canAddFriend = friend == null
-                && IPAddress.TryParse(TargetIp, out _)
-                && !string.Equals(TargetIp, NetworkHelper.GetLocalIPv4(), StringComparison.OrdinalIgnoreCase);
+                && NetworkHelper.TryNormalizeIPv4(TargetIp, out _)
+                && !NetworkHelper.AreSameIPv4(TargetIp, NetworkHelper.GetLocalIPv4());
 
             AddFriendButton.Visibility = canAddFriend ? Visibility.Visible : Visibility.Collapsed;
         }
@@ -676,8 +675,7 @@ namespace WalkieDohi.ChattingRooms.UserControls
             };
 
             popup.ShowDialog();
-            var friend = MainData.Friends.FirstOrDefault(f =>
-                string.Equals(f.Ip, TargetIp, StringComparison.OrdinalIgnoreCase));
+            var friend = MainData.FindFriendByIp(TargetIp);
             if (friend != null)
             {
                 ChatListManager.UpdateChatList(friend.Name, friend.Ip);

@@ -32,6 +32,11 @@ namespace WalkieDohi
             
         }
 
+        public static void NotifyFriendsChanged()
+        {
+            FriendsChanged?.Invoke();
+        }
+
         public static User currentUser = new User();
 
         /// <summary>
@@ -43,7 +48,12 @@ namespace WalkieDohi
         /// <returns>해당 IP의 이름, IP가 일치하는 경우가 없을 경우 원래의 이름으로 다시 제공합니다.</returns>
         public static Friend GetFriendNameOrReturnOriginal(Friend friend)
         {
-            friend.Name = MainData.Friends.FirstOrDefault(f => f.Ip == friend.Ip)?.Name ?? friend.Name;
+            if (friend == null)
+            {
+                return null;
+            }
+
+            friend.Name = FindFriendByIp(friend.Ip)?.Name ?? friend.Name;
             return friend;
         }
 
@@ -56,8 +66,18 @@ namespace WalkieDohi
         /// <returns>해당 IP의 이름, IP가 일치하는 경우가 없을 경우 원래의 이름으로 다시 제공합니다.</returns>
         public static string GetFriendNameOrReturnOriginal(string name,string ip)
         {
-            name = MainData.Friends.FirstOrDefault(f => f.Ip == ip)?.Name ?? name;
+            name = FindFriendByIp(ip)?.Name ?? name;
             return name;
+        }
+
+        public static string GetSingleChatDisplayName(string ip)
+        {
+            return FindFriendByIp(ip)?.Name ?? "미등록 친구";
+        }
+
+        public static Friend FindFriendByIp(string ip)
+        {
+            return MainData.Friends?.FirstOrDefault(f => NetworkHelper.AreSameIPv4(f.Ip, ip));
         }
         
         public static ObservableCollection<Friend> GetsortedFriends()

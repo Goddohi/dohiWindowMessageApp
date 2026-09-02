@@ -12,6 +12,7 @@ using WalkieDohi.ChattingRooms.Entity;
 using WalkieDohi.Core;
 using WalkieDohi.Groups.Entity;
 using WalkieDohi.Packet.Messages.Entity;
+using WalkieDohi.Util;
 using WalkieDohi.Util.IO;
 
 namespace WalkieDohi.ChattingRooms.Data
@@ -65,19 +66,24 @@ namespace WalkieDohi.ChattingRooms.Data
 
         public static void UpdateChatList(string name, string ip)
         {
-            name = MainData.GetFriendNameOrReturnOriginal(name, ip);
+            string normalizedIp = NormalizeIpOrOriginal(ip);
+            name = MainData.GetFriendNameOrReturnOriginal(name, normalizedIp);
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                name = MainData.GetSingleChatDisplayName(normalizedIp);
+            }
 
-            var existing = _chatList.FirstOrDefault(c => c.Ip == ip);
+            var existing = _chatList.FirstOrDefault(c => c.Group == null && NetworkHelper.AreSameIPv4(c.Ip, normalizedIp));
             if (existing != null)
             {
                 existing.Name = name;
-                existing.Ip = ip;
+                existing.Ip = normalizedIp;
                 _chatList.Remove(existing);
                 _chatList.Insert(0, existing);
             }
             else
             {
-                _chatList.Insert(0, new ChatListItem { Name = name, Ip = ip, Group = null });
+                _chatList.Insert(0, new ChatListItem { Name = name, Ip = normalizedIp, Group = null });
             }
             SaveChatList();
         }
@@ -88,22 +94,131 @@ namespace WalkieDohi.ChattingRooms.Data
 
             foreach (var item in _chatList.Where(c => c.Group == null && !string.IsNullOrWhiteSpace(c.Ip)))
             {
-                var friend = MainData.Friends.FirstOrDefault(f =>
-                    string.Equals(f.Ip, item.Ip, StringComparison.OrdinalIgnoreCase));
+                string normalizedIp = NormalizeIpOrOriginal(item.Ip);
+                string displayName = MainData.GetSingleChatDisplayName(normalizedIp);
 
-                if (friend == null || string.Equals(item.Name, friend.Name, StringComparison.Ordinal))
+                if (!string.Equals(item.Ip, normalizedIp, StringComparison.Ordinal))
                 {
-                    continue;
+                    item.Ip = normalizedIp;
+                    changed = true;
                 }
 
-                item.Name = friend.Name;
-                changed = true;
+                if (!string.Equals(item.Name, displayName, StringComparison.Ordinal))
+                {
+                    item.Name = displayName;
+                    changed = true;
+                }
             }
+
+            RefreshGroupFriendDisplays();
 
             if (changed)
             {
                 SaveChatList();
             }
+        }
+
+        public static void ReplaceFriendIpReferences(string oldIp, string newIp, string friendName)
+        {
+            if (string.IsNullOrWhiteSpace(oldIp)
+                || string.IsNullOrWhiteSpace(newIp)
+                || NetworkHelper.AreSameIPv4(oldIp, newIp))
+            {
+                RefreshSingleChatNamesFromFriends();
+                return;
+            }
+
+            string normalizedNewIp = NormalizeIpOrOriginal(newIp);
+            bool changed = false;
+
+            foreach (var item in _chatList)
+            {
+                if (item.Group == null)
+                {
+                    if (!NetworkHelper.AreSameIPv4(item.Ip, oldIp))
+                    {
+                        continue;
+                    }
+
+                    item.Ip = normalizedNewIp;
+                    item.Name = string.IsNullOrWhiteSpace(friendName)
+                        ? MainData.GetSingleChatDisplayName(normalizedNewIp)
+                        : friendName;
+                    changed = true;
+                    continue;
+                }
+
+                if (ReplaceGroupMemberIp(item.Group, oldIp, normalizedNewIp))
+                {
+                    item.RefreshFriendDependentDisplay();
+                    changed = true;
+                }
+            }
+
+            RefreshSingleChatNamesFromFriends();
+
+            if (changed)
+            {
+                SaveChatList();
+            }
+        }
+
+        private static bool ReplaceGroupMemberIp(GroupEntity group, string oldIp, string newIp)
+        {
+            if (group?.Ips == null)
+            {
+                return false;
+            }
+
+            bool changed = false;
+            var ips = new List<string>();
+
+            foreach (string ip in group.Ips)
+            {
+                string nextIp = NetworkHelper.AreSameIPv4(ip, oldIp)
+                    ? newIp
+                    : NormalizeIpOrOriginal(ip);
+
+                if (!string.Equals(ip, nextIp, StringComparison.Ordinal))
+                {
+                    changed = true;
+                }
+
+                if (ips.Any(existing => NetworkHelper.AreSameIPv4(existing, nextIp)))
+                {
+                    changed = true;
+                    continue;
+                }
+
+                if (!ips.Contains(nextIp))
+                {
+                    ips.Add(nextIp);
+                }
+            }
+
+            if (!changed)
+            {
+                return false;
+            }
+
+            group.Ips = ips;
+            return true;
+        }
+
+        private static void RefreshGroupFriendDisplays()
+        {
+            foreach (var item in _chatList.Where(c => c.Group != null))
+            {
+                item.RefreshFriendDependentDisplay();
+            }
+        }
+
+        private static string NormalizeIpOrOriginal(string ip)
+        {
+            string normalizedIp;
+            return NetworkHelper.TryNormalizeIPv4(ip, out normalizedIp)
+                ? normalizedIp
+                : ip;
         }
 
         #endregion
@@ -324,6 +439,14 @@ namespace WalkieDohi.ChattingRooms.Data
         public string DisplayName => Group == null ? $"{Name} ({Ip})" : Name;
 
         public string UniqueKey => Group?.Key ?? Ip;
+
+        public void RefreshFriendDependentDisplay()
+        {
+            OnPropertyChanged(nameof(RoomName));
+            OnPropertyChanged(nameof(RoomSummary));
+            OnPropertyChanged(nameof(DisplayName));
+            Group?.RefreshFriendDisplay();
+        }
     }
 
 }
